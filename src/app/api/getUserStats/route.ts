@@ -10,10 +10,10 @@ export async function GET(req: NextRequest) {
     if (!token) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
- 
+
     const account = await prisma.account.findFirst({
       where: {
-        userId: token.sub, 
+        userId: token.sub,
         provider: "github",
       },
       select: {
@@ -31,27 +31,39 @@ export async function GET(req: NextRequest) {
     const octokit = new Octokit({
       auth: account.access_token,
     });
- 
+
     const { data: userData } = await octokit.rest.users.getAuthenticated();
  
-    const [
-      repos,
-      gists,
-      followers,
-      following,
-      receivedEvents,
-      starredRepos,
-    ] = await Promise.all([
-      octokit.rest.repos.listForAuthenticatedUser(),
-      octokit.rest.gists.list(),
-      octokit.rest.users.listFollowersForAuthenticatedUser(),
-      octokit.rest.users.listFollowedByAuthenticatedUser(),
-      octokit.rest.activity.listReceivedEventsForUser({
-        username: userData.login,
-        per_page: 30,
-      }),
-      octokit.rest.activity.listReposStarredByAuthenticatedUser(),
-    ]);
+    const contributionsQuery = `query {
+      user(login: "${userData.login}") {
+        name
+        contributionsCollection {
+          contributionCalendar {
+            colors
+            totalContributions
+            weeks {
+              contributionDays {
+                color
+                contributionCount
+                date
+                weekday
+              }
+              firstDay
+            }
+          }
+        }
+      }
+    }`;
+
+    const [repos, gists, followers, following, starredRepos, contributions] =
+      await Promise.all([
+        octokit.rest.repos.listForAuthenticatedUser(),
+        octokit.rest.gists.list(),
+        octokit.rest.users.listFollowersForAuthenticatedUser(),
+        octokit.rest.users.listFollowedByAuthenticatedUser(),
+        octokit.rest.activity.listReposStarredByAuthenticatedUser(),
+        octokit.graphql<{ user: { contributionsCollection: { contributionCalendar: { totalContributions: number } } } }>(contributionsQuery),
+      ]);
 
     const repoLanguages = await Promise.all(
       repos.data.slice(0, 5).map((repo) =>
@@ -68,7 +80,9 @@ export async function GET(req: NextRequest) {
         name: userData.name,
         bio: userData.bio,
         avatar_url: userData.avatar_url,
-        location: userData.location,
+        city:"",
+        state:"",
+        country: "",
         company: userData.company,
         blog: userData.blog,
         twitter_username: userData.twitter_username,
@@ -77,6 +91,9 @@ export async function GET(req: NextRequest) {
         followers: userData.followers,
         following: userData.following,
         created_at: userData.created_at,
+        totalContributions:
+          contributions.user.contributionsCollection.contributionCalendar
+            .totalContributions ,
       },
       socialStats: {
         followersCount: followers.data.length,
@@ -101,7 +118,6 @@ export async function GET(req: NextRequest) {
         starredReposCount: starredRepos.data.length,
       },
       activity: {
-        recentEvents: receivedEvents.data.slice(0, 10),
         topRepositories: repos.data
           .sort((a, b) => b.stargazers_count - a.stargazers_count)
           .slice(0, 5)

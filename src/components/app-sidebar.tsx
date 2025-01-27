@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings, UserCog2Icon } from "lucide-react"
+import { Calendar, GithubIcon, Home, Inbox, Search, SearchCode, Settings, UserCog2Icon, UserRoundSearchIcon } from "lucide-react"
 
 import {
   Sidebar,
@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { ModeToggle } from "./ui/mode-toggle"
 
 // Menu items.
 const items = [
@@ -23,6 +24,21 @@ const items = [
     url: "/dashboard/profile",
     icon: UserCog2Icon
   },
+  {
+    title: "GitDate Profile",
+    url: "/dashboard/gitdate-profile",
+    icon: GithubIcon
+  },
+  {
+    title: "Match Preference",
+    url: "/dashboard/match-preference",
+    icon: UserCog2Icon
+  },
+  {
+  title:"Explore",
+  url:"/dashboard/explore",
+  icon:UserRoundSearchIcon
+  }
   // {
   //   title: "Calendar",
   //   url: "#",
@@ -45,7 +61,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xl leading-relaxed font-black bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent hover:opacity-80 transition-opacity duration-300">Git Dates</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-xl leading-relaxed font-black bg-gradient-to-r from-gitdate to-pink-500 bg-clip-text text-transparent hover:opacity-80 transition-opacity duration-300">Git Dates</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -58,6 +74,7 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <ModeToggle />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

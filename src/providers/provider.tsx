@@ -2,6 +2,8 @@
 import { FC, ReactNode } from 'react';
 import AuthProvider from './auth-provider';
 import { ThemeProvider } from './theme-provider';
+import { Toaster } from "@/components/ui/toaster"
+
 
 const Provider: FC<{ children: ReactNode }> = ({ children }) => {
   return (
@@ -13,6 +15,7 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
         disableTransitionOnChange
       >
         {children}
+        <Toaster />
       </ThemeProvider>
     </AuthProvider>
   );

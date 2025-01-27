@@ -1,5 +1,4 @@
 "use client";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,96 +18,194 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState, useEffect } from "react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { UserData } from "../page";
+import { useForm } from "react-hook-form";
+import { getUserProfile, updateUserProfile } from "@/actions/user.profile.action";
+import { Camera } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+
+interface ProfileFormData {
+  name?: string;
+  location?: string;
+  gender?: string;
+  image?: FileList;
+}
 
 const ProfilePage = () => {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<ProfileFormData>();
 
-  const [name, setName] = useState("John Doe");
-  const [location, setLocation] = useState("New York, USA");
-  const [gender, setGender] = useState("male");
+  const [userProfile, setUserProfile] = useState<any | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
- 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const profile = await getUserProfile();
+        setUserProfile(profile);
+        setImagePreview(profile?.image || null);
+
+        // Set form values when profile data is received
+        setValue("name", profile?.name || "");
+        setValue("location", profile?.location || "");
+        setValue("gender", profile?.gender || "");
+        setValue("image", profile?.image || "");
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [setValue]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const onSubmit = async (data: ProfileFormData) => {
+    try {
+      console.log("Form data:", data);
+      
+      // Validate required fields
+      if (!data.name?.trim()) {
+        throw new Error("Name is required");
+      }
+
+      // Update profile
+      const updatedProfile = await updateUserProfile(data);
+      
+      if (!updatedProfile) {
+        throw new Error("Failed to update profile");
+      }
+
+      // Update local state with server response
+      setUserProfile(updatedProfile);
+
+      toast({
+        title: "Profile updated successfully",
+      });
+
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Error updating profile",
+        description: error instanceof Error ? error.message : "Please try again",
+     
+      });
+    }
+  };
+
+  if (!userProfile) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center p-4">
       <Card className="w-full max-w-4xl overflow-hidden">
         <div className="md:flex">
           <div className="md:w-1/3 bg-primary/5 p-6 flex flex-col items-center justify-center">
-            <Avatar className="w-32 h-32 mb-4">
-              <AvatarImage
-                src="/placeholder.svg?height=128&width=128"
-                alt={name}
+            <div className="relative">
+              <Avatar className="w-32 h-32 mb-4">
+                <AvatarImage
+                  src={imagePreview || "/placeholder.svg?height=128&width=128"}
+                  alt={userProfile.name}
+                />
+                <AvatarFallback>
+                  {userProfile.name
+                    ?.split(" ")
+                    .map((n: string) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
+              <label
+                htmlFor="image-upload"
+                className="absolute bottom-4 right-0 cursor-pointer"
+              >
+                <div className="rounded-full bg-neutral-700 p-2 text-white hover:bg-neutral-500/90">
+                 <Camera className="w-6 h-6" />
+                </div>
+              </label>
+              <input
+                type="file"
+                id="image-upload"
+                accept="image/*"
+                className="hidden"
+                {...register("image", {
+                  onChange: handleImageChange
+                })}
               />
-              <AvatarFallback>
-                {name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
-              </AvatarFallback>
-            </Avatar>
-            <CardTitle className="text-2xl font-bold mb-2">{name}</CardTitle>
-            <p className="text-muted-foreground text-center">{location}</p>
+            </div>
+          
+            <CardTitle className="text-2xl font-bold mb-2">
+              {userProfile.name}
+            </CardTitle>
             <Button onClick={() => signOut()}>Sign Out</Button>
           </div>
           <div className="md:w-2/3 p-6">
-            <CardHeader className="px-0 pt-0">
-              <CardTitle className="text-3xl font-bold">Edit Profile</CardTitle>
-            </CardHeader>
-            <CardContent className="px-0 space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <CardHeader className="px-0 pt-0">
+                <CardTitle className="text-3xl font-bold">
+                  Edit Profile
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-0 space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
-                  <Input
-                    id="username"
-                    value="johndoe123"
-                    readOnly
-                    className="bg-muted"
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input id="username" value={userProfile.username || ''} disabled />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" value={userProfile.email || ''} disabled />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    value="john.doe@example.com"
-                    readOnly
-                    className="bg-muted"
-                  />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input id="name" {...register("name")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="location">Location</Label>
+                    <Input id="location" {...register("location")} />
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
-                  <Input
-                    id="location"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                  />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="gender">Gender</Label>
+                    <Select
+                      onValueChange={(value) => setValue("gender", value)}
+                      value={userProfile.gender || ""}
+                    >
+                      <SelectTrigger id="gender">
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="gender">Gender</Label>
-                  <Select value={gender} onValueChange={setGender}>
-                    <SelectTrigger id="gender">
-                      <SelectValue placeholder="Select gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="px-0 pb-0">
-              <Button className="w-full">Save Changes</Button>
-            </CardFooter>
+              </CardContent>
+              <CardFooter className="px-0 pb-0">
+                <Button  type="submit" className="w-full">
+                  Save Changes
+                </Button>
+              </CardFooter>
+            </form>
           </div>
         </div>
       </Card>

@@ -16,22 +16,28 @@ datasource db {
 model User {
   id    String     @id @default(uuid())
   email String  @unique
+  username String? @unique
   name  String?
   password String?
   emailVerified DateTime? @map("email_verified")
   image String?
   avatar String?
   gender String?
-  location String?
+  city String?
+  state String?
+  country String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   dob DateTime?
   accounts      Account[]
   sessions      Session[]
+  gitDateProfile GitDateProfile?
+  preferences   MatchPreference?
+  sentMatches     Match[]         @relation("Sender")
+  receivedMatches Match[]         @relation("Receiver")
 
   @@map("users")
 }
-
 
 model Account {
   id                String   @id @default(cuid())
@@ -75,4 +81,65 @@ model VerificationRequest {
   updatedAt  DateTime @updatedAt
 
   @@unique([identifier, token])
+}
+
+model GitDateProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  githubUsername  String   @unique
+  name            String?
+  image           String?
+  repositories    Int      @default(0)
+  followers       Int      @default(0)
+  following       Int      @default(0)
+  mainLanguages   String[] 
+  contributions   Int      @default(0)
+  bio            String?
+  city           String?
+  state          String?
+  country        String?
+  blog           String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("github_profiles")
+}
+
+model MatchPreference {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ageMin          Int?
+  ageMax          Int?
+  languages       String[]  
+  city            String?
+  state           String?
+  country         String?
+  gender          String?
+  minContributions Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("match_preferences")
+}
+
+model Match {
+  id          String   @id @default(uuid())
+  senderId    String
+  receiverId  String
+  status      MatchStatus @default(PENDING)
+  sender      User     @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User     @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([senderId, receiverId])
+  @@map("matches")
+}
+
+enum MatchStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }

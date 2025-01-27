@@ -10,6 +10,7 @@ export default {
   theme: {
   	extend: {
   		colors: {
+			gitdate: '#FF0072',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
