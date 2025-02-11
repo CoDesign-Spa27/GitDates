@@ -11,6 +11,9 @@ export default function Explore() {
   const [accounts, setAccounts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"matches" | "developers">(
+    "matches"
+  );
 
   useEffect(() => {
     async function loadData() {
@@ -42,43 +45,80 @@ export default function Explore() {
   }, [session?.user?.email]);
 
   if (isLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading...
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="flex items-center justify-center min-h-screen text-red-500">Error: {error}</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen text-red-500">
+        Error: {error}
+      </div>
+    );
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-12">
-        <h2 className="text-3xl font-bold mb-6">Recommended Matches</h2>
-        {matches.length === 0 ? (
-          <div className="text-gray-500">No matches found</div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {matches.map((match: PotentialMatch) => (
-              <div key={match.id} className="dark:bg-neutral-800 bg-white shadow-lg rounded-xl p-6 hover:shadow-xl transition-shadow">
-                <h3 className="text-xl font-bold mb-2">{match.profile.name}</h3>
-                <p className="text-blue-600 font-semibold">Match Score: {match.score}%</p>
-              </div>
-            ))}
-          </div>
-        )}
+      <div className="mb-6">
+        <button
+          className={`px-4 py-2 ${
+            activeTab === "matches" ? "bg-blue-500 text-white" : "bg-gray-200"
+          }`}
+          onClick={() => setActiveTab("matches")}
+        >
+          Matches
+        </button>
+        <button
+          className={`px-4 py-2 ml-2 ${
+            activeTab === "developers"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200"
+          }`}
+          onClick={() => setActiveTab("developers")}
+        >
+          All Developers
+        </button>
       </div>
 
-      <div>
-        <h2 className="text-3xl font-bold mb-6">All Developers</h2>
-        {accounts.length === 0 ? (
-          <div className="text-gray-500">No developers found</div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 place-items-center">
-            {accounts.map((account) => (
-              <ExploreCard key={account.id} account={account.gitDateProfile} />
-            ))}
-          </div>
-        )}
-      </div>
+      {activeTab === "matches" ? (
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold mb-6">Recommended Matches</h2>
+          {matches.filter((match) => match.score > 1).length === 0 ? (
+            <div className="text-gray-500">No matches found</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {matches
+                .filter((match) => match.score > 1)
+                .map((match: PotentialMatch) => (
+                  <ExploreCard
+                    key={match.id}
+                    account={match.profile}
+                    matchScore={match.score}
+                  />
+                ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div>
+          <h2 className="text-3xl font-bold mb-6">All Developers</h2>
+          {accounts.length === 0 ? (
+            <div className="text-gray-500">No developers found</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 place-items-center">
+              {accounts.map((account) => (
+                <ExploreCard
+                  key={account.id}
+                  account={account.gitDateProfile}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
