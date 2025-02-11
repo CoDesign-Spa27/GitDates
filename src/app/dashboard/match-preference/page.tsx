@@ -366,7 +366,7 @@ const MatchPreferencePage = () => {
                   />
                 </div>
                 <div>
-                  <Button type="submit" variant="outline" className="w-full">
+                  <Button type="submit"  className="w-full">
                     Save Preferences
                   </Button>
                 </div>

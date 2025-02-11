@@ -3,6 +3,7 @@ import { findMatches, PotentialMatch } from "@/actions/match.action";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { getAllAccounts } from "@/actions/match.action";
+import ExploreCard from "@/components/explore-card";
 
 export default function Explore() {
   const { data: session } = useSession();
@@ -26,6 +27,7 @@ export default function Explore() {
         if (!matchesResponse) {
           throw new Error("Failed to fetch matches");
         }
+        console.log(accountsResponse);
         setMatches(matchesResponse);
         setAccounts(accountsResponse || []);
       } catch (error) {
@@ -40,61 +42,41 @@ export default function Explore() {
   }, [session?.user?.email]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className="flex items-center justify-center min-h-screen text-red-500">Error: {error}</div>;
   }
 
   return (
-    <div className="p-4">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4">Recommended Matches</h2>
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-12">
+        <h2 className="text-3xl font-bold mb-6">Recommended Matches</h2>
         {matches.length === 0 ? (
-          <div>No matches found</div>
+          <div className="text-gray-500">No matches found</div>
         ) : (
-          matches.map((match: PotentialMatch) => (
-            <div key={match.id} className="border p-4 mb-4 rounded-lg">
-              <h3 className="text-xl font-bold">{match.profile.name}</h3>
-              <p>Match Score: {match.score}%</p>
-            </div>
-          ))
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {matches.map((match: PotentialMatch) => (
+              <div key={match.id} className="dark:bg-neutral-800 bg-white shadow-lg rounded-xl p-6 hover:shadow-xl transition-shadow">
+                <h3 className="text-xl font-bold mb-2">{match.profile.name}</h3>
+                <p className="text-blue-600 font-semibold">Match Score: {match.score}%</p>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold mb-4">All Developers</h2>
+        <h2 className="text-3xl font-bold mb-6">All Developers</h2>
         {accounts.length === 0 ? (
-          <div>No developers found</div>
+          <div className="text-gray-500">No developers found</div>
         ) : (
-          accounts.map((account) => (
-            <div key={account.id} className="border p-4 mb-4 rounded-lg">
-              <h3 className="text-xl font-bold">
-                {account.gitDateProfile?.name ||
-                  account.name ||
-                  "Anonymous Developer"}
-              </h3>
-              {account.gitDateProfile && (
-                <>
-                  <p className="text-gray-600">{account.gitDateProfile.bio}</p>
-                  <p>
-                    Languages: {account.gitDateProfile.mainLanguages.join(", ")}
-                  </p>
-                  <p>
-                    Location:{" "}
-                    {[
-                      account.gitDateProfile.city,
-                      account.gitDateProfile.state,
-                      account.gitDateProfile.country,
-                    ]
-                      .filter(Boolean)
-                      .join(", ")}
-                  </p>
-                </>
-              )}
-            </div>
-          ))
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 place-items-center">
+            {accounts.map((account) => (
+              <ExploreCard key={account.id} account={account.gitDateProfile} />
+            ))}
+          </div>
         )}
       </div>
     </div>
