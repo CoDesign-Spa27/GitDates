@@ -55,7 +55,6 @@ async function main() {
       dob: new Date('1992-08-20'),
       gitDateProfile: {
         create: {
-          
           githubUsername: 'janey-github',
           name: 'Jane Doe',
           repositories: 15,

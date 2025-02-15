@@ -1,6 +1,7 @@
 import React from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { Users, GitFork, Star, MapPin, Link as LinkIcon } from "lucide-react";
+import { Button } from "./ui/button";
 
 interface GitDateProfileType {
   githubUsername: string;
@@ -30,10 +31,11 @@ const ExploreCard = ({
   const rotateY = useTransform(x, [-100, 100], [-10, 10]);
 
   if (!account) return null;
-
+ 
+  
   return (
     <motion.div
-      className="w-[350px] h-[200px] relative group"
+      className="w-[350px] h-[280px] relative group"
       style={{ perspective: 1000, rotateX, rotateY }}
       whileHover={{ scale: 1 }}
       initial={{ opacity: 0, y: 20 }}
@@ -43,15 +45,15 @@ const ExploreCard = ({
       <div className="absolute inset-0 rounded-2xl blur-[2px] transition-all" />
 
       <div className="relative bg-white/5 rounded-xl p-4 h-full">
-        {/* Match Score and Request Button */}
+    
         {matchScore !== undefined && (
-          <div className="flex justify-between items-center mb-2">
-            <p className="text-blue-600 font-semibold">
-              Match Score: {matchScore}%
+          <div className="flex justify-between items-center  ">
+                <div className="absolute -top-2 -right-2 w-12 h-12 rounded-full bg-gitdate flex items-center justify-center">
+            <p className="text-white font-bold text-sm">
+              {matchScore}%
             </p>
-            <button className="bg-blue-500 text-white px-2 py-1 rounded">
-              Send Match Request
-            </button>
+          </div>
+           
           </div>
         )}
 
@@ -118,6 +120,7 @@ const ExploreCard = ({
             ))}
           </div>
         </div>
+<div className="flex justify-between items-center py-2">
 
         {/* Blog Link */}
         {account.blog && (
@@ -127,11 +130,16 @@ const ExploreCard = ({
             rel="noopener noreferrer"
             className="mt-3 flex items-center gap-1 text-sm text-purple-400 transition-colors"
             whileHover={{ x: 2 }}
-          >
+            >
             <LinkIcon className="w-4 h-4" />
             <span className="truncate">Visit Blog</span>
           </motion.a>
         )}
+
+        <Button>
+       Send Match Request
+        </Button>
+       </div> 
 
         {/* Hover Glow Effect */}
         <div className="absolute inset-0 rounded-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
