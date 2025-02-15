@@ -35,7 +35,7 @@ const ExploreCard = ({
   
   return (
     <motion.div
-      className="w-[350px] h-[280px] relative group"
+      className="w-[350px] h-[280px] relative group bg-neutral-100 dark:bg-transparent  rounded-xl"
       style={{ perspective: 1000, rotateX, rotateY }}
       whileHover={{ scale: 1 }}
       initial={{ opacity: 0, y: 20 }}
