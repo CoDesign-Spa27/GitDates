@@ -4,7 +4,12 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { getAllAccounts } from "@/actions/match.action";
 import ExploreCard from "@/components/explore-card";
-
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 export default function Explore() {
   const { data: session } = useSession();
   const [matches, setMatches] = useState<PotentialMatch[]>([]);
@@ -63,24 +68,25 @@ export default function Explore() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
-        <button
-          className={`px-4 py-2 ${
-            activeTab === "matches" ? "bg-blue-500 text-white" : "bg-gray-200"
-          }`}
-          onClick={() => setActiveTab("matches")}
-        >
-          Matches
-        </button>
-        <button
-          className={`px-4 py-2 ml-2 ${
-            activeTab === "developers"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200"
-          }`}
-          onClick={() => setActiveTab("developers")}
-        >
-          All Developers
-        </button>
+        <Tabs defaultValue="matches">
+          <TabsList className="animate-fade-in">
+            <TabsTrigger 
+              onClick={() => setActiveTab("matches")} 
+              value="matches"
+      
+            >
+              Matches
+            </TabsTrigger>
+            <TabsTrigger 
+              onClick={() => setActiveTab("developers")} 
+              value="developers"
+          
+            >
+              All Developers
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+       
       </div>
 
       {activeTab === "matches" ? (
