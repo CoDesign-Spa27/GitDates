@@ -10,6 +10,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Performance optimizations:
 // 1. Using useCallback for loadData to prevent unnecessary re-renders
@@ -59,13 +60,19 @@ export default function Explore() {
     [matches]
   );
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        Loading...
-      </div>
-    );
-  }
+  const SkeletonCards = useCallback(() => (
+    <>
+      {[...Array(6)].map((_, index) => (
+        <div key={index} className="w-full ">
+          <Skeleton className="h-[280px] w-full rounded-lg" />
+          <div className="mt-3 space-y-2">
+            <Skeleton className="h-8 w-3/4" />
+        
+          </div>
+        </div>
+      ))}
+    </>
+  ), []);
 
   if (error) {
     return (
@@ -96,37 +103,43 @@ export default function Explore() {
         </Tabs>
       </div>
 
-      {activeTab === "matches" ? (
-        <div className="mb-12">
-          {filteredMatches.length === 0 ? (
-            <div className="text-gray-500 text-center">No matches found</div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
-              {filteredMatches.map((match: PotentialMatch) => (
-                <ExploreCard
-                  key={match.id}
-                  account={match.profile}
-                  matchScore={match.score}
-                />
-              ))}
-            </div>
-          )}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <SkeletonCards />
         </div>
       ) : (
-        <div>
-          {accounts.length === 0 ? (
-            <div className="text-gray-500">No developers found</div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 place-items-center">
-              {accounts.map((account) => (
-                <ExploreCard
-                  key={account.id}
-                  account={account.gitDateProfile}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        activeTab === "matches" ? (
+          <div className="mb-12">
+            {filteredMatches.length === 0 ? (
+              <div className="text-gray-500 text-center">No matches found</div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
+                {filteredMatches.map((match: PotentialMatch) => (
+                  <ExploreCard
+                    key={match.id}
+                    account={match.profile}
+                    matchScore={match.score}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div>
+            {accounts.length === 0 ? (
+              <div className="text-gray-500">No developers found</div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 place-items-center">
+                {accounts.map((account) => (
+                  <ExploreCard
+                    key={account.id}
+                    account={account.gitDateProfile}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )
       )}
     </div>
   );

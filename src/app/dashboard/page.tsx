@@ -1,12 +1,9 @@
 'use client'
+import { getMatchPreference } from '@/actions/match.action'
+import { getGithubProfile } from '@/actions/user.profile.action'
+import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { BarChart, GitFork, Star, Users } from 'lucide-react'
+ 
 
 export interface UserData {
   basicInfo: {
@@ -47,30 +44,114 @@ export interface UserData {
 }
 
 export default function Dashboard() {
-  const [userData, setUserData] = useState<UserData | null>(null)
+  const [profile, setProfile] = useState<any>(null);
+  const [matchPreference, setMatchPreference] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isProfileCreated, setIsProfileCreated] = useState(false);
+  const [isMatchPreferenceCreated, setIsMatchPreferenceCreated] = useState(false);
+  const {data:session} = useSession();
+  const user = session?.user;
+ 
+
+ 
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchProfile = async () => {
+      if(!session?.user) return;
       try {
-        const response = await fetch('/api/getUserStats')
-        const data = await response.json()
-        setUserData(data)
-      } catch (error) {
-        console.error('Error fetching user data:', error)
+        const data = await getGithubProfile();
+        const matchPreference = await getMatchPreference(session?.user?.email || '');
+        setProfile(data);
+        setMatchPreference(matchPreference);
+        setIsProfileCreated(!!data);
+        setIsMatchPreferenceCreated(!!matchPreference);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+        setIsProfileCreated(false);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
+  
+      fetchProfile();
+   
+  }, [session?.user]);
 
-    fetchUserData()
-  }, [])
+ 
 
-  if (!userData) {
-    return <div>Loading...</div>
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-4 flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto p-4 space-y-4">
-       
+    <div className="container mx-auto p-4 space-y-8">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Get Started</h1>
+        
+        <div className="space-y-4">
+          <div className={`p-4 rounded-lg border ${isProfileCreated ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
+            <div className="flex items-center">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isProfileCreated ? 'bg-green-500' : 'bg-yellow-500'}`}>
+                <span className="text-white">{isProfileCreated ? '✓' : '1'}</span>
+              </div>
+              <div className="ml-4">
+                <h2 className="text-xl font-semibold">Create GitHub Profile</h2>
+                <p className="text-gray-600">
+                  {isProfileCreated 
+                    ? 'Your GitHub profile has been created successfully!' 
+                    : 'Connect your GitHub account to create your dating profile'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className={`p-4 rounded-lg border ${isMatchPreferenceCreated ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
+            <div className="flex items-center">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isMatchPreferenceCreated ? 'bg-green-500' : 'bg-yellow-500'}`}>
+                <span className="text-white">{isMatchPreferenceCreated ? '✓' : '2'}</span>
+              </div>
+              <div className="ml-4">
+                <h2 className="text-xl font-semibold">Set Match Preferences</h2>
+                <p className="text-gray-600">
+                  {isMatchPreferenceCreated
+                    ? 'Your match preferences have been set!' 
+                    : 'Define your preferences to find your perfect match'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {isProfileCreated && isMatchPreferenceCreated && (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <span className="text-white">✓</span>
+                </div>
+                <div className="ml-4">
+                  <h2 className="text-xl font-semibold">Ready to Match!</h2>
+                  <p className="text-gray-600">You're all set to start finding your perfect match!</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
-  )
+  );
 }
 
