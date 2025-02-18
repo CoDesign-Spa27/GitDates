@@ -3,7 +3,7 @@ import { getMatchPreference } from '@/actions/match.action'
 import { getGithubProfile } from '@/actions/user.profile.action'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
- 
+import {motion}  from 'motion/react'
 
 export interface UserData {
   basicInfo: {
@@ -98,59 +98,80 @@ export default function Dashboard() {
     );
   }
 
-  return (
-    <div className="container mx-auto p-4 space-y-8">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Get Started</h1>
-        
-        <div className="space-y-4">
-          <div className={`p-4 rounded-lg border ${isProfileCreated ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
-            <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isProfileCreated ? 'bg-green-500' : 'bg-yellow-500'}`}>
-                <span className="text-white">{isProfileCreated ? '✓' : '1'}</span>
-              </div>
-              <div className="ml-4">
-                <h2 className="text-xl font-semibold">Create GitHub Profile</h2>
-                <p className="text-gray-600">
-                  {isProfileCreated 
-                    ? 'Your GitHub profile has been created successfully!' 
-                    : 'Connect your GitHub account to create your dating profile'}
-                </p>
-              </div>
-            </div>
-          </div>
 
-          <div className={`p-4 rounded-lg border ${isMatchPreferenceCreated ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
-            <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isMatchPreferenceCreated ? 'bg-green-500' : 'bg-yellow-500'}`}>
-                <span className="text-white">{isMatchPreferenceCreated ? '✓' : '2'}</span>
-              </div>
-              <div className="ml-4">
-                <h2 className="text-xl font-semibold">Set Match Preferences</h2>
-                <p className="text-gray-600">
-                  {isMatchPreferenceCreated
-                    ? 'Your match preferences have been set!' 
-                    : 'Define your preferences to find your perfect match'}
-                </p>
-              </div>
+  const GetStartedSection = ({isProfileCreated,isMatchPreferenceCreated}:{isProfileCreated:boolean,isMatchPreferenceCreated:boolean}) => {
+    return (
+      <div className="max-w-2xl mx-auto p-6">
+        <motion.h1
+          className="text-3xl font-bold text-center mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          Complete these steps to unlock your Dashboard
+        </motion.h1>
+  
+        <div className="space-y-6">
+ 
+          <motion.div
+            className={`p-6 rounded-lg border shadow-lg flex items-center gap-4 transition-all ${isProfileCreated ? "bg-neutral-900 border-gitdate" : "bg-yellow-100 border-yellow-300"}`}
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <motion.div
+              className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${isProfileCreated ? "bg-gitdate" : "bg-yellow-500"}`}
+              whileHover={{ scale: 1.1 }}
+            >
+              {isProfileCreated ? "✓" : "1"}
+            </motion.div>
+            <div>
+              <h2 className="text-xl font-semibold">Create GitHub Profile</h2>
+              <p className="text-gray-600">
+                {isProfileCreated
+                  ? "Your GitHub profile has been created successfully!"
+                  : "Connect your GitHub account to create your dating profile."}
+              </p>
             </div>
-          </div>
-
-          {isProfileCreated && isMatchPreferenceCreated && (
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <span className="text-white">✓</span>
-                </div>
-                <div className="ml-4">
-                  <h2 className="text-xl font-semibold">Ready to Match!</h2>
-                  <p className="text-gray-600">You're all set to start finding your perfect match!</p>
-                </div>
-              </div>
+          </motion.div>
+ 
+          <motion.div
+            className={`p-6 rounded-lg border shadow-lg flex items-center gap-4 transition-all ${isMatchPreferenceCreated ? "bg-neutral-900 border-gitdate" : "bg-yellow-100 border-yellow-300"}`}
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7 }}
+          >
+            <motion.div
+              className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${isMatchPreferenceCreated ? "bg-gitdate" : "bg-yellow-500"}`}
+              whileHover={{ scale: 1.1 }}
+            >
+              {isMatchPreferenceCreated ? "✓" : "2"}
+            </motion.div>
+            <div>
+              <h2 className="text-xl font-semibold">Set Match Preferences</h2>
+              <p className="text-gray-600">
+                {isMatchPreferenceCreated
+                  ? "Your match preferences have been set!"
+                  : "Define your preferences to find your perfect match."}
+              </p>
             </div>
-          )}
+          </motion.div>
+   
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto p-4 space-y-8">
+      {!isProfileCreated && isMatchPreferenceCreated ? (
+        <>
+        Dashboard
+        </>
+      
+      ) : (
+          <GetStartedSection isProfileCreated={isProfileCreated} isMatchPreferenceCreated={isMatchPreferenceCreated} />
+      )}
     </div>
   );
 }
