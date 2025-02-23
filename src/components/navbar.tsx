@@ -7,8 +7,8 @@ import { Button } from "./ui/button";
 import { navigation } from "@/constants";
 import { MenuIcon } from "lucide-react";
 import { HamburgerMenu } from "./designs/navbar";
-import { gitDark,gitLight, heart } from  '../../public/assets/index'
 import { ModeToggle } from "./ui/mode-toggle";
+import { Logo } from "./designs/logo";
 
 type Props = {};
 
@@ -58,11 +58,9 @@ const Navbar = (props: Props) => {
     >
       <div className={cn(`flex items-center px-5 max-lg:py-4 lg:px-7.5 xl:px-10`)}>
         
-          <Image src={heart} alt="heart" width={22} height={22} className="absolute left-32 top-6" />
-        <Link href="#hero" className={cn(`block w-56 xl:mr-5`)}>
-          <Image src={gitDark} alt="gitDark" width={440} height={70} className="hidden dark:block" />
-          <Image src={gitLight} alt="gitLight" width={440} height={70} className="block dark:hidden" />
-        </Link>
+        <div>
+            <Logo />
+        </div>
 
         <nav
           className={cn(
