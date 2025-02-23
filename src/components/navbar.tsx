@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
@@ -8,7 +7,9 @@ import { Button } from "./ui/button";
 import { navigation } from "@/constants";
 import { MenuIcon } from "lucide-react";
 import { HamburgerMenu } from "./designs/navbar";
-import { gitDark } from  '../../public/assets/index'
+import { gitDark,gitLight, heart } from  '../../public/assets/index'
+import { ModeToggle } from "./ui/mode-toggle";
+
 type Props = {};
 
 const Navbar = (props: Props) => {
@@ -56,8 +57,11 @@ const Navbar = (props: Props) => {
       )}
     >
       <div className={cn(`flex items-center px-5 max-lg:py-4 lg:px-7.5 xl:px-10`)}>
-        <Link href="#hero" className={cn(`block w-48 xl:mr-8`)}>
-          <Image src={gitDark} alt="gitDark" width={190} height={40} />
+        
+          <Image src={heart} alt="heart" width={22} height={22} className="absolute left-32 top-6" />
+        <Link href="#hero" className={cn(`block w-56 xl:mr-5`)}>
+          <Image src={gitDark} alt="gitDark" width={440} height={70} className="hidden dark:block" />
+          <Image src={gitLight} alt="gitLight" width={440} height={70} className="block dark:hidden" />
         </Link>
 
         <nav
@@ -77,11 +81,11 @@ const Navbar = (props: Props) => {
                 href={item.url}
                 onClick={handleClick}
                 className={cn(
-                  `block relative font-code text-2xl uppercase text-n-1 transition-colors hover:text-color-1`,
-                  "px-6 py-6 md:py-8 lg:-mr-0.25 lg:text-xs lg:font-semibold",
+                  `block relative font-mono text-2xl uppercase transition-colors hover:text-pink-500`,
+                  "px-6 lg:text-sm lg:font-semibold",
                   item.onlyMobile && "lg:hidden",
-                  item.url === hash ? "z-2 lg:text-n-1" : "lg:text-n-1/50",
-                  "lg:leading-5 lg:hover:text-n-1 xl:px-12"
+                  item.url === hash ? "z-10 lg:text-pink-500" : "lg:text-black/50 dark:lg:text-white/50",
+                  "lg:leading-5 dark:text-white text-black lg:hover:text-black dark:lg:hover:text-white xl:px-12"
                 )}
               >
                 {item.title}
@@ -91,16 +95,15 @@ const Navbar = (props: Props) => {
     <HamburgerMenu />
         </nav>
 
-        <Link
-          href="#signup"
+        <div
           className="button mr-8 hidden text-n-1/50 transition-colors hover:text-n-1 lg:block"
         >
-          New account
-        </Link>
+       <ModeToggle />
+        </div>
         <Button className="hidden lg:flex" onClick={() => {
           window.location.href = "#login";
         }}>
-          Sign in
+        Let's Date
         </Button>
 
         <Button className="ml-auto lg:hidden" onClick={toggleNavigation}>

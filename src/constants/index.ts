@@ -1,8 +1,8 @@
 export const navigation = [
     {
       id: "0",
-      title: "Features",
-      url: "#features",
+      title: "About",
+      url: "#about",
     },
     {
       id: "1",
@@ -11,13 +11,13 @@ export const navigation = [
     },
     {
       id: "2",
-      title: "How to use",
-      url: "#how-to-use",
+      title: "How it works",
+      url: "#how-it-works",
     },
     {
       id: "3",
-      title: "Roadmap",
-      url: "#roadmap",
+      title: "FAQ",
+      url: "#faq",
     },
     {
       id: "4",

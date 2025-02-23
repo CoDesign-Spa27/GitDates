@@ -1,3 +1,4 @@
+import heart from './heart.svg'
 import gitDark from './git-dark.svg'
 import gitLight from './git-light.svg'
 import brainwave from "./brainwave.svg";
@@ -148,4 +149,5 @@ export {
   twitter,
   gitDark,
   gitLight,
+  heart,
 };
