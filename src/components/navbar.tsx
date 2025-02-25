@@ -96,7 +96,7 @@ const Navbar = (props: Props) => {
         <div
           className="button mr-8 hidden text-n-1/50 transition-colors hover:text-n-1 lg:block"
         >
-       <ModeToggle />
+   
         </div>
         <Button className="hidden lg:flex" onClick={() => {
           window.location.href = "#login";
