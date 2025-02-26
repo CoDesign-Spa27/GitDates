@@ -1,3 +1,4 @@
+import undermark from '../assets/hero/undermark.svg'
 import heart from './heart.svg'
 import gitDark from './git-dark.svg'
 import gitLight from './git-light.svg'
@@ -150,4 +151,5 @@ export {
   gitDark,
   gitLight,
   heart,
+  undermark
 };
