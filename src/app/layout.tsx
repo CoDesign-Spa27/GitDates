@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import localFont from "next/font/local"
 import Provider from "@/providers/provider";
 
 const geistSans = Geist({
@@ -12,6 +13,13 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+
+const riffic = localFont({
+ src:"./fonts/RifficFree-Bold.ttf",
+ variable:'--font-riffic',
+})
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -26,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${riffic.variable} antialiased`}
       >
         <Provider>{children}</Provider>
       </body>

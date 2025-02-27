@@ -9,6 +9,9 @@ export default {
   ],
   theme: {
   	extend: {
+		fontFamily: {
+			'riffic': 'var(--font-riffic)'
+		},
   		colors: {
 			gitdate: '#FF0072',
   			background: 'hsl(var(--background))',

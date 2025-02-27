@@ -76,7 +76,7 @@ const Hero = () => {
         <motion.div
           className="absolute top-10 left-1/4 w-96 h-96 rounded-full bg-gradient-to-r from-pink-500/30 to-purple-500/30 blur-[120px]"
           animate={{ 
-            x: [0, 50, -30, 20, -50, 0],
+            x: [0, 80, -20, 70, -10, 0],
             y: [0, -40, 30, -20, 40, 0],
             scale: [1, 1.2, 0.9, 1.1, 0.8, 1]
           }}
@@ -237,12 +237,12 @@ const Hero = () => {
           </motion.div>
 
           <motion.h1
-            className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 text-white relative tracking-tight"
+            className="font-riffic text-5xl md:text-7xl lg:text-8xl font-bold mb-8 text-white relative tracking-tight"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            <span className="text-transparent bg-clip-text bg-gitdate">git</span>
+            <span className="text-transparent bg-clip-text bg-gitdate ">git</span>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-white">Connected</span>
             <div
               className="absolute w-full flex justify-center"

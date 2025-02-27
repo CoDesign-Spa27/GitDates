@@ -21,7 +21,7 @@ export const FeatureCard = ({ icon, title, description }:FeatureCardProps) => {
       >
         <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <div className="mb-5">{icon}</div>
-        <h3 className="text-xl font-bold text-white mb-3">{title}</h3>
+        <h3 className="text-2xl font-bold text-white mb-3">{title}</h3>
         <p className="text-gray-300">{description}</p>
       </motion.div>
     );
