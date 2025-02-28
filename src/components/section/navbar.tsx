@@ -3,12 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { navigation } from "@/constants";
 import { MenuIcon } from "lucide-react";
-import { HamburgerMenu } from "./designs/navbar";
-import { ModeToggle } from "./ui/mode-toggle";
-import { Logo } from "./designs/logo";
+import { HamburgerMenu } from "../designs/navbar";
+import { ModeToggle } from "../ui/mode-toggle";
+import { Logo } from "../designs/logo";
 
 type Props = {};
 

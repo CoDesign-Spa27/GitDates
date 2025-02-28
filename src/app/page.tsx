@@ -1,17 +1,18 @@
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/section/navbar";
 import { getServerSession } from "next-auth";
 import { cn } from "@/lib/utils";
-import Hero from "@/components/Hero";
+import Hero from "@/components/section/Hero";
+import { Features } from "@/components/section/features";
 
 export default async function Home() {
- const session = await getServerSession();
+  const session = await getServerSession();
 
   return (
-    <div >
-           <Navbar /> 
-           
+    <div>
+      <Navbar />
+
       <Hero />
-    
+      <Features />
     </div>
   );
 }
