@@ -8,11 +8,11 @@ export const Features = () => {
   return (
     <section>
         <motion.div
-        className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-gray-950/50 backdrop-blur-md"
-        style={{ y: y2 }}
+        className=" z-10 min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-gradient-to-bl from-gray-950 via-gray-900 to-gray-800"
+         
       >
         <motion.h2
-          className="text-4xl md:text-5xl font-bold mb-16 text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-blue-500"
+          className="text-4xl md:text-5xl font-riffic font-bold mb-16 text-center text-transparent bg-clip-text bg-gradient-to-r from-[#C0F4B8] to-[#FFD4E5]"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { cn } from "@/lib/utils";
 import Hero from "@/components/section/Hero";
 import { Features } from "@/components/section/features";
+import HowItWorks from "@/components/section/howitworks";
 
 export default async function Home() {
   const session = await getServerSession();
@@ -13,6 +14,7 @@ export default async function Home() {
 
       <Hero />
       <Features />
+      <HowItWorks />
     </div>
   );
 }
