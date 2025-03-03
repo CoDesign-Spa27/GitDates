@@ -1,114 +1,198 @@
 "use client";
-import Image from "next/image";
+
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { navigation } from "@/constants";
-import { MenuIcon } from "lucide-react";
-import { HamburgerMenu } from "../designs/navbar";
-import { ModeToggle } from "../ui/mode-toggle";
+import { MenuIcon, X } from "lucide-react";
 import { Logo } from "../designs/logo";
+import { motion, AnimatePresence } from "motion/react";
 
-type Props = {};
-
-const Navbar = (props: Props) => {
-  const [hash, setHash] = useState<string>("hero");
-  const [openNavigation, setOpenNavigation] = useState<boolean>(false);
+const Navbar = () => {
+  const [hash, setHash] = useState("#hero");
+  const [openNavigation, setOpenNavigation] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const dynamicNavbarHighlight = () => {
       const sections = document.querySelectorAll("section[id]");
+      
+      // Check if we've scrolled past the top
+      if (window.scrollY > 20) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
 
       sections.forEach((current) => {
-        if (current === null) return;
-
+        if (!current) return;
+        
         const sectionId = current.getAttribute("id");
-        // @ts-ignore
-        const sectionHeight = current.offsetHeight;
+        const sectionHeight = (current as HTMLElement).offsetHeight;
         const sectionTop = current.getBoundingClientRect().top - sectionHeight * 0.2;
-
-        if (sectionTop < 0 && sectionTop + sectionHeight > 0 && hash !== sectionId) {
+        
+        if (sectionTop < 0 && sectionTop + sectionHeight > 0 && hash !== `#${sectionId}`) {
           setHash(`#${sectionId as string}`);
         }
       });
     };
-
+    
     window.addEventListener("scroll", dynamicNavbarHighlight);
-
+    
     return () => window.removeEventListener("scroll", dynamicNavbarHighlight);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [hash]);
 
   const toggleNavigation = () => setOpenNavigation(!openNavigation);
+  
   const handleClick = () => {
-    if (!openNavigation) return;
-
-    setOpenNavigation(false);
+    if (openNavigation) {
+      setOpenNavigation(false);
+    }
   };
-
-
-
+  
   return (
-    <div
+    <motion.header 
       className={cn(
-        `fixed top-0 left-0 w-full z-50 border-b border-n-6 lg:bg-n-8/90 lg:backdrop-blur-sm`,
-        openNavigation ? "bg-n-8" : "bg-n-8/90 backdrop-blur-sm"
+        "fixed top-0 left-0 w-full z-50 transition-all duration-300",
+        scrolled ? "bg-background/90 backdrop-blur-lg shadow-lg border-b border-border/20" : "bg-transparent"
       )}
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
     >
-      <div className={cn(`flex items-center px-5 max-lg:py-4 lg:px-7.5 xl:px-10`)}>
-        
-        <div>
-            <Logo />
-        </div>
-
-        <nav
-          className={cn(
-            `fixed inset-x-0 bottom-0 top-20 hidden bg-n-8 lg:static lg:mx-auto lg:flex lg:bg-transparent`,
-            openNavigation ? "flex" : "hidden"
-          )}
-        >
-          <div
-            className={cn(
-              "relative z-2 flex flex-col items-center justify-center m-auto lg:flex-row"
-            )}
+      <div className="mx-auto px-2 lg:px-8 ">
+        <div className="flex items-center justify-between h-16 md:h-20">
+     
+          <motion.div 
+            className="flex items-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
           >
-            {navigation.map((item) => (
-              <Link
-                key={item.id}
-                href={item.url}
-                onClick={handleClick}
-                className={cn(
-                  `block relative font-mono text-2xl uppercase transition-colors hover:text-pink-500`,
-                  "px-6 lg:text-sm lg:font-semibold",
-                  item.onlyMobile && "lg:hidden",
-                  item.url === hash ? "z-10 lg:text-pink-500" : "lg:text-black/50 dark:lg:text-white/50",
-                  "lg:leading-5 dark:text-white text-black lg:hover:text-black dark:lg:hover:text-white xl:px-12"
-                )}
+            <Link href="/#hero" className="flex items-center group">
+              <div className="transition-transform duration-300 group-hover:scale-110">
+                <Logo />
+              </div>
+            </Link>
+          </motion.div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-1">
+            {navigation.map((item, index) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                {item.title}
-              </Link>
+                <Link
+                  href={item.url}
+                  className={cn(
+                    "relative px-4 py-2 text-sm font-medium rounded-md transition-all duration-300",
+                    hash === item.url
+                      ? "text-primary font-semibold"
+                      : "text-muted-foreground hover:text-primary hover:bg-primary/5"
+                  )}
+                  onClick={handleClick}
+                >
+                  {item.title}
+                  {hash === item.url && (
+                    <motion.div
+                      className="absolute -bottom-1 left-0 h-0.5 w-full bg-primary rounded-full"
+                      layoutId="navHighlight"
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                </Link>
+              </motion.div>
             ))}
-          </div>
-    <HamburgerMenu />
-        </nav>
-
-        <div
-          className="button mr-8 hidden text-n-1/50 transition-colors hover:text-n-1 lg:block"
-        >
+          </nav>
+ 
    
+          <div className="flex items-center space-x-1">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="hidden md:block"
+            >
+              <Button 
+          
+                onClick={() => {
+                  window.location.href = "#login";
+                }}
+              >
+                Let's Date
+              </Button>
+            </motion.div>
+ 
+            <div className="flex md:hidden">
+              <motion.button
+                onClick={toggleNavigation}
+                className="p-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors duration-300 z-[60]"
+                aria-label={openNavigation ? "Close menu" : "Open menu"}
+                whileTap={{ scale: 0.9 }}
+              >
+                {openNavigation ? <X size={20} /> : <MenuIcon size={20} />}
+              </motion.button>
+            </div>
+          </div>
         </div>
-        <Button className="hidden lg:flex" onClick={() => {
-          window.location.href = "#login";
-        }}>
-        Let's Date
-        </Button>
-
-        <Button className="ml-auto lg:hidden" onClick={toggleNavigation}>
-          <MenuIcon />
-        </Button>
       </div>
-    </div>
+  
+      <AnimatePresence>
+        {openNavigation && (
+          <motion.div
+            className="md:hidden h-screen w-screen fixed top-0 left-0 bg-background/90 z-50"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="mx-4 mt-2 px-4 py-6 shadow-xl rounded-xl border border-border/50">
+              <nav className="flex flex-col space-y-2">
+                {navigation.map((item, index) => (
+                  <motion.div
+                    key={item.title}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <Link
+                      href={item.url}
+                      className={cn(
+                        "block px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-300",
+                        hash === item.url
+                          ? "bg-primary/10 text-primary font-bold"
+                          : "text-muted-foreground  hover:text-gitdate font-bold"
+                      )}
+                      onClick={handleClick}
+                    >
+                      {item.title}
+                    </Link>
+                  </motion.div>
+                ))}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: navigation.length * 0.05 }}
+                >
+                  <Button 
+                
+                    onClick={() => {
+                      window.location.href = "#login";
+                      handleClick();
+                    }}
+                  >
+                    Let's Date
+                  </Button>
+                </motion.div>
+              </nav>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   );
 };
 
