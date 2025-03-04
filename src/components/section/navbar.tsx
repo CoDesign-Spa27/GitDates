@@ -10,15 +10,14 @@ import { Logo } from "../designs/logo";
 import { motion, AnimatePresence } from "motion/react";
 
 const Navbar = () => {
-  const [hash, setHash] = useState("#hero");
+  const [hash, setHash] = useState("#home");
   const [openNavigation, setOpenNavigation] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const dynamicNavbarHighlight = () => {
       const sections = document.querySelectorAll("section[id]");
-      
-      // Check if we've scrolled past the top
+       
       if (window.scrollY > 20) {
         setScrolled(true);
       } else {
@@ -77,7 +76,7 @@ const Navbar = () => {
             </Link>
           </motion.div>
 
-          {/* Desktop Navigation */}
+      
           <nav className="hidden md:flex items-center space-x-1">
             {navigation.map((item, index) => (
               <motion.div

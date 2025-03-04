@@ -4,13 +4,43 @@ import { FeatureCard } from '../feature-card';
 import { Code, Github, Heart } from 'lucide-react';
 export const Features = () => {
   const { scrollY } = useScroll();
-  const y2 = useTransform(scrollY, [0, 500], [0, -50]);
+  
   return (
     <section>
+      
         <motion.div
-        className=" z-10 min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-gradient-to-bl from-gray-950 via-gray-900 to-gray-800"
+        className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-[#0C0A09]">
+   
+
+        <motion.div
+          className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-[100px]"
+          animate={{
+            x: [0, -60, 30, -50, 20, 0],
+            y: [0, 30, -40, 20, -30, 0],
+            scale: [1, 0.9, 1.1, 0.8, 1.2, 1],
+          }}
+          transition={{
+            duration: 5,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        <motion.div
+          className="absolute top-40 right-20 w-72 h-72 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 blur-[90px]"
+          animate={{
+            x: [0, 50, -40, 30, -20, 0],
+            y: [0, -30, 20, -40, 30, 0],
+            scale: [1, 1.1, 0.8, 1.2, 3, 1],
+          }}
+          transition={{
+            duration: 5,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+           
          
-      >
         <motion.h2
           className="text-4xl md:text-5xl font-riffic font-bold mb-16 text-center text-transparent bg-clip-text bg-gradient-to-r from-[#C0F4B8] to-[#FFD4E5]"
           initial={{ opacity: 0, y: 30 }}
@@ -39,8 +69,8 @@ export const Features = () => {
           />
         </div>
 
-    
-      </motion.div>
+          
+            </motion.div>
 
     </section>
   );

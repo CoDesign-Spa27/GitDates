@@ -85,7 +85,7 @@ const Hero = () => {
   return (
     <div
       ref={containerRef}
-      className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800"
+      className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#0C0A09]  to-[#0C0A09]"
     >
       <motion.div
         className="absolute inset-0 opacity-10"

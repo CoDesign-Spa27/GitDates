@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import Hero from "@/components/section/Hero";
 import { Features } from "@/components/section/features";
 import HowItWorks from "@/components/section/howitworks";
+import FAQSection from "@/components/section/faq";
 
 export default async function Home() {
   const session = await getServerSession();
@@ -15,6 +16,7 @@ export default async function Home() {
       <Hero />
       <Features />
       <HowItWorks />
+      <FAQSection />
     </div>
   );
 }
