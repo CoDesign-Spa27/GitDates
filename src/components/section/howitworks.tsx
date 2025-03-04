@@ -125,11 +125,7 @@ const HowItWorks = () => {
           ))}
         </div>
       </div>
- 
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        <div className="absolute top-10 left-1/2 w-40 h-40 bg-[#7FBAFF]/20 blur-3xl opacity-30 animate-pulse"></div>
-        <div className="absolute bottom-10 right-1/2 w-32 h-32 bg-[#FF88DC]/30 blur-2xl opacity-25 animate-pulse"></div>
-      </div>
+  
     </section>
   );
 };

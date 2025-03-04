@@ -54,7 +54,7 @@ const Navbar = () => {
     <motion.header 
       className={cn(
         "fixed top-0 left-0 w-full z-50 transition-all duration-300",
-        scrolled ? "bg-background/90 backdrop-blur-lg shadow-lg border-b border-border/20" : "bg-transparent"
+        scrolled ? "bg-[#0C0A09]/90 backdrop-blur-lg shadow-lg border-b border-border/20" : "bg-transparent"
       )}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -90,8 +90,8 @@ const Navbar = () => {
                   className={cn(
                     "relative px-4 py-2 text-sm font-medium rounded-md transition-all duration-300",
                     hash === item.url
-                      ? "text-primary font-semibold"
-                      : "text-muted-foreground hover:text-primary hover:bg-primary/5"
+                      ? "text-neutral-200 font-semibold"
+                      : "text-neutral-400 hover:text-neutral-100 hover:bg-neutral-100/5"
                   )}
                   onClick={handleClick}
                 >
