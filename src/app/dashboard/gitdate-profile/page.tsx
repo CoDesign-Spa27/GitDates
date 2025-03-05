@@ -214,7 +214,7 @@ const GitDateProfile = () => {
   return (
     <div className="min-h-screen  flex items-center justify-center p-4">
       <Card className="w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden border-none">
-        <div className="absolute top-9 right-4 z-10 flex gap-2">
+        <div className="absolute top-1/2 right-4 z-10 flex gap-2">
           {!isEditing ? (
             <Button 
               variant="outline" 

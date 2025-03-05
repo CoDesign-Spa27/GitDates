@@ -114,7 +114,7 @@ export default function Dashboard() {
         <div className="space-y-6">
  
           <motion.div
-            className={`p-6 rounded-lg border shadow-lg flex items-center gap-4 transition-all ${isProfileCreated ? "bg-neutral-900 border-gitdate" : "bg-yellow-100 border-yellow-300"}`}
+            className={`p-6 rounded-lg border shadow-lg flex items-center gap-4 transition-all ${isProfileCreated ? "dark:bg-neutral-900  border-gitdate" : "bg-yellow-100 border-yellow-300"}`}
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
@@ -136,7 +136,7 @@ export default function Dashboard() {
           </motion.div>
  
           <motion.div
-            className={`p-6 rounded-lg border shadow-lg flex items-center gap-4 transition-all ${isMatchPreferenceCreated ? "bg-neutral-900 border-gitdate" : "bg-yellow-100 border-yellow-300"}`}
+            className={`p-6 rounded-lg border shadow-lg flex items-center gap-4 transition-all ${isMatchPreferenceCreated ? "dark:bg-neutral-900 border-gitdate" : "bg-yellow-100 border-yellow-300"}`}
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7 }}
