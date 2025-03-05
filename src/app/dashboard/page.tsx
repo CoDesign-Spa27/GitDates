@@ -1,9 +1,10 @@
 'use client'
-import { getMatchPreference } from '@/actions/match.action'
+import { getMatchPreference, getMatchRequests } from '@/actions/match.action'
 import { getGithubProfile } from '@/actions/user.profile.action'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import {motion}  from 'motion/react'
+import { RequestsList } from '@/components/recieved-request'
 
 export interface UserData {
   basicInfo: {
@@ -50,9 +51,11 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isProfileCreated, setIsProfileCreated] = useState(false);
   const [isMatchPreferenceCreated, setIsMatchPreferenceCreated] = useState(false);
+  const [matchRequests,setMatchRequests] = useState<any[]>([]);
   const {data:session} = useSession();
   const user = session?.user;
  
+  console.log(matchRequests)
 
  
 
@@ -62,6 +65,8 @@ export default function Dashboard() {
       try {
         const data = await getGithubProfile();
         const matchPreference = await getMatchPreference(session?.user?.email || '');
+        const matchRequests= await getMatchRequests();
+        setMatchRequests(matchRequests);
         setProfile(data);
         setMatchPreference(matchPreference);
         setIsProfileCreated(!!data);
@@ -77,9 +82,7 @@ export default function Dashboard() {
       fetchProfile();
    
   }, [session?.user]);
-
  
-
   if (isLoading) {
     return (
       <div className="container mx-auto p-4 flex justify-center items-center min-h-screen">
@@ -164,9 +167,10 @@ export default function Dashboard() {
 
   return (
     <div className="container mx-auto p-4 space-y-8">
-      {!isProfileCreated && isMatchPreferenceCreated ? (
+      {isProfileCreated && isMatchPreferenceCreated ? (
         <>
         Dashboard
+          <RequestsList requests={matchRequests} />
         </>
       
       ) : (

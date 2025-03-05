@@ -314,6 +314,39 @@ return match;
 } 
 }
 
+export const getMatchRequests = async () =>{
+  try {
+    const session = await getServerSession(authOptions);
+    if(!session?.user?.email) throw new Error("Not Authenticated");
+
+    const user = await prisma.user.findUnique({
+      where:{
+        email:session.user.email,
+      },
+    });
+
+    if(!user) throw new Error("User not found");
+
+    const pendingRequests = await prisma.match.findMany({
+      where: {
+        receiverId: user.id,
+        status: "PENDING",
+      },
+      include: {
+        sender: {
+          select: {
+            gitDateProfile: true
+          }
+        }
+      }
+    });
+    return pendingRequests;
+  }catch(error){
+    console.error("Error getting match requests",error);
+    throw error;
+  }
+}
+
 export const getMatchStatus = async (otherUserId:string) =>{
   try {
     const session = await getServerSession(authOptions);
@@ -347,3 +380,34 @@ export const getMatchStatus = async (otherUserId:string) =>{
   }
 }
 
+
+export const respondToMatchRequest = async (matchId:string,action:"ACCEPT" | "REJECT") =>{
+  try{
+    const session = await getServerSession(authOptions);
+    if(!session?.user?.email) throw new Error("Not Authenticated");
+
+    const user = await prisma.user.findUnique({
+      where:{email:session.user.email},
+    })
+    if(!user) throw new Error("User not found");
+     
+    const match = await prisma.match.findFirst({
+      where:{
+        id:matchId,
+        receiverId:user.id,
+      }
+    });
+
+    if(!match) throw new Error("Match not found");
+
+    const updateMatch = await prisma.match.update({
+      where:{id:matchId},
+      data:{status: action}
+      
+    })
+return updateMatch;
+  }catch(error){
+    console.error("Error getting match requests:", error);
+    throw error;
+  }
+}
