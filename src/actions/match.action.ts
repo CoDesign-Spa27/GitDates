@@ -257,3 +257,93 @@ export const getAllAccounts=async()=>{
     throw error;
   }
 }
+
+
+export const sendMatchRequest = async (receiverId:string) =>{
+try {
+  const session = await getServerSession(authOptions);
+  if(!session?.user?.email) throw new Error("Not Authenticated");
+
+  const sender = await prisma.user.findUnique({
+    where:{
+      email:session.user.email
+    },
+  })
+
+  if(!sender) throw new Error("Sender not found");
+
+  const existingMatch = await prisma.match.findFirst({
+    where:{
+      OR:[
+        {senderId:sender.id,receiverId},
+        {senderId:receiverId,receiverId:sender.id}
+      ]
+    }
+  });
+
+  if(existingMatch){
+    if(existingMatch.senderId === sender.id){
+      throw new Error("Match request already sent");
+    }
+    else if(existingMatch.status === "PENDING"){
+      throw new Error("Match request already received");
+    }
+    else if(existingMatch.status === "ACCEPTED"){
+      throw new Error("Match already exists");
+    } 
+    else {
+      await prisma.match.delete({
+        where:{
+          id:existingMatch.id
+        },
+      })
+    }
+  }
+const match = await prisma.match.create({
+  data:{
+    senderId:sender.id,
+    receiverId:receiverId,
+    status:"PENDING"
+  }
+})
+
+return match;
+}catch(error){
+  console.error("Error sending match request",error);
+  throw error;
+} 
+}
+
+export const getMatchStatus = async (otherUserId:string) =>{
+  try {
+    const session = await getServerSession(authOptions);
+    if(!session?.user?.email) throw new Error("Not Authenticated");
+
+    const user = await prisma.user.findUnique({
+      where:{email:session.user.email},
+    })
+
+    if(!user) return null;
+
+    const match = await prisma.match.findFirst({
+      where:{
+        OR:[
+          {senderId:user.id,receiverId:otherUserId},
+          {senderId:otherUserId,receiverId:user.id}
+        ]
+      }
+    });
+    if(!match) return {status:"NONE"};
+
+    return {
+      id:match.id,
+      status:match.status,
+      isSender:match.senderId === user.id,
+    };
+
+  }catch(error){
+    console.error("Error getting match status",error);
+    return null;
+  }
+}
+

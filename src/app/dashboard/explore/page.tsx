@@ -119,6 +119,7 @@ export default function Explore() {
                     key={match.id}
                     account={match.profile}
                     matchScore={match.score}
+                    userId={match.id}
                   />
                 ))}
               </div>
@@ -133,6 +134,7 @@ export default function Explore() {
                 {accounts.map((account) => (
                   <ExploreCard
                     key={account.id}
+                    userId={account.id}
                     account={account.gitDateProfile}
                   />
                 ))}

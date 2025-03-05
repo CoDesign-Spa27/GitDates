@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
-import { Users, GitFork, Star, MapPin, Link as LinkIcon } from "lucide-react";
+import { Users, GitFork, Star, MapPin, Link as LinkIcon, Heart, Check } from "lucide-react";
 import { Button } from "./ui/button";
+import { getMatchStatus, sendMatchRequest } from "@/actions/match.action";
+import { toast } from "@/hooks/use-toast";
 
 interface GitDateProfileType {
   githubUsername: string;
@@ -18,17 +20,112 @@ interface GitDateProfileType {
   blog: string;
   image: string;
 }
+
+interface MatchStatusType {
+  id?: string;
+  status: "PENDING" | "ACCEPTED" | "REJECTED" | "NONE" ;
+  isSender?: boolean;
+}
 const ExploreCard = ({
   account,
   matchScore,
+  userId,
 }: {
   account: GitDateProfileType;
   matchScore?: number;
+  userId:string;
 }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotateX = useTransform(y, [-100, 100], [10, -10]);
   const rotateY = useTransform(x, [-100, 100], [-10, 10]);
+  const [matchStatus,setMatchStatus] = useState<MatchStatusType | null>(null);
+  const [isLoading,setIsLoading] = useState(false);
+
+
+  useEffect(()=>{
+    const checkMatchStatus = async() => {
+      const status:any = await getMatchStatus(userId);
+      setMatchStatus(status);
+    }
+    checkMatchStatus();
+  },[userId])
+ 
+const handleSendMatchRequest = async () => { 
+       try{
+        setIsLoading(true);
+        await sendMatchRequest(userId);
+        toast({
+          title:`Match request sent successfully!`,
+          variant:'success'
+        })
+       }
+       catch(error){
+        toast({
+          title:`An error occurred while sending match request!`,
+          variant:'destructive'
+        })
+    }finally{
+      setIsLoading(false);
+    }
+}
+
+const getMatchButton = () =>{
+  if (!matchStatus){
+    return (
+      <Button disabled={isLoading} onClick={handleSendMatchRequest}>
+        {isLoading ? "Sending..." : "Send Match Request"}
+      </Button>
+    );
+  }
+
+  switch (matchStatus.status){
+    case "NONE": 
+    return (
+      <Button disabled={isLoading} onClick={handleSendMatchRequest}>
+      {isLoading ? "Sending..." : "Send Match Request"}
+    </Button>
+    )
+    case "PENDING":
+      if (matchStatus.isSender) {
+        return (
+          <Button disabled variant="secondary" className="bg-amber-500/20 text-amber-500">
+          <span className="mr-1">Request Sent</span>
+          <Heart size={16} fill="currentColor" />
+        </Button>
+      );
+    } else {
+      // This will be handled in the Notifications/Requests section
+      return (
+        <Button disabled variant="secondary" className="bg-amber-500/20 text-amber-500">
+          <span className="mr-1">Response Pending</span>
+          <Heart size={16} />
+        </Button>
+      );
+    }
+    case "ACCEPTED":
+      return (
+        <Button disabled variant="secondary" className="bg-green-500/20 text-green-500">
+          <span className="mr-1">Matched</span>
+          <Check size={16} />
+        </Button>
+      );
+    case "REJECTED":
+      return (
+        <Button onClick={handleSendMatchRequest}>
+          Try Again
+        </Button>
+      );
+      default:
+        return (
+          <Button disabled={isLoading} onClick={handleSendMatchRequest}>
+            {isLoading ? "Sending..." : "Send Match Request"}
+          </Button>
+        );
+  }
+
+
+}
 
   if (!account) return null;
  
@@ -43,7 +140,7 @@ const ExploreCard = ({
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
       <div className="absolute inset-0 rounded-2xl blur-[2px] transition-all" />
-
+     
       <div className="relative bg-white/5 rounded-xl p-4 h-full">
     
         {matchScore !== undefined && (
@@ -135,13 +232,9 @@ const ExploreCard = ({
             <span className="truncate">Visit Blog</span>
           </motion.a>
         )}
-
-        <Button>
-       Send Match Request
-        </Button>
+ {getMatchButton()}
        </div> 
-
-        {/* Hover Glow Effect */}
+ 
         <div className="absolute inset-0 rounded-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="absolute -inset-[1px] border border-gitdate rounded-xl " />
         </div>

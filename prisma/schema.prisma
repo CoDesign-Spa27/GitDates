@@ -142,4 +142,5 @@ enum MatchStatus {
   PENDING
   ACCEPTED
   REJECTED
+  NONE
 }
