@@ -89,7 +89,7 @@ const FAQSection = () => {
             />
       
             <motion.div
-            className="absolute bottom-0 right-20 w-52 h-52 rounded-full bg-gradient-to-r from-yellow-500/40 to-green-400/60  blur-[90px] "
+            className="absolute bottom-0 right-0 md:right-20 w-52 h-52 rounded-full bg-gradient-to-r from-yellow-500/40 to-green-400/60  blur-[90px] "
             animate={{
                 x: [0, 10, -20, 10, 0],
                 y: [0, -10, 20, -20, 0],

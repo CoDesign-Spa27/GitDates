@@ -13,10 +13,10 @@ export const Features = () => {
    
 
         <motion.div
-          className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-[100px]"
+          className="absolute bottom-20 right-20 w-80 h-80 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-[100px]"
           animate={{
-            x: [0, -60, 30, -50, 20, 0],
-            y: [0, 30, -40, 20, -30, 0],
+            x: [0, -10, 10, -10, 20, 0],
+            y: [0, 30, -10, 20, -30, 0],
             scale: [1, 0.9, 1.1, 0.8, 1.2, 1],
           }}
           transition={{
@@ -29,9 +29,9 @@ export const Features = () => {
         <motion.div
           className="absolute top-40 right-20 w-72 h-72 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 blur-[90px]"
           animate={{
-            x: [0, 50, -40, 30, -20, 0],
-            y: [0, -30, 20, -40, 30, 0],
-            scale: [1, 1.1, 0.8, 1.2, 3, 1],
+            x: [0, -10, 10, -10, 20, 0],
+            y: [0, 30, -10, 20, -30, 0],
+            scale: [1, 0.9, 1.1, 0.8, 1.2, 1],
           }}
           transition={{
             duration: 5,
