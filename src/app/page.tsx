@@ -5,6 +5,7 @@ import Hero from "@/components/section/Hero";
 import { Features } from "@/components/section/features";
 import HowItWorks from "@/components/section/howitworks";
 import FAQSection from "@/components/section/faq";
+import Footer from "@/components/section/footer";
 
 export default async function Home() {
   const session = await getServerSession();
@@ -17,6 +18,7 @@ export default async function Home() {
       <Features />
       <HowItWorks />
       <FAQSection />
+      <Footer />
     </div>
   );
 }
