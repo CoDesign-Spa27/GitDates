@@ -6,8 +6,9 @@ export const Features = () => {
   const { scrollY } = useScroll();
   
   return (
-    <section>
-      
+    <section
+    id='features'
+    >
         <motion.div
         className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-[#0C0A09]">
    

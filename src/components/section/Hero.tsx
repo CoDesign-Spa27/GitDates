@@ -50,7 +50,7 @@ const Hero = () => {
     "class Relationship extends Perfect { constructor(you, me) {...} }",
   ];
 
-  // Animated background pattern
+ 
   const patternVariants: any = {
     animate: {
       backgroundPosition: ["0% 0%", "100% 100%"],
@@ -63,31 +63,16 @@ const Hero = () => {
     },
   };
 
-  // Testimonials
-  const testimonials = [
-    {
-      name: "Alex C.",
-      role: "Full Stack Developer",
-      text: "Found my teammate for life here! Our stack compatibility is 100%.",
-    },
-    {
-      name: "Sam R.",
-      role: "UX Designer",
-      text: "Finally, someone who gets my Figma obsession and doesn't mind my CSS rants.",
-    },
-    {
-      name: "Jordan T.",
-      role: "DevOps Engineer",
-      text: "We deployed our relationship to production on our first date!",
-    },
-  ];
+ 
 
   return (
-    <div
+    <section
+      id="home"
       ref={containerRef}
       className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#0C0A09]  to-[#0C0A09]"
     >
       <motion.div
+        
         className="absolute inset-0 opacity-10"
         variants={patternVariants}
         animate="animate"
@@ -420,7 +405,7 @@ const Hero = () => {
           }
         }
       `}</style>
-    </div>
+    </section>
   );
 };
 
