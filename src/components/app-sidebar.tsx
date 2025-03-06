@@ -18,6 +18,7 @@ import { dashboardIcon, exploreIcon, gitIcon, preferenceIcon, profileIcon } from
 import { useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
+import { HeartHandshakeIcon } from "lucide-react"
 
 // Menu items.
 const items = [
@@ -45,7 +46,13 @@ const items = [
   title:"Explore",
   url:"/dashboard/explore",
   icon:exploreIcon
-  }
+  },
+  {
+    title:"Matches",
+    url:"/dashboard/matches",
+    icon:HeartHandshakeIcon
+    }
+
   // {
   //   title: "Calendar",
   //   url: "#",

@@ -400,9 +400,11 @@ export const respondToMatchRequest = async (matchId:string,action:"ACCEPT" | "RE
 
     if(!match) throw new Error("Match not found");
 
+    const status = action === "ACCEPT" ? "ACCEPTED" : "REJECTED";
+    
     const updateMatch = await prisma.match.update({
       where:{id:matchId},
-      data:{status: action}
+      data:{status: status}
       
     })
 return updateMatch;
@@ -411,3 +413,56 @@ return updateMatch;
     throw error;
   }
 }
+
+
+export  const getMyMatches = async () => {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      throw new Error("Not authenticated");
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+      // Get all accepted matches
+      const matches = await prisma.match.findMany({
+        where: {
+          OR: [
+            { senderId: user.id, status: "ACCEPTED" },
+            { receiverId: user.id, status: "ACCEPTED" },
+          ],
+        },
+        include: {
+          sender: {
+            include: {
+              gitDateProfile: true,
+            },
+          },
+          receiver: {
+            include: {
+              gitDateProfile: true,
+            },
+          },
+        },
+      });
+      return matches.map(match => {
+        const isUserSender = match.senderId === user.id;
+        const otherPerson = isUserSender ? match.receiver : match.sender;
+        
+        return {
+          matchId: match.id,
+          userId: otherPerson.id,
+          profile: otherPerson.gitDateProfile,
+          createdAt: match.createdAt,
+        };
+      });
+    } catch (error) {
+      console.error("Error getting matches:", error);
+      throw error;
+    }
+ }

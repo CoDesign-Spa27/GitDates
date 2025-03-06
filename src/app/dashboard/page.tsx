@@ -54,10 +54,7 @@ export default function Dashboard() {
   const [matchRequests,setMatchRequests] = useState<any[]>([]);
   const {data:session} = useSession();
   const user = session?.user;
- 
-  console.log(matchRequests)
-
- 
+  
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -83,6 +80,11 @@ export default function Dashboard() {
    
   }, [session?.user]);
  
+  const  handleReject = async (matchId : string) => {
+
+   }
+
+
   if (isLoading) {
     return (
       <div className="container mx-auto p-4 flex justify-center items-center min-h-screen">
@@ -170,7 +172,7 @@ export default function Dashboard() {
       {isProfileCreated && isMatchPreferenceCreated ? (
         <>
         Dashboard
-          <RequestsList requests={matchRequests} />
+          {/* <RequestsList requests={matchRequests} /> */}
         </>
       
       ) : (

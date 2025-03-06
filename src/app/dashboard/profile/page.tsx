@@ -27,7 +27,9 @@ import { toast } from "@/hooks/use-toast";
 
 interface ProfileFormData {
   name?: string;
-  location?: string;
+  city?: string;
+  state?: string;
+  country?: string;
   gender?: string;
   image?: FileList;
 }
@@ -50,11 +52,12 @@ const ProfilePage = () => {
         setUserProfile(profile);
         setImagePreview(profile?.image || null);
 
-        // Set form values when profile data is received
         setValue("name", profile?.name || "");
-        setValue("location", profile?.location || "");
         setValue("gender", profile?.gender || "");
-        setValue("image", profile?.image || "");
+        setValue("city", profile?.city || "");
+        setValue("state", profile?.state || "");
+        setValue("country", profile?.country
+        || "");
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -63,6 +66,7 @@ const ProfilePage = () => {
     fetchData();
   }, [setValue]);
 
+console.log("User Profile:", userProfile);
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -106,11 +110,7 @@ const ProfilePage = () => {
       });
     }
   };
-
-  if (!userProfile) {
-    return <div>Loading...</div>;
-  }
-
+ 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center p-4">
       <Card className="w-full max-w-4xl overflow-hidden">
@@ -120,10 +120,10 @@ const ProfilePage = () => {
               <Avatar className="w-32 h-32 mb-4">
                 <AvatarImage
                   src={imagePreview || "/placeholder.svg?height=128&width=128"}
-                  alt={userProfile.name}
+                  // alt={userProfile}
                 />
                 <AvatarFallback>
-                  {userProfile.name
+                  {userProfile?.name
                     ?.split(" ")
                     .map((n: string) => n[0])
                     .join("")}
@@ -149,7 +149,7 @@ const ProfilePage = () => {
             </div>
           
             <CardTitle className="text-2xl font-bold mb-2">
-              {userProfile.name}
+              {userProfile?.name}
             </CardTitle>
             <Button onClick={() => signOut()}>Sign Out</Button>
           </div>
@@ -164,11 +164,11 @@ const ProfilePage = () => {
               <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="username">Username</Label>
-                    <Input id="username" value={userProfile.username || ''} disabled />
+                    <Input id="username" value={userProfile?.username || ''} disabled />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" value={userProfile.email || ''} disabled />
+                    <Input id="email" value={userProfile?.email || ''} disabled />
                   </div>
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -177,8 +177,16 @@ const ProfilePage = () => {
                     <Input id="name" {...register("name")} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="location">Location</Label>
-                    <Input id="location" {...register("location")} />
+                    <Label htmlFor="city">City</Label>
+                    <Input id="city" {...register("city")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="state">State</Label>
+                    <Input id="state" {...register("state")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="country">Country</Label>
+                    <Input id="country" {...register("country")} />
                   </div>
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -186,7 +194,7 @@ const ProfilePage = () => {
                     <Label htmlFor="gender">Gender</Label>
                     <Select
                       onValueChange={(value) => setValue("gender", value)}
-                      value={userProfile.gender || ""}
+                      value={userProfile?.gender || ""}
                     >
                       <SelectTrigger id="gender">
                         <SelectValue placeholder="Select gender" />

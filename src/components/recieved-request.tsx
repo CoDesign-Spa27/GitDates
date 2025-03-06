@@ -10,6 +10,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { GitDateProfileType } from "@/actions/match.action"
+import { useState } from "react"
 
  
 interface RecievedRequests {
@@ -22,7 +23,26 @@ interface RecievedRequests {
   mutualConnections?: number
 }
 
-export function RequestsList({ requests }: { requests: RecievedRequests[] }) {
+export function RequestsList({ requests, onAccept, onReject }: { requests: RecievedRequests[]
+onAccept: () => void
+onReject: () => void
+
+ }) {
+  
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const handleAccept = async () => {
+    setIsLoading(true);
+    await onAccept();
+    setIsLoading(false);
+  };
+  
+  const handleReject = async () => {
+    setIsLoading(true);
+    await onReject();
+    setIsLoading(false);
+  };
+  
   return (
     <div className="space-y-4">
       {requests.map((request) => (
@@ -83,7 +103,7 @@ export function RequestsList({ requests }: { requests: RecievedRequests[] }) {
                 <>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button size="sm" variant="outline" className="gap-1">
+                      <Button size="sm" variant="outline" className="gap-1" onClick={handleReject}>
                         <X className="h-4 w-4" />
                         Decline
                       </Button>
@@ -95,7 +115,7 @@ export function RequestsList({ requests }: { requests: RecievedRequests[] }) {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button size="sm" className="gap-1">
-                        <Check className="h-4 w-4" />
+                        <Check className="h-4 w-4" onClick={handleAccept} />
                         Accept
                       </Button>
                     </TooltipTrigger>
