@@ -29,6 +29,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   dob DateTime?
+  sentMesssages Message[]
   accounts      Account[]
   sessions      Session[]
   gitDateProfile GitDateProfile?
@@ -126,6 +127,7 @@ model MatchPreference {
 
 model Match {
   id          String   @id @default(uuid())
+  conversation Conversation?
   senderId    String
   receiverId  String
   status      MatchStatus @default(PENDING)
@@ -144,3 +146,32 @@ enum MatchStatus {
   REJECTED
   NONE
 }
+
+model Conversation {
+  id  String @id @default(uuid())
+  matchId String @unique
+  match  Match @relation(fields: [matchId], references: [id])
+  messages Message[]
+  lastMessageId String?
+  lastMessage Message? @relation("LastMessage", fields: [lastMessageId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("conversations")
+}
+
+model Message {
+  id String @id @default(uuid())
+  conversationId String
+  conversation Conversation @relation(fields: [conversationId], references: [id],onDelete: Cascade)
+  senderId String
+  sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  read Boolean @default(false)
+  content String @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt 
+  
+  @@map("messages")
+  Conversation Conversation[] @relation("LastMessage")
+}
+
