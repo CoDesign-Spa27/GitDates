@@ -11,7 +11,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton";
-
+import Chat from "@/components/socket-text";
 // Performance optimizations:
 // 1. Using useCallback for loadData to prevent unnecessary re-renders
 // 2. Using useMemo for filteredMatches to memoize expensive filtering
@@ -85,6 +85,7 @@ export default function Explore() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
+      <Chat />
         <Tabs defaultValue="matches">
           <TabsList className="animate-fade-in">
             <TabsTrigger 
