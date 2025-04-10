@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:socket": "cross-env NODE_OPTIONS='--loader --trace-warnings --no-warnings' ts-node server.mts",
+    "dev:socket": "cross-env NODE_OPTIONS='--loader=ts-node/esm' ts-node --esm server.mts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -30,6 +30,7 @@
     "@radix-ui/react-toast": "^1.2.4",
     "@radix-ui/react-tooltip": "^1.1.6",
     "@types/bcryptjs": "^2.4.6",
+    "@types/socket.io": "^3.0.1",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -46,6 +47,7 @@
     "react-hook-form": "^7.54.2",
     "react-just-parallax": "^3.1.16",
     "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "ts-node": "^10.9.2",

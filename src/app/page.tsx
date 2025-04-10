@@ -15,7 +15,7 @@ export default async function Home() {
     <div>
 
       <Navbar />
-
+      <Chat />
       <Hero />
       <Features />
       <HowItWorks />

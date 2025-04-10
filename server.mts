@@ -1,48 +1,58 @@
-import { createServer } from "node:http";
-import { Server as NetServer } from "http";
-import {Server as SocketIOServer } from 'socket.io'
-import { NextApiRequest, NextApiResponse } from "next";
-import { NextServer } from "next/dist/server/next";
-import { getServerSession } from "next-auth";
-import { AuthOptions } from "next-auth";
-import next from "next";
-// import prisma from "@/lib/prisma";
-
-console.log('Starting server...');
+import { createServer } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
+import next from 'next';
 
 const dev = process.env.NODE_ENV !== 'production';
-const hostname = 'localhost';
-const port = 3000;
+const port = parseInt(process.env.PORT || '3000', 10);
+const hostname = process.env.HOSTNAME || 'localhost';
 
-const app = next({dev , hostname, port});
+// Create Next.js app
+const app = next({ dev, hostname, port });
+const handler = app.getRequestHandler();
 
-const handle = app.getRequestHandler();
-
-let io : SocketIOServer | undefined;
+console.log(handler, "handler")
 app.prepare().then(() => {
-  const httpServer = createServer(handle);
- 
-  io = new SocketIOServer(httpServer, {
-    path: '/api/socket',
-    cors :{ origin : '*'},
-    
+  // Create HTTP server
+  const httpServer = createServer((req, res) => {
+    // Handle Next.js requests
+    handler(req, res);
   });
-   io.on('connection', async (socket) => { 
-    console.log('A user connected:', socket.id);
+
+  console.log(httpServer, "httpServer")
+
+  // Initialize Socket.IO on the same server
+  const io = new SocketIOServer(httpServer, {
+    path: '/api/socket',
+    cors: {
+      origin: dev ? '*' : 'your-production-domain.com',
+      methods: ['GET', 'POST']
+    }
+  });
+
+  // Socket.IO connection handler
+  io.on('connection', (socket) => {
+    console.log('Client connected:', socket.id);
+
     socket.on('disconnect', () => {
-      console.log('User disconnected:', socket.id);
+      console.log('Client disconnected:', socket.id);
     });
+
     socket.on('message', (msg) => {
       console.log('Message received:', msg);
-      io?.emit('message', msg); // Broadcast message to all connected clients
+      io.emit('message', msg);
     });
-   })
+  });
 
-   httpServer.listen(port, () => {
+  // Start the combined server
+  httpServer.listen(port, () => {
     console.log(`> Ready on http://${hostname}:${port}`);
-    });
-}); 
+    console.log(`> Socket.IO running on ws://${hostname}:${port}/api/socket`);
+  });
 
+}).catch((err) => {
+  console.error('Server startup error:', err);
+  process.exit(1);
+});
 // // this will extend the NextApiResponse to support scoker io (web socket server) because the NextServer does not have the io property
 // // this will handle res and req as in real time
 // export type NextApiResponseWithSocket = NextApiResponse & {
