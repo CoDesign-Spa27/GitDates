@@ -1,7 +1,7 @@
 "use server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { authOptions } from "../lib/auth";
+import prisma from "../lib/prisma";
 import { UserData } from "@/app/dashboard/page";
 
 export const getUserProfile = async () => {
@@ -36,9 +36,9 @@ export const getUserProfile = async () => {
 export interface UpdateUserProfileData {
   name?: string;
   gender?: string;
-    city?: string;
-    state?: string;
-    country?: string;
+  city?: string;
+  state?: string;
+  country?: string;
   dob?: Date;
   image?: FileList;
 }
@@ -87,107 +87,105 @@ export const updateUserProfile = async (data: UpdateUserProfileData) => {
   }
 };
 
-
-export const createGithubProfile = async (githubData:UserData) => {
+export const createGithubProfile = async (githubData: UserData) => {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     throw new Error("Not authenticated");
   }
-  try{
+  try {
     const user = await prisma.user.findUnique({
-      where:{
-        email:session.user.email
-      }
-    })
-    if(!user){
+      where: {
+        email: session.user.email,
+      },
+    });
+    if (!user) {
       throw new Error("User not found");
     }
     const existingProfile = await prisma.gitDateProfile.findUnique({
-      where:{
-        userId:user.id
-      }
-    })
-    if(existingProfile){
+      where: {
+        userId: user.id,
+      },
+    });
+    if (existingProfile) {
       throw new Error("Profile already exists");
     }
-     const githubProfile = await prisma.gitDateProfile.create({
-      data:{
-        userId:user.id,
-        githubUsername:githubData.basicInfo.login,
-        name:githubData.basicInfo.name,
-        repositories:githubData.activity.topRepositories.length,
-        followers:githubData.socialStats.followers.length,
-        following:githubData.socialStats.following.length,
-        mainLanguages:Object.keys(githubData.codingProfile.topLanguages),
-        contributions:githubData.basicInfo.totalContributions,
-        image:githubData.basicInfo.avatar_url,
-        bio:githubData.basicInfo.bio,
-        city:githubData.basicInfo.city || "",
-        state:githubData.basicInfo.state || "",
-        country:githubData.basicInfo.country || "",
-        blog:githubData.basicInfo.blog,
-      }
-     })
-     return githubProfile;
-  }catch(error){
-    console.error("Error creating github profile:",error);
+    const githubProfile = await prisma.gitDateProfile.create({
+      data: {
+        userId: user.id,
+        githubUsername: githubData.basicInfo.login,
+        name: githubData.basicInfo.name,
+        repositories: githubData.activity.topRepositories.length,
+        followers: githubData.socialStats.followers.length,
+        following: githubData.socialStats.following.length,
+        mainLanguages: Object.keys(githubData.codingProfile.topLanguages),
+        contributions: githubData.basicInfo.totalContributions,
+        image: githubData.basicInfo.avatar_url,
+        bio: githubData.basicInfo.bio,
+        city: githubData.basicInfo.city || "",
+        state: githubData.basicInfo.state || "",
+        country: githubData.basicInfo.country || "",
+        blog: githubData.basicInfo.blog,
+      },
+    });
+    return githubProfile;
+  } catch (error) {
+    console.error("Error creating github profile:", error);
     throw new Error("Failed to create github profile");
   }
 };
-
-
 
 export const getGithubProfile = async () => {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     throw new Error("Not authenticated");
   }
-  try{
+  try {
     const user = await prisma.user.findUnique({
-      where:{
-        email:session.user.email
-      },include:{
-        gitDateProfile:true
-      }
-    })
+      where: {
+        email: session.user.email,
+      },
+      include: {
+        gitDateProfile: true,
+      },
+    });
     return user?.gitDateProfile;
-  }catch(error){
-    console.error("Error fetching github profile:",error);
+  } catch (error) {
+    console.error("Error fetching github profile:", error);
     throw new Error("Failed to fetch github profile");
   }
 };
 
-export const updateGithubProfile = async (githubData:any) => {
+export const updateGithubProfile = async (githubData: any) => {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     throw new Error("Not authenticated");
   }
-  try{
-    const user=await prisma.user.findUnique({
-      where:{
-        email:session.user.email
-      }
-    })
-    if(!user){
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: session.user.email,
+      },
+    });
+    if (!user) {
       throw new Error("User not found");
     }
-    
+
     const updatedGithubProfile = await prisma.gitDateProfile.update({
-      where:{
-        userId:user.id
+      where: {
+        userId: user.id,
       },
-      data:{
-        name:githubData.name,
-        city:githubData.city,
-        state:githubData.state,
-        country:githubData.country,
-        bio:githubData.bio,
-        blog:githubData.blog,
-      }
-    })
+      data: {
+        name: githubData.name,
+        city: githubData.city,
+        state: githubData.state,
+        country: githubData.country,
+        bio: githubData.bio,
+        blog: githubData.blog,
+      },
+    });
     return updatedGithubProfile;
-  }catch(error){
-    console.error("Error updating github profile:",error);
+  } catch (error) {
+    console.error("Error updating github profile:", error);
     throw new Error("Failed to update github profile");
   }
 };

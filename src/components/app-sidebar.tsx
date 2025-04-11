@@ -19,6 +19,9 @@ import { useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import { HeartHandshakeIcon } from "lucide-react"
+import { signOut } from "next-auth/react"
+import { toast } from "@/hooks/use-toast"
+import { Button } from "./ui/button"
 
 // Menu items.
 const items = [
@@ -51,8 +54,8 @@ const items = [
     title:"Matches",
     url:"/dashboard/matches",
     icon:HeartHandshakeIcon
-    }
-
+    },
+ 
   // {
   //   title: "Calendar",
   //   url: "#",
@@ -74,6 +77,23 @@ export function AppSidebar() {
   const pathname = usePathname();
   const activeItem = useMemo(()=> items.find((item)=> item.url === pathname), [pathname])
   const router = useRouter()
+
+
+  const handleSignOut = async () =>{
+    try {
+      const res =await signOut({
+        callbackUrl:"/"
+      })
+      console.log(res, "signout")
+    } catch (error) {
+      toast({
+        title:"Internal Server Error",
+        variant:"destructive"
+      })
+      console.error("Error signing out:", error)
+    }
+      
+  }
   return (
     <Sidebar>
       <SidebarContent>
@@ -95,6 +115,9 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               ))}
               <ModeToggle />
+              <Button variant="pressed" className="w-full mt-5" onClick={handleSignOut}>
+                Sign Out
+              </Button>
             </SidebarMenu>
           </SidebarGroupContent>
           

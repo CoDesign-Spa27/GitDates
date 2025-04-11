@@ -1,6 +1,6 @@
 import Navbar from "@/components/section/navbar";
 import { getServerSession } from "next-auth";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 import Hero from "@/components/section/Hero";
 import { Features } from "@/components/section/features";
 import HowItWorks from "@/components/section/howitworks";
@@ -13,7 +13,6 @@ export default async function Home() {
 
   return (
     <div>
-
       <Navbar />
       <Chat />
       <Hero />

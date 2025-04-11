@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
 import { navigation } from "@/constants";
 import { MenuIcon, X } from "lucide-react";
@@ -17,7 +17,7 @@ const Navbar = () => {
   useEffect(() => {
     const dynamicNavbarHighlight = () => {
       const sections = document.querySelectorAll("section[id]");
-       
+
       if (window.scrollY > 20) {
         setScrolled(true);
       } else {
@@ -26,35 +26,42 @@ const Navbar = () => {
 
       sections.forEach((current) => {
         if (!current) return;
-        
+
         const sectionId = current.getAttribute("id");
         const sectionHeight = (current as HTMLElement).offsetHeight;
-        const sectionTop = current.getBoundingClientRect().top - sectionHeight * 0.2;
-        
-        if (sectionTop < 0 && sectionTop + sectionHeight > 0 && hash !== `#${sectionId}`) {
+        const sectionTop =
+          current.getBoundingClientRect().top - sectionHeight * 0.2;
+
+        if (
+          sectionTop < 0 &&
+          sectionTop + sectionHeight > 0 &&
+          hash !== `#${sectionId}`
+        ) {
           setHash(`#${sectionId as string}`);
         }
       });
     };
-    
+
     window.addEventListener("scroll", dynamicNavbarHighlight);
-    
+
     return () => window.removeEventListener("scroll", dynamicNavbarHighlight);
   }, [hash]);
 
   const toggleNavigation = () => setOpenNavigation(!openNavigation);
-  
+
   const handleClick = () => {
     if (openNavigation) {
       setOpenNavigation(false);
     }
   };
-  
+
   return (
-    <motion.header 
+    <motion.header
       className={cn(
         "fixed top-0 left-0 w-full z-50 transition-all duration-300",
-        scrolled ? "bg-[#0C0A09]/90 backdrop-blur-lg shadow-lg border-b border-border/20" : "bg-transparent"
+        scrolled
+          ? "bg-[#0C0A09]/90 backdrop-blur-lg shadow-lg border-b border-border/20"
+          : "bg-transparent"
       )}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -62,8 +69,7 @@ const Navbar = () => {
     >
       <div className="mx-auto px-2 lg:px-8 ">
         <div className="flex items-center justify-between h-16 md:h-20">
-     
-          <motion.div 
+          <motion.div
             className="flex items-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -76,7 +82,6 @@ const Navbar = () => {
             </Link>
           </motion.div>
 
-      
           <nav className="hidden md:flex items-center space-x-1">
             {navigation.map((item, index) => (
               <motion.div
@@ -100,23 +105,25 @@ const Navbar = () => {
                     <motion.div
                       className="absolute -bottom-1 left-0 h-0.5 w-full bg-primary rounded-full"
                       layoutId="navHighlight"
-                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 350,
+                        damping: 30,
+                      }}
                     />
                   )}
                 </Link>
               </motion.div>
             ))}
           </nav>
- 
-   
+
           <div className="flex items-center space-x-1">
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="hidden md:block"
             >
-              <Button 
-          
+              <Button
                 onClick={() => {
                   window.location.href = "#login";
                 }}
@@ -124,7 +131,7 @@ const Navbar = () => {
                 Let's Date
               </Button>
             </motion.div>
- 
+
             <div className="flex md:hidden">
               <motion.button
                 onClick={toggleNavigation}
@@ -138,7 +145,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-  
+
       <AnimatePresence>
         {openNavigation && (
           <motion.div
@@ -176,8 +183,7 @@ const Navbar = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: navigation.length * 0.05 }}
                 >
-                  <Button 
-                
+                  <Button
                     onClick={() => {
                       window.location.href = "#login";
                       handleClick();

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Octokit } from "@octokit/rest";
 import { getToken } from "next-auth/jwt";
-import prisma from "@/lib/prisma";
+import prisma from "../../../lib/prisma";
 
 export async function GET(req: NextRequest) {
   try {
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     });
 
     const { data: userData } = await octokit.rest.users.getAuthenticated();
- 
+
     const contributionsQuery = `query {
       user(login: "${userData.login}") {
         name
@@ -62,7 +62,13 @@ export async function GET(req: NextRequest) {
         octokit.rest.users.listFollowersForAuthenticatedUser(),
         octokit.rest.users.listFollowedByAuthenticatedUser(),
         octokit.rest.activity.listReposStarredByAuthenticatedUser(),
-        octokit.graphql<{ user: { contributionsCollection: { contributionCalendar: { totalContributions: number } } } }>(contributionsQuery),
+        octokit.graphql<{
+          user: {
+            contributionsCollection: {
+              contributionCalendar: { totalContributions: number };
+            };
+          };
+        }>(contributionsQuery),
       ]);
 
     const repoLanguages = await Promise.all(
@@ -80,8 +86,8 @@ export async function GET(req: NextRequest) {
         name: userData.name,
         bio: userData.bio,
         avatar_url: userData.avatar_url,
-        city:"",
-        state:"",
+        city: "",
+        state: "",
         country: "",
         company: userData.company,
         blog: userData.blog,
@@ -93,7 +99,7 @@ export async function GET(req: NextRequest) {
         created_at: userData.created_at,
         totalContributions:
           contributions.user.contributionsCollection.contributionCalendar
-            .totalContributions ,
+            .totalContributions,
       },
       socialStats: {
         followersCount: followers.data.length,
