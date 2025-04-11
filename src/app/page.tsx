@@ -6,7 +6,6 @@ import { Features } from "@/components/section/features";
 import HowItWorks from "@/components/section/howitworks";
 import FAQSection from "@/components/section/faq";
 import Footer from "@/components/section/footer";
-import Chat from "@/components/socket-text";
 
 export default async function Home() {
   const session = await getServerSession();
@@ -14,7 +13,7 @@ export default async function Home() {
   return (
     <div>
       <Navbar />
-      <Chat />
+ 
       <Hero />
       <Features />
       <HowItWorks />

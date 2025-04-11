@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { getMatchStatus, sendMatchRequest } from "@/actions/match.action";
 import { toast } from "@/hooks/use-toast";
 
-interface GitDateProfileType {
+export interface GitDateProfileType {
   githubUsername: string;
   repositories: number;
   name: string;
@@ -26,7 +26,7 @@ interface MatchStatusType {
   status: "PENDING" | "ACCEPTED" | "REJECTED" | "NONE" ;
   isSender?: boolean;
 }
-const ExploreCard = ({
+ const ExploreCard = ({
   account,
   matchScore,
   userId,

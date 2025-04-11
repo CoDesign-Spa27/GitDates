@@ -2,6 +2,9 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../lib/auth";
 import prisma from "../lib/prisma";
+import { SuccessResponse } from "@/lib/success";
+import { ErrorHandler } from "@/lib/error";
+import { GitDateProfile } from "@prisma/client";
 
 export interface MatchPreference {
   ageMin: number;
@@ -121,11 +124,7 @@ export const getMatchPreference = async (email: string) => {
     throw error;
   }
 };
-
-export const findMatches = async (
-  email: string | undefined | null
-): Promise<PotentialMatch[]> => {
-  console.log(email, "email");
+export const findMatches = async (email: string | undefined | null) => {
   try {
     if (!email) {
       throw new Error("Email is required");
@@ -252,10 +251,14 @@ export const findMatches = async (
       });
 
     const sortedMatches = matchesWithScores.sort((a, b) => b.score - a.score);
-    return sortedMatches;
+    const response = new SuccessResponse(
+      "Matches found successfully",
+      200,
+      sortedMatches
+    );
+    return response.serialize();
   } catch (error) {
-    console.error("Error finding matches:", error);
-    throw error;
+    throw new ErrorHandler("Error finding matches", "DATABASE_ERROR");
   }
 };
 
@@ -267,7 +270,8 @@ export const getAllAccounts = async () => {
   });
   if (!currentUser) return;
   try {
-    const allAccounts = await prisma.user.findMany({
+    //added any for future fix
+    const allAccounts: any = await prisma.user.findMany({
       where: {
         NOT: {
           id: currentUser.id,
@@ -278,7 +282,12 @@ export const getAllAccounts = async () => {
       },
     });
 
-    return allAccounts;
+    const response = new SuccessResponse(
+      "All accounts fetched successfully",
+      200,
+      allAccounts
+    );
+    return response.serialize();
   } catch (error) {
     console.error("Error getting all accounts", error);
     throw error;

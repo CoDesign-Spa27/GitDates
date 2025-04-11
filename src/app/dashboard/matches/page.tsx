@@ -1,12 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getMyMatches, getMatchRequests, respondToMatchRequest } from "@/actions/match.action";
+import {
+  getMyMatches,
+  getMatchRequests,
+  respondToMatchRequest,
+} from "@/actions/match.action";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Check, X, Heart } from "lucide-react";
-  
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
+import useSWR from "swr";
 
 interface Profile {
   name: string;
@@ -27,7 +32,7 @@ interface MatchRequest {
   sender: {
     gitDateProfile: Profile;
   };
-  
+
   createdAt: Date;
 }
 
@@ -36,6 +41,7 @@ export default function MatchesPage() {
   const [requests, setRequests] = useState<MatchRequest[]>([]);
   const [activeTab, setActiveTab] = useState("matches");
   const [loading, setLoading] = useState(true);
+
 
   const loadData = async () => {
     try {
@@ -50,10 +56,10 @@ export default function MatchesPage() {
       setRequests(requestsData || []);
     } catch (error) {
       console.error("Error loading match data:", error);
-     toast({
+      toast({
         title: "Failed to load matches",
         variant: "destructive",
-     })
+      });
     } finally {
       setLoading(false);
     }
@@ -69,29 +75,29 @@ export default function MatchesPage() {
       toast({
         title: "Match request accepted",
         variant: "destructive",
-     })
+      });
       loadData(); // Refresh data
     } catch (error) {
       toast({
         title: "Failed to accept match request",
         variant: "destructive",
-     })
+      });
     }
   };
 
   const handleReject = async (matchId: string) => {
     try {
       await respondToMatchRequest(matchId, "REJECT");
-        toast({
-            title: "Match request rejected",
-            variant: "destructive",
-        })
+      toast({
+        title: "Match request rejected",
+        variant: "destructive",
+      });
       loadData(); // Refresh data
     } catch (error) {
-        toast({
-            title: "Failed to reject match request",
-            variant: "destructive",
-         })
+      toast({
+        title: "Failed to reject match request",
+        variant: "destructive",
+      });
     }
   };
 
@@ -114,8 +120,12 @@ export default function MatchesPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Your Matches</h1>
-      
-      <Tabs defaultValue="matches" value={activeTab} onValueChange={setActiveTab}>
+
+      <Tabs
+        defaultValue="matches"
+        value={activeTab}
+        onValueChange={setActiveTab}
+      >
         <TabsList className="mb-6">
           <TabsTrigger value="matches">
             Matches
@@ -134,7 +144,7 @@ export default function MatchesPage() {
             )}
           </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="matches">
           {loading ? (
             renderLoadingSkeleton()
@@ -154,7 +164,7 @@ export default function MatchesPage() {
             </div>
           )}
         </TabsContent>
-        
+
         <TabsContent value="requests">
           {loading ? (
             renderLoadingSkeleton()
@@ -169,9 +179,9 @@ export default function MatchesPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {requests.map((request) => (
-                <RequestCard 
-                  key={request.id} 
-                  request={request} 
+                <RequestCard
+                  key={request.id}
+                  request={request}
                   onAccept={() => handleAccept(request.id)}
                   onReject={() => handleReject(request.id)}
                 />
@@ -186,21 +196,21 @@ export default function MatchesPage() {
 
 function MatchCard({ match }: { match: Match }) {
   if (!match.profile) return null;
-  
+
   return (
     <div className="bg-card rounded-lg border border-border overflow-hidden flex flex-col">
       <div className="p-4 flex gap-4">
         <div className="relative">
-          <img 
-            src={match.profile.image || "/placeholder-avatar.png"} 
-            alt={match.profile.name} 
+          <img
+            src={match.profile.image || "/placeholder-avatar.png"}
+            alt={match.profile.name}
             className="w-16 h-16 rounded-full object-cover border-2 border-primary"
           />
           <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full w-5 h-5 flex items-center justify-center">
             <Check className="w-3 h-3 text-white" />
           </div>
         </div>
-        
+
         <div>
           <h3 className="font-bold text-lg">{match.profile.name}</h3>
           <p className="text-muted-foreground text-sm line-clamp-2">
@@ -211,51 +221,58 @@ function MatchCard({ match }: { match: Match }) {
           </p>
         </div>
       </div>
-      
+
       <div className="mt-auto p-4 pt-0 flex gap-2">
-        <Button variant="outline" className="flex-1">View Profile</Button>
-        <Button variant="pressed" className="flex-1">Message</Button>
+        <Button variant="outline" className="flex-1">
+          View Profile
+        </Button>
+        <Button variant="pressed" className="flex-1">
+          Message
+        </Button>
       </div>
     </div>
   );
 }
 
-function RequestCard({ 
-  request, 
-  onAccept, 
-  onReject 
-}: { 
-  request: MatchRequest; 
+function RequestCard({
+  request,
+  onAccept,
+  onReject,
+}: {
+  request: MatchRequest;
   onAccept: () => void;
   onReject: () => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const handleAccept = async () => {
     setIsLoading(true);
     await onAccept();
     setIsLoading(false);
   };
-  
+
   const handleReject = async () => {
     setIsLoading(true);
     await onReject();
     setIsLoading(false);
   };
-  
+
   return (
     <div className="bg-card rounded-lg border border-border overflow-hidden">
       <div className="p-4 flex gap-4">
-        <img 
-          src={request.sender.gitDateProfile?.image || "/placeholder-avatar.png"} 
-          alt={request.sender.gitDateProfile?.name} 
+        <img
+          src={
+            request.sender.gitDateProfile?.image || "/placeholder-avatar.png"
+          }
+          alt={request.sender.gitDateProfile?.name}
           className="w-16 h-16 rounded-full object-cover"
         />
-        
+
         <div>
           <h3 className="font-bold">{request.sender.gitDateProfile?.name}</h3>
           <p className="text-muted-foreground text-sm">
-            {request.sender.gitDateProfile?.bio?.substring(0, 60) || "No bio available"}
+            {request.sender.gitDateProfile?.bio?.substring(0, 60) ||
+              "No bio available"}
             {request.sender.gitDateProfile?.bio?.length > 60 ? "..." : ""}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
@@ -263,18 +280,18 @@ function RequestCard({
           </p>
         </div>
       </div>
-      
+
       <div className="p-4 pt-0 flex gap-2">
-        <Button 
-          variant="outline" 
-          className="flex-1" 
+        <Button
+          variant="outline"
+          className="flex-1"
           onClick={handleReject}
           disabled={isLoading}
         >
           <X className="mr-1 w-4 h-4" /> Reject
         </Button>
-        <Button 
-          variant="default" 
+        <Button
+          variant="default"
           className="flex-1"
           onClick={handleAccept}
           disabled={isLoading}

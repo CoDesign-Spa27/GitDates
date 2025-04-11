@@ -1,11 +1,11 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
   createMatchPreference,
+  findMatches,
   getMatchPreference,
 } from "@/actions/match.action";
 import {
@@ -39,6 +39,8 @@ import { toast } from "@/hooks/use-toast";
 import { MapPin, Languages, Users, GitCommit } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { Skeleton } from "@/components/ui/skeleton";
+import useSWR from "swr";
+import { findMatchesFetcher } from "@/components/fetchers/fetchers";
 const matchPreferenceSchema = z.object({
   ageRange: z.array(z.number()).length(2).default([18, 99]),
   languages: z.array(z.string()).min(1, "At least one language is required"),
@@ -52,13 +54,23 @@ const matchPreferenceSchema = z.object({
 });
 
 type MatchPreferenceFormInputs = z.infer<typeof matchPreferenceSchema>;
-
+ 
 const MatchPreferencePage = () => {
   const [languageInput, setLanguageInput] = useState("");
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const session =  useSession();
-
+  const session = useSession();
+  const email = session?.data?.user?.email;
+  const { data: matches, error: matchesError, isLoading: loadingMatches } = useSWR(
+    email ? ['matches',email] : null,
+    ([_,email]) => findMatchesFetcher(email),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 300000
+    }
+  );
+ 
   const form = useForm<MatchPreferenceFormInputs>({
     resolver: zodResolver(matchPreferenceSchema),
     defaultValues: {
@@ -72,10 +84,12 @@ const MatchPreferencePage = () => {
     },
   });
 
+
+
   useEffect(() => {
     const fetchPreferences = async () => {
       try {
-        setIsLoading(true)
+        setIsLoading(true);
         if (session?.data?.user?.email) {
           const preferences = await getMatchPreference(session.data.user.email);
           if (preferences) {
@@ -104,7 +118,6 @@ const MatchPreferencePage = () => {
 
     fetchPreferences();
   }, [session]);
-  
 
   const onSubmit = async (data: MatchPreferenceFormInputs) => {
     try {
@@ -149,24 +162,24 @@ const MatchPreferencePage = () => {
     form.setValue("languages", newLanguages);
   };
 
-  if(isLoading){
+  if (isLoading) {
     return (
       <div>
         <div className="flex items-center justify-center p-4">
-        <Card className="w-full max-w-4xl rounded-2xl border-none">
-          <CardHeader>
-            <Skeleton className="h-14 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-          </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-5 ">
-            {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-4 w-full" />
-            ))}
-          </CardContent>
-        </Card>
+          <Card className="w-full max-w-4xl rounded-2xl border-none">
+            <CardHeader>
+              <Skeleton className="h-14 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-5 ">
+              {[...Array(6)].map((_, i) => (
+                <Skeleton key={i} className="h-4 w-full" />
+              ))}
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
-    )
+    );
   }
 
   return (
@@ -220,7 +233,6 @@ const MatchPreferencePage = () => {
                       </FormItem>
                     )}
                   />
-
                   <FormItem>
                     <FormLabel>Programming Languages</FormLabel>
                     <div className="space-y-4">
@@ -247,7 +259,6 @@ const MatchPreferencePage = () => {
                       </div>
                     </div>
                   </FormItem>
-
                   <FormField
                     control={form.control}
                     name="city"
@@ -267,7 +278,7 @@ const MatchPreferencePage = () => {
                       </FormItem>
                     )}
                   />
- <FormField
+                  <FormField
                     control={form.control}
                     name="state"
                     render={({ field }) => (
@@ -285,25 +296,26 @@ const MatchPreferencePage = () => {
                         <FormMessage />
                       </FormItem>
                     )}
-                  /> <FormField
-                  control={form.control}
-                  name="country"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Country</FormLabel>
-                      <FormControl>
-                        <div className="flex items-center space-x-2">
-                          <MapPin className="w-4 h-4 text-gitdate" />
-                          <Input
-                            placeholder="Enter your preferred location"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  />{" "}
+                  <FormField
+                    control={form.control}
+                    name="country"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Country</FormLabel>
+                        <FormControl>
+                          <div className="flex items-center space-x-2">
+                            <MapPin className="w-4 h-4 text-gitdate" />
+                            <Input
+                              placeholder="Enter your preferred location"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <FormField
                     control={form.control}
                     name="gender"
@@ -336,7 +348,6 @@ const MatchPreferencePage = () => {
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
                     name="minContributions"
@@ -366,7 +377,7 @@ const MatchPreferencePage = () => {
                   />
                 </div>
                 <div>
-                  <Button type="submit"  className="w-full">
+                  <Button type="submit" className="w-full">
                     Save Preferences
                   </Button>
                 </div>
