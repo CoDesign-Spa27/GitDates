@@ -96,10 +96,14 @@ export const createMatchPreference = async (matchData: MatchPreference) => {
             minContributions: minContributions,
           },
         });
-    return matchPreference;
+    const response = new SuccessResponse(
+      "Match preference created successfully",
+      200,
+      matchPreference
+    );
+    return response.serialize();
   } catch (error) {
-    console.error("Error creating match preference", error);
-    throw error;
+    throw new ErrorHandler("Error finding matches", "DATABASE_ERROR");
   }
 };
 
@@ -118,10 +122,18 @@ export const getMatchPreference = async (email: string) => {
     const matchPreference = await prisma.matchPreference.findUnique({
       where: { userId: user.id },
     });
-    return matchPreference;
+    if (!matchPreference) {
+      throw new Error("Match preference not found");
+    }
+
+    const response = new SuccessResponse(
+      "Match preference fetched successfully",
+      200,
+      matchPreference
+    );
+    return response.serialize();
   } catch (error) {
-    console.error("Error getting match preference", error);
-    throw error;
+    throw new ErrorHandler("Error fetching match preference", "DATABASE_ERROR");
   }
 };
 export const findMatches = async (email: string | undefined | null) => {
