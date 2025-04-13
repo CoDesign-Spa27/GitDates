@@ -1,12 +1,10 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useActionState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
   createMatchPreference,
-  findMatches,
-  getMatchPreference,
 } from "@/actions/match.action";
 import {
   Card,
@@ -40,7 +38,7 @@ import { MapPin, Languages, Users, GitCommit } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import useSWR from "swr";
-import { findMatchesFetcher } from "@/components/fetchers/fetchers";
+import { getMatchPreferencesFetcher } from "@/components/fetchers/fetchers";
 const matchPreferenceSchema = z.object({
   ageRange: z.array(z.number()).length(2).default([18, 99]),
   languages: z.array(z.string()).min(1, "At least one language is required"),
@@ -58,19 +56,8 @@ type MatchPreferenceFormInputs = z.infer<typeof matchPreferenceSchema>;
 const MatchPreferencePage = () => {
   const [languageInput, setLanguageInput] = useState("");
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const session = useSession();
   const email = session?.data?.user?.email;
-  const { data: matches, error: matchesError, isLoading: loadingMatches } = useSWR(
-    email ? ['matches',email] : null,
-    ([_,email]) => findMatchesFetcher(email),
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      dedupingInterval: 300000
-    }
-  );
- 
   const form = useForm<MatchPreferenceFormInputs>({
     resolver: zodResolver(matchPreferenceSchema),
     defaultValues: {
@@ -84,14 +71,18 @@ const MatchPreferencePage = () => {
     },
   });
 
-
-
+  const {data:matchPreference, error:matchPreferenceError, isLoading: matchPreferenceLoding} = useSWR(
+    email ? ["matchPreference", email] : null,
+    ([_,email]) => getMatchPreferencesFetcher(email),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 300000,
+    }
+  )
+  const preferences = matchPreference?.additional
+ 
   useEffect(() => {
-    const fetchPreferences = async () => {
-      try {
-        setIsLoading(true);
-        if (session?.data?.user?.email) {
-          const preferences = await getMatchPreference(session.data.user.email);
           if (preferences) {
             form.reset({
               ageRange: [preferences.ageMin ?? 18, preferences.ageMax ?? 99],
@@ -104,20 +95,7 @@ const MatchPreferencePage = () => {
             });
             setSelectedLanguages(preferences.languages ?? []);
           }
-        }
-      } catch (error) {
-        toast({
-          title: "Error loading preferences",
-          description: "Failed to load your existing preferences",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPreferences();
-  }, [session]);
+  }, [matchPreference]);
 
   const onSubmit = async (data: MatchPreferenceFormInputs) => {
     try {
@@ -162,7 +140,7 @@ const MatchPreferencePage = () => {
     form.setValue("languages", newLanguages);
   };
 
-  if (isLoading) {
+  if (matchPreferenceLoding) {
     return (
       <div>
         <div className="flex items-center justify-center p-4">
@@ -186,7 +164,7 @@ const MatchPreferencePage = () => {
     <div className="">
       <div className="w-full mx-auto">
         <Card className="border-none">
-          {isLoading ? (
+          {matchPreferenceLoding ? (
             <CardContent className="flex justify-center py-6">
               <div>Loading...</div>
             </CardContent>
