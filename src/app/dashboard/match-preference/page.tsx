@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
   createMatchPreference,
+  MatchPreference,
 } from "@/actions/match.action";
 import {
   Card,
@@ -38,7 +39,9 @@ import { MapPin, Languages, Users, GitCommit } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import useSWR from "swr";
+import useSWRMutation from "swr/mutation";
 import { getMatchPreferencesFetcher } from "@/components/fetchers/fetchers";
+import { createMatchPreferenceMutation } from "@/components/fetchers/mutations";
 const matchPreferenceSchema = z.object({
   ageRange: z.array(z.number()).length(2).default([18, 99]),
   languages: z.array(z.string()).min(1, "At least one language is required"),
@@ -82,6 +85,11 @@ const MatchPreferencePage = () => {
   )
   const preferences = matchPreference?.additional
  
+  const { trigger } = useSWRMutation(
+    email ? ["matchPreference", email] : null,
+    (_key, { arg }: { arg: MatchPreference }) => createMatchPreferenceMutation(arg),
+  )
+
   useEffect(() => {
           if (preferences) {
             form.reset({
@@ -99,15 +107,17 @@ const MatchPreferencePage = () => {
 
   const onSubmit = async (data: MatchPreferenceFormInputs) => {
     try {
-      const result = await createMatchPreference({
+      const payload = {
         ...data,
         ageMin: data.ageRange[0],
         ageMax: data.ageRange[1],
-      });
+      };
+      
+      const result = await trigger(payload);
       if (result) {
         toast({
           title: "Match preferences saved successfully!",
-          variant: "default",
+          variant: "success",
         });
         form.reset();
         setSelectedLanguages([]);
@@ -354,8 +364,8 @@ const MatchPreferencePage = () => {
                     )}
                   />
                 </div>
-                <div>
-                  <Button type="submit" className="w-full">
+                <div className=" w-full">
+                  <Button type="submit" className="flex justify-end">
                     Save Preferences
                   </Button>
                 </div>
