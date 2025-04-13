@@ -29,7 +29,7 @@ export default function Explore() {
     isLoading: isMatchesLoading,
   } = useSWR(
     email ? ["matches", email] : null,
-    ([_, email]) => findMatches(email),
+    useMemo(()=>([_, email]) => findMatches(email),[email]),
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
