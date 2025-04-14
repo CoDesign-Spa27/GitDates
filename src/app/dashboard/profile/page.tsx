@@ -24,6 +24,9 @@ import { useForm } from "react-hook-form";
 import { getUserProfile, updateUserProfile } from "@/actions/user.profile.action";
 import { Camera } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import useSWRMutation from "swr/mutation";
+import { updateAvatarMutation } from "@/components/fetchers/mutations";
+import { uploadImage } from "@/lib/upload-image";
 
 interface ProfileFormData {
   name?: string;
@@ -44,15 +47,24 @@ const ProfilePage = () => {
 
   const [userProfile, setUserProfile] = useState<any | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const { data: session } = useSession();
+  const email = session?.user?.email;
+  const {trigger:updateAvatar} = useSWRMutation(
+   email ? ['updateAvatar', email] : null,
+   (_key,{arg}:{arg:{email:string, avatar:string}}) => updateAvatarMutation(arg.email,arg.avatar)
+  )
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const profile = await getUserProfile();
+        if (!profile) {
+          throw new Error("Failed to fetch user profile");
+        }
         setUserProfile(profile);
-        setImagePreview(profile?.image || null);
-
         setValue("name", profile?.name || "");
+        setImagePreview(profile?.image || null);
         setValue("gender", profile?.gender || "");
         setValue("city", profile?.city || "");
         setValue("state", profile?.state || "");
@@ -65,48 +77,118 @@ const ProfilePage = () => {
 
     fetchData();
   }, [setValue]);
+ 
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try{
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+     
+      const publicUrl = await uploadImage(e);
 
-console.log("User Profile:", userProfile);
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      if (!publicUrl || !email) {
+        throw new Error("Failed to upload image");
+      }
+
+      const result = await updateAvatar({email, avatar: publicUrl});
+     
+      if(result?.success){
+        toast({
+          title: "Avatar updated successfully",
+          variant:'success'
+        })
+
+        setUserProfile((prev:any) =>{
+          return {
+            ...prev,
+            image:publicUrl
+          }
+        })
+      }else{
+        throw new Error("Failed to update avatar");
+      }
+       
+    }catch(err){
+      console.error("Error uploading image:", err);
+      toast({
+        title: "Error uploading image",
+        description: err instanceof Error ? err.message : "Please try again",
+        variant:'destructive'
+      });
+
+      setImagePreview(userProfile?.image || null);
+    }finally{
+
     }
   };
 
   const onSubmit = async (data: ProfileFormData) => {
     try {
-      console.log("Form data:", data);
+      // First handle image upload if there's a new image
+      let imageUrl = userProfile?.image;
       
-      // Validate required fields
-      if (!data.name?.trim()) {
-        throw new Error("Name is required");
+      if (data.image && data.image.length > 0) {
+        // Create a synthetic event object for uploadImage
+        const uploadEvent = {
+          target: {
+            files: data.image
+          }
+        } as unknown as React.ChangeEvent<HTMLInputElement>;
+        
+        imageUrl = await uploadImage(uploadEvent);
+        
+        if (!imageUrl) {
+          toast({
+            title: "Image upload failed",
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        // Update avatar in user profile
+        if (session?.user?.email) {
+          await updateAvatar({ 
+            email: session.user.email,
+            avatar: imageUrl 
+          });
+        }
       }
-
-      // Update profile
-      const updatedProfile = await updateUserProfile(data);
+      
+      // Update the rest of the profile data
+      const updatedProfileData = {
+        name: data.name,
+        gender: data.gender,
+        city: data.city,
+        state: data.state,
+        country: data.country,
+      };
+      
+      const updatedProfile = await updateUserProfile(updatedProfileData);
       
       if (!updatedProfile) {
         throw new Error("Failed to update profile");
       }
-
+      
       // Update local state with server response
-      setUserProfile(updatedProfile);
-
+      setUserProfile({
+        ...updatedProfile,
+        image: imageUrl  // Use the new image URL if available
+      });
+      
       toast({
         title: "Profile updated successfully",
       });
-
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({
         title: "Error updating profile",
         description: error instanceof Error ? error.message : "Please try again",
-     
+        variant: "destructive"
       });
     }
   };
@@ -120,7 +202,7 @@ console.log("User Profile:", userProfile);
               <Avatar className="w-32 h-32 mb-4">
                 <AvatarImage
                   src={imagePreview || "/placeholder.svg?height=128&width=128"}
-                  // alt={userProfile}
+                  alt={userProfile?.name || "User"}
                 />
                 <AvatarFallback>
                   {userProfile?.name
@@ -142,9 +224,7 @@ console.log("User Profile:", userProfile);
                 id="image-upload"
                 accept="image/*"
                 className="hidden"
-                {...register("image", {
-                  onChange: handleImageChange
-                })}
+                onChange={handleImageChange}
               />
             </div>
           

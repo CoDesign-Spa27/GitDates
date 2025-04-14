@@ -40,7 +40,6 @@ export interface UpdateUserProfileData {
   state?: string;
   country?: string;
   dob?: Date;
-  image?: FileList;
 }
 
 export const updateUserProfile = async (data: UpdateUserProfileData) => {
@@ -61,14 +60,13 @@ export const updateUserProfile = async (data: UpdateUserProfileData) => {
         state: data.state,
         country: data.country,
         dob: data.dob,
-        image: data.image?.[0]?.name,
+  
       },
       select: {
         id: true,
         name: true,
         email: true,
         username: true,
-        image: true,
         gender: true,
         city: true,
         state: true,
@@ -86,6 +84,32 @@ export const updateUserProfile = async (data: UpdateUserProfileData) => {
     throw new Error("Failed to update user profile");
   }
 };
+
+export const updateUserAvatar = async (email:string, image:string) =>{
+  try{
+    const existingUser = await prisma.user.findUnique({
+      where:{
+        email: email,
+      }
+    });
+    if(!existingUser){
+      throw new Error("User not found");
+    }
+
+   await prisma.user.update({
+    where:{
+      id:existingUser.id,
+    },
+    data:{
+      image:image,
+    }
+    })
+
+    return { success:"Avatar Updated Successfully " }
+  }catch(err){
+  return { error: "Failed to update avatar" };
+  }
+}
 
 export const createGithubProfile = async (githubData: UserData) => {
   const session = await getServerSession(authOptions);

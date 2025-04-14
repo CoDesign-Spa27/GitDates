@@ -9,7 +9,6 @@ export default async function middleware(request: NextRequest) {
       });
   const { pathname } = new URL(request.url);
 
-  console.log(token, "token")
   const publicPaths = [
     "/",
     "/api/auth/signin",
