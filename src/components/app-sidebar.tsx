@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Sidebar,
   SidebarContent,
@@ -9,11 +8,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { ModeToggle } from "./ui/mode-toggle";
 import { Logo } from "./designs/logo";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   dashboardIcon,
   exploreIcon,
@@ -21,69 +20,88 @@ import {
   preferenceIcon,
   profileIcon,
 } from "../../public/icons";
-import { useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { HeartHandshakeIcon } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { 
+  HeartHandshake, 
+  Settings, 
+  LogOut,
+  Bell,
+  MessageCircle 
+} from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
-import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
+import { ProfileSet } from "./profileSet";
 
-// Menu items.
-const items = [
-  {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: dashboardIcon,
-  },
-  {
-    title: "Profile",
-    url: "/dashboard/profile",
-    icon: profileIcon,
-  },
-  {
-    title: "GitDate Profile",
-    url: "/dashboard/gitdate-profile",
-    icon: gitIcon,
-  },
-  {
-    title: "Match Preference",
-    url: "/dashboard/match-preference",
-    icon: preferenceIcon,
-  },
-  {
-    title: "Explore",
-    url: "/dashboard/explore",
-    icon: exploreIcon,
-  },
-  {
-    title: "Matches",
-    url: "/dashboard/matches",
-    icon: HeartHandshakeIcon,
-  },
-
-  // {
-  //   title: "Calendar",
-  //   url: "#",
-  //   icon: Calendar,
-  // },
-  // {
-  //   title: "Search",
-  //   url: "#",
-  //   icon: Search,
-  // },
-  // {
-  //   title: "Settings",
-  //   url: "#",
-  //   icon: Settings,
-  // },
-];
+// Navigation items grouped by category
+const navigationItems = {
+  main: [
+    {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: dashboardIcon,
+      tooltip: "View your dashboard",
+    },
+    {
+      title: "Explore",
+      url: "/dashboard/explore", 
+      icon: exploreIcon,
+      tooltip: "Find new matches",
+    },
+    {
+      title: "Messages",
+      url: "/dashboard/messages",
+      icon: MessageCircle,
+      tooltip: "Chat with matches",
+    },
+    {
+      title: "Notifications",
+      url: "/dashboard/notifications",
+      icon: Bell,
+      tooltip: "View notifications",
+      badge: 3, // Optional badge count
+    }
+  ],
+  profile: [
+    {
+      title: "Profile",
+      url: "/dashboard/profile",
+      icon: profileIcon,
+      tooltip: "Edit your profile",
+    },
+    {
+      title: "GitDate Profile",
+      url: "/dashboard/gitdate-profile",
+      icon: gitIcon,
+      tooltip: "Manage GitDate profile",
+    },
+    {
+      title: "Match Preference",
+      url: "/dashboard/match-preference",
+      icon: preferenceIcon,
+      tooltip: "Set match preferences",
+    },
+    {
+      title: "Matches",
+      url: "/dashboard/matches",
+      icon: HeartHandshake,
+      tooltip: "View your matches",
+    }
+  ],
+  settings: [
+    // {
+    //   title: "Settings",
+    //   url: "/dashboard/settings",
+    //   icon: Settings,
+    //   tooltip: "App settings",
+    // }
+  ]
+};
 
 export function AppSidebar() {
   const pathname = usePathname();
-  
-  const router = useRouter();
-
+  const {data:session} = useSession();
   const isActive = (url: string) => {
     if (url === "/dashboard" && pathname === "/dashboard") {
       return true;
@@ -96,59 +114,105 @@ export function AppSidebar() {
 
   const handleSignOut = async () => {
     try {
-      const res = await signOut({
-        callbackUrl: "/",
-      });
-      console.log(res, "signout");
+      await signOut({ callbackUrl: "/" });
     } catch (error) {
       toast({
-        title: "Internal Server Error",
+        title: "Failed to sign out",
+        description: "Please try again",
         variant: "destructive",
       });
-      console.error("Error signing out:", error);
     }
   };
+
+  const NavigationSection = ({ items, title }: { items: typeof navigationItems.main, title?: string }) => (
+    <>
+      {title && (
+        <div className="px-4 py-2">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            {title}
+          </h3>
+        </div>
+      )}
+      {items.map((item) => (
+        <SidebarMenuItem key={item.title}>
+          <Link href={item.url} prefetch={true} className="w-full">
+            <SidebarMenuButton 
+              tooltip={item.tooltip}
+              className={cn(
+                "transition-all duration-200 ease-in-out",
+                isActive(item.url) 
+                  ? "bg-gitdate bg-opacity-10 text-gitdate" 
+                  : "hover:bg-gray-100 dark:hover:bg-neutral-800"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <item.icon
+                className={`${
+                  isActive(item.url)
+                  ? "bg-gitdate text-[#fff] rounded-full p-1 text-3xl "
+                  : "dark:text-gray-300 text-gray-800 rounded-full p-1 text-3xl"
+                }`}
+                />
+                <span className="font-medium">
+                  {item.title}
+                </span>
+                {item.badge && (
+                  <span className="ml-auto bg-gitdate text-white px-2 py-0.5 rounded-full text-xs">
+                    {item.badge}
+                  </span>
+                )}
+              </div>
+            </SidebarMenuButton>
+          </Link>
+        </SidebarMenuItem>
+      ))}
+    </>
+  );
+
   return (
-    <Sidebar>
-      <SidebarContent>
+    <Sidebar className="overflow-x-hidden">
+      <SidebarContent className="py-4">
         <SidebarGroup>
-          <SidebarGroupLabel>
+          <SidebarGroupLabel className="px-2 mb-6">
             <Logo />
           </SidebarGroupLabel>
+          
           <SidebarGroupContent>
-            <SidebarMenu className="py-5">
-              {items.map((item) => (
-                <SidebarMenuItem
-                  key={item.title}
-                  className="py-1"
-                >
-                  <Link href={item.url} prefetch={true} className="w-full" >
-                  <SidebarMenuButton className={isActive(item.url) ? "bg-opacity-10 bg-gitdate rounded-md" : ""}>
-                    <div className="flex items-center gap-2">
-                      <item.icon
-                        className={`${
-                          isActive(item.url)
-                          ? "bg-gitdate text-[#fff] rounded-full p-1 text-3xl "
-                          : "dark:text-gray-300 text-gray-800 rounded-full p-1 text-3xl"
-                        }`}
-                        />
-                      <span className="font-bold text-[16px]">
-                        {item.title}
-                      </span>
-                    </div>
-                  </SidebarMenuButton>
-                        </Link>
-                </SidebarMenuItem>
-              ))}
-              <ModeToggle />
-              <Button
-                variant="pressed"
-                className="w-full mt-5"
-                onClick={handleSignOut}
-              >
-                Sign Out
-              </Button>
+            <SidebarMenu>
+              <div className="py-2">
+                <ProfileSet session={session?.user} />
+              </div>
+              <div className="px-1 py-3">
+
+              <NavigationSection items={navigationItems.main} />
+              
+              <SidebarSeparator className="my-4" />
+              
+              <NavigationSection 
+                items={navigationItems.profile} 
+                title="Profile" 
+                />
+              
+              <SidebarSeparator className="my-4" />
+              
+              <NavigationSection 
+                items={navigationItems.settings} 
+                title="Settings" 
+                />
+                </div>
             </SidebarMenu>
+
+            <div className="px-4 mt-auto pt-4">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-md transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign out</span>
+                </button>
+              </div>
+            </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

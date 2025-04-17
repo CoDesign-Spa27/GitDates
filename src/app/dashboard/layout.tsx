@@ -7,17 +7,24 @@ import Loading from "./loading";
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <div className="flex h-screen w-full overflow-hidden">
+        <div className="hidden md:block h-full overflow-hidden">
+          <AppSidebar />
+        </div>
 
-      <div className="fixed top-5 right-5 z-50 flex items-center justify-center p-2 rounded-full shadow-md   transition-all cursor-pointer">
-        <SidebarTrigger />
+        <div className="flex-1 flex flex-col h-full overflow-auto relative">
+          <div className="md:hidden fixed top-4 right-4 z-50">
+            <SidebarTrigger />
+          </div>
+
+          {/* Content with proper spacing */}
+          <Suspense fallback={<Loading />}>
+            <main className="flex-1 p-4 md:p-6 pt-16 md:pt-6">
+              {children}
+            </main>
+          </Suspense>
+        </div>
       </div>
-
-      <Suspense fallback={<Loading />}>
-        <main className="w-full">
-          <div className="p-4">{children}</div>
-        </main>
-      </Suspense>
     </SidebarProvider>
   );
 }
