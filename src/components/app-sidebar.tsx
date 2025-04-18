@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sidebar";
 import { ModeToggle } from "./ui/mode-toggle";
 import { Logo } from "./designs/logo";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   dashboardIcon,
   exploreIcon,
@@ -33,6 +33,7 @@ import { signOut, useSession } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { ProfileSet } from "./profileSet";
+import { getUnreadMessageCounts } from "@/actions/conversation.action";
 
 // Navigation items grouped by category
 const navigationItems = {
@@ -49,11 +50,11 @@ const navigationItems = {
       icon: exploreIcon,
       tooltip: "Find new matches",
     },
-    {
-      title: "Messages",
-      url: "/dashboard/messages",
+     {
+      title: "Conversations",
+      url: "/dashboard/conversations",
       icon: MessageCircle,
-      tooltip: "Chat with matches",
+      tooltip: "Conversations",
     },
     {
       title: "Notifications",
@@ -102,6 +103,7 @@ const navigationItems = {
 export function AppSidebar() {
   const pathname = usePathname();
   const {data:session} = useSession();
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const isActive = (url: string) => {
     if (url === "/dashboard" && pathname === "/dashboard") {
       return true;
@@ -111,6 +113,25 @@ export function AppSidebar() {
     }
     return false;
   };
+
+  useEffect(() => {
+    // Fetch unread message counts
+    const fetchUnreadCounts = async () => {
+      try {
+        const counts = await getUnreadMessageCounts();
+        setUnreadMessageCount(counts?.total || 0);
+      } catch (error) {
+        console.error("Error fetching unread counts:", error);
+      }
+    };
+    
+    fetchUnreadCounts();
+    
+    // Set up polling every 30 seconds
+    const interval = setInterval(fetchUnreadCounts, 30000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -156,7 +177,14 @@ export function AppSidebar() {
                 <span className="font-medium">
                   {item.title}
                 </span>
-                {item.badge && (
+                {/* Show unread message count for Messages item */}
+                {item.title === "Messages" && unreadMessageCount > 0 && (
+                  <span className="ml-auto bg-gitdate text-white px-2 py-0.5 rounded-full text-xs">
+                    {unreadMessageCount}
+                  </span>
+                )}
+                {/* Other badges */}
+                {item.badge && item.title !== "Messages" && (
                   <span className="ml-auto bg-gitdate text-white px-2 py-0.5 rounded-full text-xs">
                     {item.badge}
                   </span>

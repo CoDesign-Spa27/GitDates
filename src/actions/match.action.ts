@@ -122,8 +122,14 @@ export const getMatchPreference = async (email: string) => {
     const matchPreference = await prisma.matchPreference.findUnique({
       where: { userId: user.id },
     });
-    if (!matchPreference) {
-      throw new Error("Match preference not found");
+
+    if (!matchPreference || matchPreference === null) {
+      const response = new SuccessResponse(
+        "No match preference found",
+        404,
+        null
+      );
+      return response.serialize();
     }
 
     const response = new SuccessResponse(
@@ -493,6 +499,9 @@ export const getMyMatches = async () => {
         },
       },
     });
+    if (!matches) {
+      throw new Error("No matches found");
+    }
     return matches.map((match) => {
       const isUserSender = match.senderId === user.id;
       const otherPerson = isUserSender ? match.receiver : match.sender;

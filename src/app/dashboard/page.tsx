@@ -46,16 +46,16 @@ export interface UserData {
 
 export default function Dashboard() {
   const [profile, setProfile] = useState<any>(null);
-  const [matchPreference, setMatchPreference] = useState<any>(null);
+ 
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProfileCreated, setIsProfileCreated] = useState(false);
   const [isMatchPreferenceCreated, setIsMatchPreferenceCreated] = useState(false);
   const [matchRequests,setMatchRequests] = useState<any[]>([]);
   const {data:session} = useSession();
-  const user = session?.user;
-  
 
+   
+ 
   useEffect(() => {
     const fetchProfile = async () => {
       if(!session?.user) return;
@@ -65,7 +65,6 @@ export default function Dashboard() {
         const matchRequests= await getMatchRequests();
         setMatchRequests(matchRequests);
         setProfile(data);
-        setMatchPreference(matchPreference);
         setIsProfileCreated(!!data);
         setIsMatchPreferenceCreated(!!matchPreference);
       } catch (err) {
@@ -80,9 +79,6 @@ export default function Dashboard() {
    
   }, [session?.user]);
  
-  const  handleReject = async (matchId : string) => {
-
-   }
 
 
   if (isLoading) {

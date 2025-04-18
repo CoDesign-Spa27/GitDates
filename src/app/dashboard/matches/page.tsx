@@ -12,6 +12,7 @@ import { Check, X, Heart } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import useSWR from "swr";
+import { useRouter } from "next/navigation";
 
 interface Profile {
   name: string;
@@ -195,7 +196,18 @@ export default function MatchesPage() {
 }
 
 function MatchCard({ match }: { match: Match }) {
+  const router = useRouter();
+  
   if (!match.profile) return null;
+
+  const handleMessage = () => {
+    router.push(`/dashboard/messages/new?matchId=${match.matchId}`);
+  };
+
+  const handleViewProfile = () => {
+    // Open profile view
+    router.push(`/dashboard/explore/${match.userId}`);
+  };
 
   return (
     <div className="bg-card rounded-lg border border-border overflow-hidden flex flex-col">
@@ -223,10 +235,18 @@ function MatchCard({ match }: { match: Match }) {
       </div>
 
       <div className="mt-auto p-4 pt-0 flex gap-2">
-        <Button variant="outline" className="flex-1">
+        <Button 
+          variant="outline" 
+          className="flex-1"
+          onClick={handleViewProfile}
+        >
           View Profile
         </Button>
-        <Button variant="pressed" className="flex-1">
+        <Button 
+          variant="pressed" 
+          className="flex-1"
+          onClick={handleMessage}
+        >
           Message
         </Button>
       </div>
