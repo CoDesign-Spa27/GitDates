@@ -102,7 +102,6 @@ const navigationItems = {
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const {data:session} = useSession();
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const isActive = (url: string) => {
     if (url === "/dashboard" && pathname === "/dashboard") {
@@ -208,7 +207,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <div className="py-2">
-                <ProfileSet session={session?.user} />
+                <ProfileSet />
               </div>
               <div className="px-1 py-3">
 
