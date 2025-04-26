@@ -9,6 +9,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
+  SidebarMenuBadge,
+  useSidebar,
+  SidebarFooter,
+  SidebarHeader,
 } from "@/components/ui/sidebar";
 import { ModeToggle } from "./ui/mode-toggle";
 import { Logo } from "./designs/logo";
@@ -101,6 +105,15 @@ const navigationItems = {
 };
 
 export function AppSidebar() {
+  const {
+    state: isCollapsed,
+    open,
+    setOpen,
+    openMobile,
+    setOpenMobile,
+    isMobile,
+    toggleSidebar,
+  } = useSidebar();
   const pathname = usePathname();
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const isActive = (url: string) => {
@@ -114,22 +127,27 @@ export function AppSidebar() {
   };
 
   useEffect(() => {
-    // Fetch unread message counts
+    let mounted = true;
+ 
     const fetchUnreadCounts = async () => {
       try {
         const counts = await getUnreadMessageCounts();
-        setUnreadMessageCount(counts?.total || 0);
+        if (mounted) {
+          setUnreadMessageCount(counts?.total || 0);
+        }
       } catch (error) {
         console.error("Error fetching unread counts:", error);
       }
     };
     
     fetchUnreadCounts();
-    
-    // Set up polling every 30 seconds
+   
     const interval = setInterval(fetchUnreadCounts, 30000);
     
-    return () => clearInterval(interval);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   const handleSignOut = async () => {
@@ -147,48 +165,36 @@ export function AppSidebar() {
   const NavigationSection = ({ items, title }: { items: typeof navigationItems.main, title?: string }) => (
     <>
       {title && (
-        <div className="px-4 py-2">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-            {title}
-          </h3>
-        </div>
+        <SidebarGroupLabel className="py-2">
+          {title}
+        </SidebarGroupLabel>
       )}
       {items.map((item) => (
-        <SidebarMenuItem key={item.title}>
-          <Link href={item.url} prefetch={true} className="w-full">
+        <SidebarMenuItem key={item.title} className="py-1">
+          <Link 
+            href={item.url} 
+            prefetch={false}
+          >
             <SidebarMenuButton 
               tooltip={item.tooltip}
-              className={cn(
-                "transition-all duration-200 ease-in-out",
-                isActive(item.url) 
-                  ? "bg-gitdate bg-opacity-10 text-gitdate" 
-                  : "hover:bg-gray-100 dark:hover:bg-neutral-800"
-              )}
+              isActive={isActive(item.url)}
+             className='[&>svg]:size-8'
             >
-              <div className="flex items-center gap-3">
-                <item.icon
-                className={`${
-                  isActive(item.url)
-                  ? "bg-gitdate text-[#fff] rounded-full p-1 text-3xl "
-                  : "dark:text-gray-300 text-gray-800 rounded-full p-1 text-3xl"
-                }`}
-                />
-                <span className="font-medium">
-                  {item.title}
-                </span>
-                {/* Show unread message count for Messages item */}
-                {item.title === "Messages" && unreadMessageCount > 0 && (
-                  <span className="ml-auto bg-gitdate text-white px-2 py-0.5 rounded-full text-xs">
-                    {unreadMessageCount}
-                  </span>
-                )}
-                {/* Other badges */}
-                {item.badge && item.title !== "Messages" && (
-                  <span className="ml-auto bg-gitdate text-white px-2 py-0.5 rounded-full text-xs">
-                    {item.badge}
-                  </span>
-                )}
-              </div>
+              <item.icon className={cn(
+                "h-4 w-4 shrink-0 p-1",
+                isActive(item.url) && "bg-gitdate rounded-full "
+              )} />
+              <span className="truncate">{item.title}</span>
+              {item.title === "Conversations" && unreadMessageCount > 0 && (
+                <SidebarMenuBadge className="bg-gitdate text-white">
+                  {unreadMessageCount}
+                </SidebarMenuBadge>
+              )}
+              {item.badge && item.title !== "Conversations" && (
+                <SidebarMenuBadge className="bg-gitdate text-white">
+                  {item.badge}
+                </SidebarMenuBadge>
+              )}
             </SidebarMenuButton>
           </Link>
         </SidebarMenuItem>
@@ -197,52 +203,51 @@ export function AppSidebar() {
   );
 
   return (
-    <Sidebar className="overflow-x-hidden">
-      <SidebarContent className="py-4">
-        <SidebarGroup>
-          <SidebarGroupLabel className="px-2 mb-6">
+    <Sidebar className="overflow-hidden" collapsible="icon" >
+          <SidebarHeader >
             <Logo />
-          </SidebarGroupLabel>
+          </SidebarHeader>
+      <SidebarContent className="w-full" >
+        <SidebarGroup className="w-full">
           
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <div className="py-2">
-                <ProfileSet />
+          <SidebarGroupContent className="w-full">
+            <SidebarMenu className="w-full">
+              <div className="py-3 w-full">
+                <NavigationSection items={navigationItems.main} />
+                
+                <SidebarSeparator className="my-4" />
+                
+                <NavigationSection 
+                  items={navigationItems.profile} 
+                  title="Profile" 
+                />
+                
+                <SidebarSeparator className="my-4" />
+                
+                <NavigationSection 
+                  items={navigationItems.settings} 
+                  title="Settings" 
+                />
               </div>
-              <div className="px-1 py-3">
-
-              <NavigationSection items={navigationItems.main} />
-              
-              <SidebarSeparator className="my-4" />
-              
-              <NavigationSection 
-                items={navigationItems.profile} 
-                title="Profile" 
-                />
-              
-              <SidebarSeparator className="my-4" />
-              
-              <NavigationSection 
-                items={navigationItems.settings} 
-                title="Settings" 
-                />
-                </div>
             </SidebarMenu>
 
-            <div className="px-4 mt-auto pt-4">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleSignOut}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-md transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Sign out</span>
-                </button>
-              </div>
+            <div className="mt-auto pt-4 w-full">
+              <SidebarMenuButton
+                onClick={handleSignOut}
+                className="text-red-500 hover:bg-red-50 dark:hover:bg-red-950/50 w-full"
+              >
+                <LogOut className="h-8 w-8 shrink-0" />
+                {isCollapsed === 'expanded' &&
+                  <span className="truncate">Sign out</span>
+                }
+              </SidebarMenuButton>
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <ProfileSet isCollapsed={isCollapsed} />
+      </SidebarFooter>
     </Sidebar>
   );
 }
