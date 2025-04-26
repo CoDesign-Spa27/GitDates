@@ -181,8 +181,8 @@ export function AppSidebar() {
              className='[&>svg]:size-8'
             >
               <item.icon className={cn(
-                "h-4 w-4 shrink-0 p-1",
-                isActive(item.url) && "bg-gitdate rounded-full "
+                "h-4 w-4 shrink-0 p-1 ",
+                isActive(item.url) && "bg-gitdate text-white rounded-full "
               )} />
               <span className="truncate">{item.title}</span>
               {item.title === "Conversations" && unreadMessageCount > 0 && (

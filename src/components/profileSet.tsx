@@ -26,7 +26,7 @@ export const ProfileSet = ({ isCollapsed }: { isCollapsed: string }) => {
     return <div className="text-red-500 p-2">No session found</div>
   }
 
- return (  <div className="flex flex-col items-center justify-center bg-neutral-800 rounded-md py-1">
+ return (  <div className="flex flex-col items-center justify-center bg-neutral-200 dark:bg-neutral-800 rounded-md py-1">
         <div className="overflow-hidden">
             <div className="flex items-center space-x-2">
                 <Avatar className="h-10 w-10 shadow-md">
