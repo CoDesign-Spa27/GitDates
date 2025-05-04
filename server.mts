@@ -10,7 +10,7 @@ const hostname = process.env.HOSTNAME || "localhost";
 const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
 
-let io:SocketIOServer;
+let io: SocketIOServer;
 app
   .prepare()
   .then(() => {
@@ -20,30 +20,22 @@ app
       handler(req, res);
     });
 
-    console.log(httpServer, "httpServer");
-
-    // Initialize Socket.IO on the same server
-     io = new SocketIOServer(httpServer, {
+    // Initialize Socket.IO on the same server with improved settings for real-time messaging
+    io = new SocketIOServer(httpServer, {
       path: "/api/socket",
       cors: {
         origin: dev ? "*" : "your-production-domain.com",
         methods: ["GET", "POST"],
       },
+      // Improved settings for real-time messaging
+      transports: ['websocket', 'polling'],
+      pingInterval: 10000, // ping every 10 seconds
+      pingTimeout: 5000,   // consider disconnected after 5 seconds of no response
+      // Disable cluster mode buffering for immediate message delivery
+      allowEIO3: true,
+      connectTimeout: 45000,
     });
 
-    // Socket.IO connection handler
-    io.on("connection", (socket) => {
-      console.log("Client connected:", socket.id);
-
-      socket.on("disconnect", () => {
-        console.log("Client disconnected:", socket.id);
-      });
-
-      socket.on("message", (msg) => {
-        console.log("Message received:", msg);
-        io.emit("message", msg);
-      });
-    });
     // Start the combined server
     httpServer.listen(port, () => {
       console.log(`> Ready on http://${hostname}:${port}`);
@@ -55,4 +47,4 @@ app
     process.exit(1);
   });
 
-  export {io as socketServer};
+export { io as socketServer };

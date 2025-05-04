@@ -3,6 +3,7 @@ import { socketServer } from "../../server.mjs";
 import { Server as SocketIOServer } from "socket.io";
 import { authOptions } from "./auth";
 import prisma from "./prisma";
+import { verifySocketToken } from "./socket-auth";
 
 if(!socketServer) {
   throw new Error("Socket server is not initialized");
@@ -13,19 +14,31 @@ const userConnections = new Map();
 
 socketServer.use(async (socket, next) => {
   try {
-    const session = await getServerSession(authOptions);
-    if(session?.user?.email) {
-      const user = await prisma.user.findUnique({ 
-        where: { email: session.user.email }
-      });
-      
-      if(user) {
-        socket.data.user = user;
-        return next();
-      }
+    // Get auth token from socket handshake auth
+    const token = socket.handshake.auth.token;
+    
+    if (!token) {
+      return next(new Error("Authentication token is required"));
     }
     
-    return next(new Error("Unauthorized"));
+    // Verify token
+    const decodedToken = verifySocketToken(token);
+    if (!decodedToken) {
+      return next(new Error("Invalid authentication token"));
+    }
+    
+    // Get user from database
+    const user = await prisma.user.findUnique({
+      where: { id: decodedToken.userId }
+    });
+    
+    if (!user) {
+      return next(new Error("User not found"));
+    }
+    
+    // Set user data on socket
+    socket.data.user = user;
+    return next();
   } catch (err) {
     console.error("Error in socket middleware:", err);
     return next(new Error("Internal server error"));
@@ -123,7 +136,7 @@ socketServer.on("connection", async (socket) => {
   });
 
   // Handle typing events
-  socket.on("typing", ({ conversationId, isTyping }) => {
+  socket.on("userTyping", ({ conversationId, isTyping }) => {
     socket.to(`conversation:${conversationId}`).emit("userTyping", {
       userId: user.id,
       isTyping,
