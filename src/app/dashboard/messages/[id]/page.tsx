@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getOrCreateConversation, sendMessage, markConversationAsRead } from "@/actions/conversation.action";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -32,7 +32,7 @@ interface Conversation {
   otherUserId: string;
 }
 
-export default function ConversationPage() {
+export default function MessagesPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [conversation, setConversation] = useState<Conversation | null>(null);
@@ -54,11 +54,15 @@ export default function ConversationPage() {
     subscribeToMessagesRead,
     isConnected
   } = useSocket();
+ 
+ 
+ 
 
-  const fetchConversation = async () => {
+  const fetchConversation = useCallback(async () => {
     try {
       setLoading(true);
       const data: any = await getOrCreateConversation(id as string);
+      console.log("Conversation data fetched:", data);
       setConversation(data);
 
       // Mark messages as read
@@ -71,53 +75,78 @@ export default function ConversationPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, markMessagesAsRead]);
 
   useEffect(() => {
     if (id) {
       fetchConversation();
     }
-  }, [id]);
+  }, [id, fetchConversation]);
 
+  // FIX: Separate useEffect for socket subscriptions with socketKey dependency
   useEffect(() => {
+ 
+    if (!conversation || !isConnected) return;
+    
     // Subscribe to new messages
     const unsubscribeNewMessages = subscribeToNewMessages((message) => {
-      if (message.conversationId === id) {
+      console.log("New message received via socket:", message);
+      
+      if (message.id === conversation.id) {
+     
+        
+        // FIX: More reliable state update for incoming messages
         setConversation(prev => {
           if (!prev) return prev;
           
-          // Only add if not already in the list
+          // Check if message already exists
           const messageExists = prev.messages.some(m => m.id === message.id);
+          
           if (!messageExists) {
-            const newMessages = [...prev.messages, message];
+       
             
             // If message from other user, mark as read
             if (message.senderId !== prev.currentUserId) {
               markMessagesAsRead(prev.id);
-              markConversationAsRead(prev.id);
+              markConversationAsRead(prev.id).catch(console.error);
             }
             
             return {
               ...prev,
-              messages: newMessages
+              messages: [...prev.messages, message]
+            };
+          } else {
+            // Update any temporary messages that match this one
+            const updatedMessages = prev.messages.map(m => 
+              (m.id.startsWith('temp-') && m.content === message.content) ? message : m
+            );
+          
+            
+            return {
+              ...prev,
+              messages: updatedMessages
             };
           }
-          return prev;
         });
       }
     });
     
-    // Subscribe to typing events
-    const unsubscribeTyping = subscribeToTyping(({ userId, isTyping }) => {
+    // Subscribe to typing events - FIX: Simplified typing event handling
+    const unsubscribeTyping = subscribeToTyping(({ userId, isTyping: userIsTyping }) => {
+      console.log("Typing event received:", { userId, userIsTyping});
+      
       if (conversation && userId !== conversation.currentUserId) {
-        setIsTyping(isTyping);
-        setTypingUserId(isTyping ? userId : null);
+        console.log("Setting typing status:", userIsTyping);
+        setIsTyping(userIsTyping);
+        setTypingUserId(userIsTyping ? userId : null);
       }
     });
     
     // Subscribe to read receipts
     const unsubscribeMessagesRead = subscribeToMessagesRead(({ conversationId, readBy }) => {
-      if (conversationId === id) {
+      console.log("Messages read event:", { conversationId, readBy });
+      
+      if (conversationId === conversation.id) {
         setConversation(prev => {
           if (!prev) return prev;
           return {
@@ -130,41 +159,68 @@ export default function ConversationPage() {
       }
     });
     
+    // Return cleanup function
     return () => {
-      unsubscribeNewMessages?.();
+      unsubscribeNewMessages();
       unsubscribeTyping?.();
       unsubscribeMessagesRead?.();
     };
-  }, [id, conversation?.currentUserId]);
+  }, [conversation, subscribeToNewMessages, subscribeToTyping, subscribeToMessagesRead, markMessagesAsRead, isConnected]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [conversation?.messages]);
+  }, [conversation?.messages, isTyping]);
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    
     if (!messageInput.trim() || sendingMessage || !conversation) return;
+  
+    const content = messageInput.trim();
+    setMessageInput("");
+    setSendingMessage(true);
     
+ 
+  
+    const optimisticMessage: Message = {
+      id: `temp-${Date.now()}`,
+      content,
+      senderId: conversation.currentUserId,
+      read: false,
+      createdAt: new Date().toISOString(),
+      sender: {
+        id: conversation.currentUserId,
+        name: session?.user?.name || "You",
+        image: session?.user?.image || "/placeholder-avatar.png",
+      },
+    };
+  
+    // Add optimistic message to UI
+    setConversation(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        messages: [...prev.messages, optimisticMessage]
+      };
+    });
+  
     try {
-      setSendingMessage(true);
+      // First send via socket for immediate delivery
+      socketSendMessage(conversation.id, content);
       
-      // Try to send via socket first for real-time delivery
-      const sentViaSocket = socketSendMessage(conversation.id, messageInput.trim());
-      
-      if (!sentViaSocket) {
-        // Fallback to API if socket fails
-        await sendMessage(conversation.id, messageInput.trim());
-        fetchConversation();
-      }
-      
-      // Clear input regardless
-      setMessageInput("");
+      // Then save to backend
+      await sendMessage(conversation.id, content);
     } catch (error) {
-      console.error("Error sending message:", error);
+      // Remove failed optimistic message
+      setConversation(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          messages: prev.messages.filter(msg => msg.id !== optimisticMessage.id)
+        };
+      });
     } finally {
       setSendingMessage(false);
     }
@@ -172,29 +228,40 @@ export default function ConversationPage() {
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
+      e.preventDefault(); 
       handleSendMessage();
     }
   };
 
+  // FIX: Improved typing status handling
   const handleTyping = () => {
-    // Send typing indicator to other user
-    if (conversation) {
-      sendTypingStatus(conversation.id, true);
+    if (!conversation || !isConnected) return;
+   
+    sendTypingStatus(conversation.id, true);
       
-      // Clear previous timer
+    if (typingTimerRef.current) {
+      clearTimeout(typingTimerRef.current);
+    }
+    
+    typingTimerRef.current = setTimeout(() => {
+      if (conversation) {
+        sendTypingStatus(conversation.id, false);
+      }
+    }, 2000);
+  };
+
+  // FIX: Clear typing status on unmount
+  useEffect(() => {
+    return () => {
       if (typingTimerRef.current) {
         clearTimeout(typingTimerRef.current);
       }
       
-      // Set new timer to stop typing after 2 seconds
-      typingTimerRef.current = setTimeout(() => {
-        if (conversation) {
-          sendTypingStatus(conversation.id, false);
-        }
-      }, 2000);
-    }
-  };
+      if (conversation && isConnected) {
+        sendTypingStatus(conversation.id, false);
+      }
+    };
+  }, [conversation, sendTypingStatus, isConnected]);
 
   if (loading) {
     return (
@@ -249,7 +316,7 @@ export default function ConversationPage() {
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={() => router.push("/dashboard/messages")}
+            onClick={() => router.push("/dashboard/conversations")}
             className="md:hidden"
           >
             <ArrowLeft className="h-5 w-5" />

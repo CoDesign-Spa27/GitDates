@@ -130,18 +130,18 @@ socketServer.on("connection", async (socket) => {
         });
       }
     } catch (error) {
-      console.error("Error sending message via socket:", error);
       socket.emit("error", { message: "Failed to send message" });
     }
   });
 
   // Handle typing events
-  socket.on("userTyping", ({ conversationId, isTyping }) => {
-    socket.to(`conversation:${conversationId}`).emit("userTyping", {
-      userId: user.id,
-      isTyping,
-    });
+
+socket.on("typing", ({ conversationId, isTyping }) => {
+  socket.to(`conversation:${conversationId}`).emit("userTyping", {
+    userId: user.id,
+    isTyping,
   });
+});
 
   // Handle read receipts
   socket.on("markAsRead", async ({ conversationId }) => {
@@ -165,7 +165,6 @@ socketServer.on("connection", async (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log(`User disconnected: ${user.name} (${user.id})`);
     userConnections.delete(user.id);
   });
 });

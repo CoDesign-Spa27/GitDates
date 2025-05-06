@@ -26,7 +26,7 @@ export function useSocket() {
         const data = await response.json();
         setSocketToken(data.token);
       } catch (error) {
-        console.error('Error fetching socket token:', error);
+   
         setConnectionError('Failed to authenticate socket connection');
       }
     }
@@ -69,7 +69,7 @@ export function useSocket() {
       });
 
       socket.on('connect_error', (error) => {
-        console.error('Socket error:', error);
+ 
         setConnectionError(error.message);
         reconnectAttemptsRef.current += 1;
         if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
@@ -78,7 +78,7 @@ export function useSocket() {
       });
 
       socket.on('error', (error) => {
-        console.error('Socket error event:', error);
+ 
         setConnectionError(error.message);
       });
     }
@@ -97,7 +97,6 @@ export function useSocket() {
       socketRef.current.emit('sendMessage', { conversationId, content });
       return true;
     }
-    console.log('Cannot send message - socket disconnected or not initialized');
     return false;
   }, [isConnected]);
 
@@ -111,22 +110,23 @@ export function useSocket() {
       }
     };
   }, []);
-  const subscribeToTyping = useCallback((callback: (data: { userId: string, isTyping: boolean }) => void) => {
-    const socket = socketRef.current;
-    if (!socket) {
-      console.warn('Socket is not connected yet when trying to subscribe to typing.');
-      return () => { };
-    }
 
-    socket.on('userTyping', callback);
+  const subscribeToTyping = useCallback((callback: (data: { userId: string, isTyping: boolean }) => void) => {
+    if (!socketRef.current) {
+      return () => {};
+    }
+    socketRef.current.on('userTyping', callback);
     return () => {
-      socket.off('userTyping', callback);
+      socketRef.current?.off('userTyping', callback);
     };
   }, []);
+
   const sendTypingStatus = useCallback((conversationId: string, isTyping: boolean) => {
     if (socketRef.current && isConnected) {
       socketRef.current.emit('typing', { conversationId, isTyping });
+      return true;
     }
+    return false;
   }, [isConnected]);
 
   const markMessagesAsRead = useCallback((conversationId: string) => {

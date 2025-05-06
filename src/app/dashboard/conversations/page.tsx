@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getConversations, getUnreadMessageCounts } from "@/actions/conversation.action";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -29,15 +29,15 @@ interface Conversation {
   updatedAt: string;
 }
 
-export default function MessagesPage() {
+export default function ConversationsPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const router = useRouter();
-  const { subscribeToNewMessages } = useSocket();
+  const { subscribeToNewMessages, isConnected } = useSocket();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const [conversationsData, unreadData] = await Promise.all([
@@ -52,14 +52,63 @@ export default function MessagesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
     
     const unsubscribe = subscribeToNewMessages((message) => {
       // Update conversations when a new message arrives
-      fetchData();
+      setConversations(prevConversations => {
+        // Find the conversation that contains this message
+        const conversationIndex = prevConversations.findIndex(
+          conv => conv.id === message.conversationId
+        );
+        
+        if (conversationIndex === -1) {
+          // If conversation not found, refresh all conversations
+          fetchData();
+          return prevConversations;
+        }
+        
+        // Create a copy of the conversations array
+        const updatedConversations = [...prevConversations];
+        
+        // Update the conversation with the new message
+        updatedConversations[conversationIndex] = {
+          ...updatedConversations[conversationIndex],
+          lastMessage: {
+            id: message.id,
+            content: message.content,
+            createdAt: message.createdAt,
+            read: message.read,
+            senderId: message.senderId
+          },
+          updatedAt: message.createdAt
+        };
+        
+        // Move this conversation to the top (most recent)
+        const [movedConversation] = updatedConversations.splice(conversationIndex, 1);
+        updatedConversations.unshift(movedConversation);
+        
+        return updatedConversations;
+      });
+      
+      // Update unread counts
+      setUnreadCounts(prevCounts => {
+        const conversationId = message.conversationId;
+        const currentCount = prevCounts[conversationId] || 0;
+        
+        // If message is from the other user, increment unread count
+        if (message.senderId !== conversations.find(c => c.id === conversationId)?.otherUserId) {
+          return {
+            ...prevCounts,
+            [conversationId]: currentCount + 1
+          };
+        }
+        
+        return prevCounts;
+      });
     });
 
     return () => {

@@ -156,7 +156,7 @@ const GitDateProfile = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-4xl rounded-2xl border-none shadow-xl">
           <CardHeader>
             <Skeleton className="h-8 w-3/4" />
