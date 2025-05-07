@@ -317,7 +317,6 @@ export default function MessagesPage() {
             variant="ghost" 
             size="icon" 
             onClick={() => router.push("/dashboard/conversations")}
-            className="md:hidden"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>

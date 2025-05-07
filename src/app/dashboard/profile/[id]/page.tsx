@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect } from 'react';
-import { useTheme } from 'next-themes';
 import { motion } from 'framer-motion';
 import { getSelectedUserByIdFetcher } from "@/fetchers/fetchers";
 import { useSession } from "next-auth/react";
@@ -18,12 +17,14 @@ import {
   ExternalLink,
   Moon,
   Sun,
-  ArrowLeft
+  ArrowLeft,
+  GitBranch,
+  GitCommit
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Profile() {
-  const { theme, setTheme } = useTheme();
+ 
   const [mounted, setMounted] = useState(false);
   const { data: session } = useSession();
   const { id: userId } = useParams();
@@ -72,9 +73,7 @@ export default function Profile() {
 
   if (!mounted) return null;
   
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
+ 
 
   if (isUserProfileLoading) {
     return (
@@ -132,24 +131,48 @@ export default function Profile() {
     day: 'numeric'
   });
 
+  const contributionOverview = [
+    {
+      icon: Calendar,
+      title: "Joined GitHub",
+      description: joinDate,
+      subtext: null
+    },
+    {
+      icon: GitBranch,
+      title: `Created ${repositories} Repositories`,
+      description: `Working with ${mainLanguages?.length > 0 ? mainLanguages?.join(', ') : '0 Languages'}`,
+      subtext: null
+    },
+    {
+      icon: GitCommit,
+      title: `Made ${contributions} Contributions`,
+      description: "Active developer in the community",
+      subtext: null
+    }
+  ]
+
   return (
-    <div >
+    <div className='flex items-start justify-center gap-4 py-4'>
+      <div>
+
       <Button 
             variant="ghost" 
             size="icon" 
             onClick={() => router.push("/dashboard/conversations")}
- 
-          >
+            
+            >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-      <div className="container px-4 py-8 mx-auto max-w-6xl">
+            </div>
+      <div className="container px-4 mx-auto max-w-6xl">
         <motion.div
           className="grid grid-cols-1 gap-8 md:grid-cols-3"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          {/* Profile Sidebar */}
+   
           <motion.div
             className="md:col-span-1 h-full"
             variants={itemVariants}
@@ -225,8 +248,8 @@ export default function Profile() {
                 
                 <div className="flex justify-between w-full mt-6 text-sm">
                   <motion.div 
-                    className="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                    whileHover={{ y: -5 }}
+                    className="flex flex-col items-center p-2 rounded-lg  transition-colors"
+             
                   >
                     <span className="font-semibold text-lg">{followers}</span>
                     <div className="flex items-center text-gray-500 dark:text-gray-400">
@@ -236,9 +259,8 @@ export default function Profile() {
                   </motion.div>
                   
                   <motion.div 
-                    className="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                    whileHover={{ y: -5 }}
-                  >
+                    className="flex flex-col items-center p-2 rounded-lg   transition-colors"
+                >
                     <span className="font-semibold text-lg">{following}</span>
                     <div className="flex items-center text-gray-500 dark:text-gray-400">
                       <User size={14} className="mr-1" />
@@ -298,7 +320,6 @@ export default function Profile() {
                     <motion.div
                       key={index}
                       className="px-4 py-3 text-center bg-gray-100 rounded-lg dark:bg-neutral-800"
-                      whileHover={{ scale: 1.05 }}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ 
                         opacity: 1, 
@@ -323,24 +344,25 @@ export default function Profile() {
                 <Calendar size={20} className="text-blue-500" />
               </div>
               
-              <div className="relative pl-8 border-l-2 border-blue-200 dark:border-blue-800">
-                <div className="mb-6">
-                  <div className="absolute w-4 h-4 bg-blue-500 rounded-full -left-2"></div>
-                  <h3 className="text-lg font-medium">Joined GitHub</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{joinDate}</p>
-                </div>
-                
-                <div className="mb-6">
-                  <div className="absolute w-4 h-4 bg-green-500 rounded-full -left-2"></div>
-                  <h3 className="text-lg font-medium">Created {repositories} Repositories</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Working with {mainLanguages?.join(', ')}</p>
-                </div>
-                
-                <div>
-                  <div className="absolute w-4 h-4 bg-purple-500 rounded-full -left-2"></div>
-                  <h3 className="text-lg font-medium">Made {contributions} Contributions</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Active developer in the community</p>
-                </div>
+              <div className="grid grid-cols-1 gap-6">
+                {contributionOverview?.map((item, index) => (
+                  <motion.div 
+                    key={index}
+                    className="p-4 bg-neutral-100 dark:bg-neutral-800 rounded-xl"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gitdate rounded-lg">
+                        <item.icon size={20} className="text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-medium">{item.title}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             </motion.div>
           </div>
