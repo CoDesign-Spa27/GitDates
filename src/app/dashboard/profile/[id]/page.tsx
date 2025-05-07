@@ -159,7 +159,7 @@ export default function Profile() {
       <Button 
             variant="ghost" 
             size="icon" 
-            onClick={() => router.push("/dashboard/conversations")}
+            onClick={() => router.push("/dashboard/explore")}
             
             >
             <ArrowLeft className="h-5 w-5" />
