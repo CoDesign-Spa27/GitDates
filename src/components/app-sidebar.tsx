@@ -70,12 +70,6 @@ const navigationItems = {
   ],
   profile: [
     {
-      title: "Profile",
-      url: "/dashboard/profile",
-      icon: profileIcon,
-      tooltip: "Edit your profile",
-    },
-    {
       title: "GitDate Profile",
       url: "/dashboard/gitdate-profile",
       icon: gitIcon,

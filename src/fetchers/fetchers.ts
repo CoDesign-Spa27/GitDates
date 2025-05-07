@@ -1,3 +1,4 @@
+import { getSelectedUserById } from "@/actions/explore.action";
 import { findMatches, getAllAccounts, getMatchPreference } from "@/actions/match.action";
 import { toast } from "@/hooks/use-toast";
  
@@ -59,5 +60,34 @@ export const getAllAccountsFetcher = async () => {
       title: "Internal Server Error",
       variant: "destructive",
     })
+  }
+}
+export const getSelectedUserByIdFetcher = async (userId: string) => {
+  try {
+    if (!userId) {
+      toast({
+        title: 'User ID is required',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const response = await getSelectedUserById(userId);
+    if (!response?.status) {
+      toast({
+        title: 'Failed to load user profile',
+        variant: 'destructive'
+      });
+      return;
+    }
+    return response;
+  } catch (err) {
+    console.error('Error fetching user profile:', err);
+    toast({
+      title: "Failed to load user profile",
+      description: "Please try again later",
+      variant: "destructive",
+    });
+    return null;
   }
 }

@@ -308,7 +308,7 @@ export const getAllAccounts = async () => {
     return response.serialize();
   } catch (error) {
     console.error("Error getting all accounts", error);
-    throw error;
+    throw new ErrorHandler("Error getting all accounts", "DATABASE_ERROR");
   }
 };
 

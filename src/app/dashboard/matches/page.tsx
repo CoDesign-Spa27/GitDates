@@ -205,8 +205,7 @@ function MatchCard({ match }: { match: Match }) {
   };
 
   const handleViewProfile = () => {
-    // Open profile view
-    router.push(`/dashboard/explore/${match.userId}`);
+    router.push(`/dashboard/profile/${match.userId}`);
   };
 
   return (

@@ -4,7 +4,7 @@ import { Users, GitFork, Star, MapPin, Link as LinkIcon, Heart, Check } from "lu
 import { Button } from "./ui/button";
 import { getMatchStatus, sendMatchRequest } from "@/actions/match.action";
 import { toast } from "@/hooks/use-toast";
-
+import { useRouter } from "next/navigation";
 export interface GitDateProfileType {
   githubUsername: string;
   repositories: number;
@@ -37,6 +37,7 @@ interface MatchStatusType {
 }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const router = useRouter()
   const rotateX = useTransform(y, [-100, 100], [10, -10]);
   const rotateY = useTransform(x, [-100, 100], [-10, 10]);
   const [matchStatus,setMatchStatus] = useState<MatchStatusType | null>(null);
@@ -127,14 +128,19 @@ const getMatchButton = () =>{
 
 }
 
+const handleProfileClick= (userId:string) =>{
+  router.push(`/dashboard/profile/${userId}`)
+}
+
   if (!account) return null;
  
   
   return (
     <motion.div
-      className="w-[350px] h-[280px] relative group bg-neutral-100 dark:bg-transparent  rounded-xl"
+    onClick={()=>handleProfileClick(userId)}
+      className="w-[350px] h-[280px] relative group cursor-pointer bg-neutral-100 dark:bg-transparent rounded-xl"
       style={{ perspective: 1000, rotateX, rotateY }}
-      whileHover={{ scale: 1 }}
+      whileHover={{ scale: 1.05, z: 50 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -238,6 +244,7 @@ const getMatchButton = () =>{
         <div className="absolute inset-0 rounded-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="absolute -inset-[1px] border border-gitdate rounded-xl " />
         </div>
+       
       </div>
     </motion.div>
   );

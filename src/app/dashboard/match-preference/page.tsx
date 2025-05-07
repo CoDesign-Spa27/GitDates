@@ -40,8 +40,8 @@ import { useSession } from "next-auth/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
-import { getMatchPreferencesFetcher } from "@/components/fetchers/fetchers";
-import { createMatchPreferenceMutation } from "@/components/fetchers/mutations";
+import { getMatchPreferencesFetcher } from "../../../fetchers/fetchers";
+import { createMatchPreferenceMutation } from "../../../fetchers/mutations";
 const matchPreferenceSchema = z.object({
   ageRange: z.array(z.number()).length(2).default([18, 99]),
   languages: z.array(z.string()).min(1, "At least one language is required"),
