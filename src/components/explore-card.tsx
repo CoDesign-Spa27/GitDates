@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
-import { Users, GitFork, Star, MapPin, Link as LinkIcon, Heart, Check } from "lucide-react";
+import { Users, GitFork, Star, MapPin, Link as LinkIcon, Heart, Check, Eye } from "lucide-react";
 import { Button } from "./ui/button";
 import { getMatchStatus, sendMatchRequest } from "@/actions/match.action";
 import { toast } from "@/hooks/use-toast";
@@ -137,32 +137,22 @@ const handleProfileClick= (userId:string) =>{
   
   return (
     <motion.div
-    onClick={()=>handleProfileClick(userId)}
-      className="w-[350px] h-[280px] relative group cursor-pointer bg-neutral-100 dark:bg-transparent rounded-xl"
-      style={{ perspective: 1000, rotateX, rotateY }}
-      whileHover={{ scale: 1.05, z: 50 }}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      onClick={()=>handleProfileClick(userId)}
+      className="w-full h-auto relative group cursor-pointer bg-white dark:bg-neutral-900 rounded-xl shadow-sm hover:shadow-xl hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300 border border-gray-100 dark:border-neutral-800 hover:border-gitdate dark:hover:border-gitdate"
     >
-      <div className="absolute inset-0 rounded-2xl blur-[2px] transition-all" />
-     
-      <div className="relative bg-white/5 rounded-xl p-4 h-full">
-    
+ 
+      <div className="relative p-5 h-full flex flex-col">
         {matchScore !== undefined && (
-          <div className="flex justify-between items-center  ">
-                <div className="absolute -top-2 -right-2 w-12 h-12 rounded-full bg-gitdate flex items-center justify-center">
+          <div className="absolute -top-3 -right-3 w-14 h-14 rounded-full bg-gradient-to-br from-gitdate to-purple-600 flex items-center justify-center shadow-lg">
             <p className="text-white font-bold text-sm">
               {matchScore}%
             </p>
-          </div>
-           
           </div>
         )}
 
         <div className="flex items-start gap-4">
           <div className="relative shrink-0">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-gitdate to-purple-600 p-0.5">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-gitdate to-purple-600 p-0.5">
               {account.image ? (
                 <img
                   src={account.image}
@@ -171,11 +161,11 @@ const handleProfileClick= (userId:string) =>{
                 />
               ) : (
                 <div className="w-full h-full rounded-full bg-gray-800 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-gray-400" />
+                  <Users className="w-7 h-7 text-gray-400" />
                 </div>
               )}
             </div>
-            <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-gitdate to-purple-500 text-[10px] px-2 py-0.5 rounded-full text-white">
+            <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-gitdate to-purple-500 text-[10px] px-2 py-0.5 rounded-full text-white shadow-sm">
               {account.contributions}+
             </div>
           </div>
@@ -184,38 +174,35 @@ const handleProfileClick= (userId:string) =>{
             <h2 className="text-lg font-bold truncate text-gray-900 dark:text-white">
               {account.name}
             </h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400 truncate-2-lines h-[2.5em]">
+            <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mt-1">
               {account.bio || "No bio available"}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-2 mt-4">
+        <div className="grid grid-cols-2 gap-4 mt-5">
           <StatItem value={account.followers} label="Followers" icon="👥" />
           <StatItem value={account.following} label="Following" icon="🔄" />
           <StatItem value={account.repositories} label="Repos" icon="📦" />
           <StatItem value={account.contributions} label="Contribs" icon="✨" />
         </div>
 
-        {/* Location & Languages */}
-        <div className="mt-4 flex items-center justify-between text-xs">
-          {account.city ||
-            account.state ||
-            (account.country && (
-              <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                <MapPin className="w-4 h-4" />
-                <span className="truncate max-w-[120px]">
-                  {[account.city, account.state, account.country]
-                    .filter(Boolean)
-                    .join(", ")}
-                </span>
-              </div>
-            ))}
-          <div className="flex gap-1">
+        <div className="py-3 flex flex-col items-start space-y-2 justify-between text-xs">
+          {account.city || account.state || account.country ? (
+            <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+              <MapPin className="w-4 h-4" />
+              <span className="truncate max-w-[120px]">
+                {[account.city, account.state, account.country]
+                  .filter(Boolean)
+                  .join(", ")}
+              </span>
+            </div>
+          ) : null}
+          <div className="flex gap-1 flex-wrap justify-end">
             {account.mainLanguages.slice(0, 3).map((lang, i) => (
               <motion.span
                 key={i}
-                className="px-2 py-1 rounded-full bg-gitdate dark:bg-gitdate/10 text-xs font-bold text-white"
+                className="px-2 py-1 rounded-full bg-gitdate/10 dark:bg-gitdate/20 text-xs font-medium text-gitdate dark:text-gitdate/90"
                 whileHover={{ scale: 1.05 }}
               >
                 {lang}
@@ -223,28 +210,25 @@ const handleProfileClick= (userId:string) =>{
             ))}
           </div>
         </div>
-<div className="flex justify-between items-center py-2">
 
-        {/* Blog Link */}
-        {account.blog && (
-          <motion.a
-            href={account.blog}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 flex items-center gap-1 text-sm text-purple-400 transition-colors"
-            whileHover={{ x: 2 }}
+        <div className="mt-auto pt-4 flex justify-between items-center border-t border-gray-100 dark:border-neutral-800">
+          {account.blog && (
+            <motion.a
+              href={account.blog}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-sm text-purple-500 hover:text-purple-600 transition-colors"
+              whileHover={{ x: 2 }}
+              onClick={(e) => e.stopPropagation()}
             >
-            <LinkIcon className="w-4 h-4" />
-            <span className="truncate">Visit Blog</span>
-          </motion.a>
-        )}
- {getMatchButton()}
-       </div> 
- 
-        <div className="absolute inset-0 rounded-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-          <div className="absolute -inset-[1px] border border-gitdate rounded-xl " />
+              <LinkIcon className="w-4 h-4" />
+              <span className="truncate">Visit Blog</span>
+            </motion.a>
+          )}
+          <div onClick={(e) => e.stopPropagation()}>
+            {getMatchButton()}
+          </div>
         </div>
-       
       </div>
     </motion.div>
   );
@@ -259,12 +243,12 @@ const StatItem = ({
   label: string;
   icon: string;
 }) => (
-  <div className="flex flex-col items-center p-2 bg-gray-50 dark:bg-neutral-800 rounded-lg">
+  <div className="flex flex-col items-center py-2 px-4 bg-gray-50 dark:bg-neutral-800/50 rounded-lg">
     <div className="flex items-center gap-1">
       <span className="text-sm">{icon}</span>
-      <span className="font-bold text-sm">{value}</span>
+      <span className="font-semibold text-sm">{value}</span>
     </div>
-    <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide mt-0.5">
+    <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mt-0.5">
       {label}
     </span>
   </div>

@@ -72,26 +72,29 @@ export default function Explore() {
 
  
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="mb-8">
         <Tabs defaultValue="matches" value={activeTab} onValueChange={(value) => setActiveTab(value as "matches" | "developers")}>
-          <TabsList className="animate-fade-in">
-            <TabsTrigger value="matches">Matches</TabsTrigger>
-            <TabsTrigger value="developers">All Developers</TabsTrigger>
+          <TabsList className="animate-fade-in w-full sm:w-auto">
+            <TabsTrigger value="matches" className="flex-1 sm:flex-none">Matches</TabsTrigger>
+            <TabsTrigger value="developers" className="flex-1 sm:flex-none">All Developers</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
       {isAccountsLoading || isMatchesLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <SkeletonCards />
         </div>
       ) : activeTab === "matches" ? (
         <div className="mb-12">
           {!filteredMatches || filteredMatches.length === 0 ? (
-            <div className="text-gray-500 text-center">No matches found</div>
+            <div className="text-gray-500 text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <p className="text-lg">No matches found</p>
+              <p className="text-sm mt-2">Keep exploring to find potential matches!</p>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredMatches.map((match: PotentialMatch) => (
                 <ExploreCard
                   key={match.id}
@@ -106,9 +109,12 @@ export default function Explore() {
       ) : (
         <div>
           {!accounts?.additional || accounts.additional.length === 0 ? (
-            <div className="text-gray-500">No developers found</div>
+            <div className="text-gray-500 text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <p className="text-lg">No developers found</p>
+              <p className="text-sm mt-2">Be the first to join our community!</p>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 place-items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {accounts.additional.map((account: any) => (
                 <ExploreCard
                   key={account.id}
