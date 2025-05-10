@@ -1,13 +1,16 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
-        "target": "ES2017",
-        "outDir":"./dist",
-         "moduleResolution": "Node",
-         "strict": true,
-         "noEmit": false,
-         "isolatedModules": false,
-         "module": "CommonJS",
+        "target": "ES2020",
+        "outDir": "./dist",
+        "moduleResolution": "NodeNext",
+        "strict": true,
+        "noEmit": false,
+        "isolatedModules": false,
+        "module": "NodeNext",
+        "paths": {
+            "@/*": ["./src/*"]
+        }
     },
-    "include": ["server.mts"]
+    "include": ["server.ts"]
 }

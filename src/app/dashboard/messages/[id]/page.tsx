@@ -11,6 +11,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 import { useSocket } from "@/lib/client-socket";
 import { useSession } from "next-auth/react";
+import { ChatMessage } from "@/components/chat/chat-message";
+import { TypingIndicator } from "@/components/chat/typing";
+import { UserStatus } from "@/components/chat/user-status";
 
 interface Message {
   id: string;
@@ -22,6 +25,7 @@ interface Message {
     id: string;
     name: string;
     image: string;
+    lastSeen?: string;
   };
 }
 
@@ -54,15 +58,12 @@ export default function MessagesPage() {
     subscribeToMessagesRead,
     isConnected
   } = useSocket();
- 
- 
- 
 
   const fetchConversation = useCallback(async () => {
     try {
       setLoading(true);
       const data: any = await getOrCreateConversation(id as string);
-      console.log("Conversation data fetched:", data);
+ 
       setConversation(data);
 
       // Mark messages as read
@@ -83,19 +84,14 @@ export default function MessagesPage() {
     }
   }, [id, fetchConversation]);
 
-  // FIX: Separate useEffect for socket subscriptions with socketKey dependency
   useEffect(() => {
- 
     if (!conversation || !isConnected) return;
     
     // Subscribe to new messages
     const unsubscribeNewMessages = subscribeToNewMessages((message) => {
-      console.log("New message received via socket:", message);
+   
       
-      if (message.id === conversation.id) {
-     
-        
-        // FIX: More reliable state update for incoming messages
+      if (message.conversationId === conversation.id) {
         setConversation(prev => {
           if (!prev) return prev;
           
@@ -103,8 +99,6 @@ export default function MessagesPage() {
           const messageExists = prev.messages.some(m => m.id === message.id);
           
           if (!messageExists) {
-       
-            
             // If message from other user, mark as read
             if (message.senderId !== prev.currentUserId) {
               markMessagesAsRead(prev.id);
@@ -120,7 +114,6 @@ export default function MessagesPage() {
             const updatedMessages = prev.messages.map(m => 
               (m.id.startsWith('temp-') && m.content === message.content) ? message : m
             );
-          
             
             return {
               ...prev,
@@ -131,12 +124,9 @@ export default function MessagesPage() {
       }
     });
     
-    // Subscribe to typing events - FIX: Simplified typing event handling
+    // Subscribe to typing events
     const unsubscribeTyping = subscribeToTyping(({ userId, isTyping: userIsTyping }) => {
-      console.log("Typing event received:", { userId, userIsTyping});
-      
       if (conversation && userId !== conversation.currentUserId) {
-        console.log("Setting typing status:", userIsTyping);
         setIsTyping(userIsTyping);
         setTypingUserId(userIsTyping ? userId : null);
       }
@@ -144,8 +134,6 @@ export default function MessagesPage() {
     
     // Subscribe to read receipts
     const unsubscribeMessagesRead = subscribeToMessagesRead(({ conversationId, readBy }) => {
-      console.log("Messages read event:", { conversationId, readBy });
-      
       if (conversationId === conversation.id) {
         setConversation(prev => {
           if (!prev) return prev;
@@ -159,7 +147,6 @@ export default function MessagesPage() {
       }
     });
     
-    // Return cleanup function
     return () => {
       unsubscribeNewMessages();
       unsubscribeTyping?.();
@@ -182,8 +169,6 @@ export default function MessagesPage() {
     setMessageInput("");
     setSendingMessage(true);
     
- 
-  
     const optimisticMessage: Message = {
       id: `temp-${Date.now()}`,
       content,
@@ -233,7 +218,6 @@ export default function MessagesPage() {
     }
   };
 
-  // FIX: Improved typing status handling
   const handleTyping = () => {
     if (!conversation || !isConnected) return;
    
@@ -250,7 +234,7 @@ export default function MessagesPage() {
     }, 2000);
   };
 
-  // FIX: Clear typing status on unmount
+  // Clear typing status on unmount
   useEffect(() => {
     return () => {
       if (typingTimerRef.current) {
@@ -328,19 +312,14 @@ export default function MessagesPage() {
             </AvatarFallback>
           </Avatar>
           
-          <h1 className="text-xl font-semibold">
-            {otherUser?.name || "Chat"}
-          </h1>
-          
-          <div className="ml-auto flex items-center">
-            {isConnected ? (
-              <span className="text-xs text-green-500 flex items-center">
-                <span className="h-2 w-2 bg-green-500 rounded-full mr-1"></span>
-                Online
-              </span>
-            ) : (
-              <span className="text-xs text-muted-foreground">Offline</span>
-            )}
+          <div>
+            <h1 className="text-xl font-semibold">
+              {otherUser?.name || "Chat"}
+            </h1>
+            <UserStatus 
+              isOnline={isConnected} 
+              lastSeen={otherUser?.lastSeen}
+            />
           </div>
         </div>
         
@@ -352,40 +331,21 @@ export default function MessagesPage() {
                   <p>No messages yet. Start the conversation!</p>
                 </div>
               ) : (
-                conversation.messages.map((message) => {
-                  const isCurrentUser = message.senderId === conversation.currentUserId;
-                  return (
-                    <div key={message.id} className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}>
-                      <div className={`max-w-[80%] relative group ${
-                        isCurrentUser 
-                          ? "bg-primary text-primary-foreground" 
-                          : "bg-muted"
-                      } rounded-lg p-3`}>
-                        <p className="whitespace-pre-wrap break-words">{message.content}</p>
-                        <div className="flex items-center justify-end mt-1 gap-1">
-                          <span className="text-xs opacity-70">
-                            {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}
-                          </span>
-                          {isCurrentUser && message.read && (
-                            <span className="text-xs opacity-70">✓</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
+                conversation.messages.map((message, index) => (
+                  <ChatMessage 
+                    key={message.id}
+                    message={message}
+                    isCurrentUser={message.senderId === conversation.currentUserId}
+                    showAvatar={index === 0 || conversation.messages[index - 1].senderId !== message.senderId}
+                  />
+                ))
               )}
               
               {isTyping && (
-                <div className="flex justify-start">
-                  <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                    </div>
-                  </div>
-                </div>
+                <TypingIndicator 
+                  username={otherUser?.name}
+                  avatarUrl={otherUser?.image}
+                />
               )}
               
               <div ref={messageEndRef} />
