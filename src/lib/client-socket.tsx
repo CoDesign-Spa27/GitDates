@@ -9,7 +9,7 @@ export function useSocket() {
   const socketRef = useRef<Socket | null>(null);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const reconnectAttemptsRef = useRef(0);
-  const maxReconnectAttempts = 5;
+  const maxReconnectAttempts = 2;
   const [socketToken, setSocketToken] = useState<string | null>(null);
 
   // Fetch socket token on session change
@@ -42,9 +42,6 @@ export function useSocket() {
     if (!socketRef.current) {
       socketRef.current = io({
         path: '/api/socket',
-        autoConnect: true,
-        reconnectionAttempts: maxReconnectAttempts,
-        reconnectionDelay: 1000,
         auth: {
           token: socketToken
         }
@@ -146,6 +143,17 @@ export function useSocket() {
     };
   }, []);
 
+  const subscribeToOnlineUser = useCallback((callback: (onlineUsers: string[]) => void) => {
+    if (socketRef.current) {
+      socketRef.current.on('onlineUsers', callback);
+    }
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.off('onlineUsers', callback);
+      }
+    };
+  }, []);
+
   return {
     socket: socketRef.current,
     isConnected,
@@ -155,6 +163,7 @@ export function useSocket() {
     subscribeToTyping,
     sendTypingStatus,
     markMessagesAsRead,
-    subscribeToMessagesRead
+    subscribeToMessagesRead,
+    subscribeToOnlineUser
   };
 }

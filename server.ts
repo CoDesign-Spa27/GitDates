@@ -14,7 +14,7 @@ const handler = app.getRequestHandler();
 let io: SocketIOServer;
 
 // Store online users and their connections
-const onlineUsers = new Map<string, string>();
+const onlineUsers = new Map<string, Set<string>>();
 const userSockets = new Map<string, string>();
 const lastSeen = new Map<string, string>();
 
@@ -30,12 +30,7 @@ async function startServer() {
     cors: {
       origin: dev ? "*" : "https://your-production-domain.com",
       methods: ["GET", "POST"],
-    },
-    transports: ["websocket", "polling"],
-    pingInterval: 10000,
-    pingTimeout: 5000,
-    allowEIO3: true,
-    connectTimeout: 45000,
+    }
   });
 
   // Socket authentication middleware
@@ -79,7 +74,10 @@ async function startServer() {
     console.log(`User connected: ${user.name} (${user.id})`);
     
     // Store user connection info
-    onlineUsers.set(user.id, socket.id);
+    if(!onlineUsers.has(user.id)){
+      onlineUsers.set(user.id,new Set())
+    }
+    onlineUsers.get(user.id)!.add(socket.id)
     userSockets.set(socket.id, user.id);
     
     // Join user's private room
@@ -88,6 +86,7 @@ async function startServer() {
     // Broadcast online status
     io.emit("onlineUsers", Array.from(onlineUsers.keys()));
     
+ 
     // Join conversation rooms
     const matches = await prisma.match.findMany({
       where: {
@@ -187,10 +186,15 @@ async function startServer() {
 
     // Disconnect handling
     socket.on("disconnect", () => {
-      lastSeen.set(user.id, new Date().toISOString());
-      onlineUsers.delete(user.id);
-      userSockets.delete(socket.id);
-      
+      const sockets = onlineUsers.get(user.id)
+      if(sockets){
+        sockets.delete(socket.id)
+      }
+      if(sockets?.size === 0){
+        lastSeen.set(user.id, new Date().toISOString());
+        onlineUsers.delete(user.id);
+        userSockets.delete(socket.id);
+      }
       io.emit("onlineUsers", Array.from(onlineUsers.keys()));
       io.emit("userLastSeen", Object.fromEntries(lastSeen));
     });
@@ -214,9 +218,9 @@ export function getUserSocketId(userId: string) {
 }
 
 export function emitToUser(userId: string, event: string, data: any) {
-  const socketId = onlineUsers.get(userId);
-  if (socketId) {
-    io.to(socketId).emit(event, data);
+  const socketIds = onlineUsers.get(userId);
+  if (socketIds && socketIds.size > 0) {
+    io.to(Array.from(socketIds)).emit(event, data);
     return true;
   }
   return false;

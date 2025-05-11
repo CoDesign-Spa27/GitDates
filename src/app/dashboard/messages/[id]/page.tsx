@@ -14,6 +14,7 @@ import { useSession } from "next-auth/react";
 import { ChatMessage } from "@/components/chat/chat-message";
 import { TypingIndicator } from "@/components/chat/typing";
 import { UserStatus } from "@/components/chat/user-status";
+import { boolean } from "zod";
 
 interface Message {
   id: string;
@@ -48,7 +49,7 @@ export default function MessagesPage() {
   const messageEndRef = useRef<HTMLDivElement>(null);
   const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { data: session } = useSession();
-  
+  const [isOnline, setIsOnline] = useState(false);
   const { 
     sendMessage: socketSendMessage, 
     subscribeToNewMessages, 
@@ -56,7 +57,8 @@ export default function MessagesPage() {
     sendTypingStatus,
     markMessagesAsRead,
     subscribeToMessagesRead,
-    isConnected
+    isConnected,
+    subscribeToOnlineUser
   } = useSocket();
 
   const fetchConversation = useCallback(async () => {
@@ -146,14 +148,24 @@ export default function MessagesPage() {
         });
       }
     });
-    
+
+    // Subscribe to online users
+    const unsubscribeOnlineUser = subscribeToOnlineUser((users: string[]) => {
+      if (conversation) {
+        console.log(users,'users')
+        const isUserOnline = users.includes(conversation.otherUserId);
+        setIsOnline(isUserOnline);
+      }
+    });
+
     return () => {
       unsubscribeNewMessages();
-      unsubscribeTyping?.();
-      unsubscribeMessagesRead?.();
+      unsubscribeTyping();
+      unsubscribeMessagesRead();
+      unsubscribeOnlineUser();
     };
-  }, [conversation, subscribeToNewMessages, subscribeToTyping, subscribeToMessagesRead, markMessagesAsRead, isConnected]);
-
+  }, [conversation, subscribeToNewMessages, subscribeToTyping, subscribeToMessagesRead, subscribeToOnlineUser, isConnected]);
+ 
   // Scroll to bottom when messages change
   useEffect(() => {
     if (messageEndRef.current) {
@@ -317,7 +329,7 @@ export default function MessagesPage() {
               {otherUser?.name || "Chat"}
             </h1>
             <UserStatus 
-              isOnline={isConnected} 
+              isOnline={isOnline} 
               lastSeen={otherUser?.lastSeen}
             />
           </div>
