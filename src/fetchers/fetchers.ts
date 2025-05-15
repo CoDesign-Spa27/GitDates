@@ -1,3 +1,4 @@
+import { profileSetupStatus } from "@/actions/dashboard.action";
 import { getSelectedUserById } from "@/actions/explore.action";
 import { findMatches, getAllAccounts, getMatchPreference } from "@/actions/match.action";
 import { toast } from "@/hooks/use-toast";
@@ -89,5 +90,25 @@ export const getSelectedUserByIdFetcher = async (userId: string) => {
       variant: "destructive",
     });
     return null;
+  }
+}
+
+export const getProfileSetupStatus = async () =>{
+  try {
+    const response = await profileSetupStatus();
+    if (!response) {
+      toast({
+        title: "Failed to load profile setup status",
+        variant: "destructive",
+      })
+    }
+    if(response)
+      return response;
+  }catch(err){
+    toast({
+      title: "Failed to load user profile",
+      description: "Please try again later",
+      variant: "destructive",
+    });
   }
 }
