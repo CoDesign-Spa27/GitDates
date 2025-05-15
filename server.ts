@@ -191,12 +191,12 @@ async function startServer() {
         sockets.delete(socket.id)
       }
       if(sockets?.size === 0){
-        lastSeen.set(user.id, new Date().toISOString());
+        lastSeen.set(user.id, new Date().toLocaleString());
         onlineUsers.delete(user.id);
         userSockets.delete(socket.id);
       }
       io.emit("onlineUsers", Array.from(onlineUsers.keys()));
-      io.emit("userLastSeen", Object.fromEntries(lastSeen));
+      io.emit("userLastSeen", { [user.id]: lastSeen.get(user.id) });
     });
   });
 
