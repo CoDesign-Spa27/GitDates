@@ -5,6 +5,10 @@ import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import {motion}  from 'motion/react'
 import { RequestsList } from '@/components/recieved-request'
+import { ProfileSetupSuccess } from '@/components/dashboard/ProfileSetupSuccess'
+import { NewRequestsCard } from '@/components/dashboard/new-requests'
+import { ConnectionsCard } from '@/components/dashboard/connections-card'
+import { ActiveSummary } from '@/components/dashboard/active-summary'
 
 export interface UserData {
   basicInfo: {
@@ -164,12 +168,25 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="container mx-auto p-4 space-y-8">
+     <div className="container mx-auto p-4 md:p-6">
       {isProfileCreated && isMatchPreferenceCreated ? (
-        <>
-        Dashboard
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* <RequestsList requests={matchRequests} /> */}
-        </>
+          <div className="md:col-span-2 lg:col-span-3">
+          <ProfileSetupSuccess />
+        </div>
+ 
+        <div className="lg:col-span-1">
+          <NewRequestsCard />
+        </div>
+ 
+        <div className="lg:col-span-1">
+          <ConnectionsCard />
+        </div>
+        <div className="lg:col-span-1">
+          <ActiveSummary />
+        </div>
+        </div>
       
       ) : (
           <GetStartedSection isProfileCreated={isProfileCreated} isMatchPreferenceCreated={isMatchPreferenceCreated} />
