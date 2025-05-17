@@ -7,12 +7,13 @@ import {motion}  from 'motion/react'
 import { RequestsList } from '@/components/recieved-request'
 import { ProfileSetupSuccess } from '@/components/dashboard/ProfileSetupSuccess'
 import { NewRequestsCard } from '@/components/dashboard/new-requests'
-import { ConnectionsCard } from '@/components/dashboard/connections-card'
+import { ConnectionsCard } from '@/components/dashboard/matches-card'
 import { ActiveSummary } from '@/components/dashboard/active-summary'
 import useSWR from 'swr'
 import { getProfileSetupStatus } from '@/fetchers/fetchers'
 import { useProfileSetupStatus } from '@/components/hooks/useProfileSetupStatus'
 import { useMatchRequest } from '@/components/hooks/useMatchRequests'
+import { useMyMatches } from '@/components/hooks/useMyMatches'
 
 export interface UserData {
   basicInfo: {
@@ -57,7 +58,7 @@ export default function Dashboard() {
  
   const { data: profileSetupStatus, isLoading : isProfileStatusLoading } = useProfileSetupStatus()
   const {data: matchRequests} = useMatchRequest()
- 
+  const {data: matches } = useMyMatches();
   // if (isLoading) {
   //   return (
   //     <div className="container mx-auto p-4 flex justify-center items-center min-h-screen">
@@ -76,6 +77,7 @@ export default function Dashboard() {
   //   );
   // }
 
+ 
   return (
      <div className="container mx-auto p-4 md:p-6">
  
@@ -95,7 +97,7 @@ export default function Dashboard() {
         </div>
  
         <div className="lg:col-span-1">
-          <ConnectionsCard />
+          <ConnectionsCard matches={matches as []}/>
         </div>
         <div className="lg:col-span-1">
           <ActiveSummary />
