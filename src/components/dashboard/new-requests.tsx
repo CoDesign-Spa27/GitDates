@@ -3,14 +3,41 @@ import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useMatchRequest } from '@/components/hooks/useMatchRequests'
-import { Key } from 'react'
+import { Badge } from '../ui/badge'
 
- 
+interface GitDateProfile {
+  id: string;
+  userId: string;
+  name: string;
+  githubUsername: string;
+  image: string;
+  bio: string | null;
+  blog: string;
+  city: string;
+  state: string;
+  country: string;
+  contributions: number;
+  followers: number;
+  following: number;
+  repositories: number;
+  mainLanguages: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface MatchRequest {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  createdAt: Date;
+  updatedAt: Date;
+  sender: {
+    gitDateProfile: GitDateProfile;
+  };
+}
 
 export function NewRequestsCard({matchRequests}:{matchRequests:any}) {
- 
-
   const formatDate = (dateString: string | Date) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-US', { 
@@ -33,28 +60,33 @@ export function NewRequestsCard({matchRequests}:{matchRequests:any}) {
       <CardContent>
         <div className="space-y-4">
           {matchRequests && matchRequests.length > 0 ? (
-            matchRequests.map((request: { sender: { gitDateProfile: any }; id: Key | null | undefined; createdAt: string | Date }) => {
+            matchRequests.map((request:MatchRequest) => {
               const profile = request.sender?.gitDateProfile
               if (!profile) return null
 
               return (
-                <div key={request.id} className="flex items-center justify-between">
+                <Link key={request.id} 
+                href={`/dashboard/profile/${request.senderId}`}
+                className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
                   <div className="flex items-center gap-3">
-                    <Avatar>
+                    <Avatar className="h-10 w-10 border-2 border-primary/20">
                       <AvatarImage src={profile.image || "/placeholder.svg"} alt={profile.name || 'User'} />
-                      <AvatarFallback>{(profile.name || 'U').substring(0, 2)}</AvatarFallback>
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        {(profile.name || 'U').substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
                     </Avatar>
-                    <div>
+                    <div className="space-y-1">
                       <p className="text-sm font-medium leading-none">{profile.name || 'Anonymous User'}</p>
                       <p className="text-xs text-muted-foreground">@{profile.githubUsername || 'user'}</p>
                     </div>
                   </div>
-                  <div>
-              
-                  <span className="text-xs text-muted-foreground">{formatDate(request.createdAt)}</span>
+                  <div className="flex flex-col items-end gap-1">
+                    <Badge className={request.status === 'PENDING' ? 'bg-yellow-800/30 text-yellow-500 hover:bg-yellow-800' : request.status === 'ACCEPTED' ? 'bg-green-800/30 text-green-500 hover:bg-green-800' : 'bg-red-800/30 text-red-500 hover:bg-red-800'}>
+                      {request.status}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">{formatDate(request.createdAt)}</span>
                   </div>
-
-                </div>
+                </Link>
               )
             })
           ) : (
