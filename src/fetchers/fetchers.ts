@@ -1,6 +1,6 @@
 import { profileSetupStatus } from "@/actions/dashboard.action";
 import { getSelectedUserById } from "@/actions/explore.action";
-import { findMatches, getAllAccounts, getMatchPreference } from "@/actions/match.action";
+import { findMatches, getAllAccounts, getMatchPreference, getMatchRequests } from "@/actions/match.action";
 import { toast } from "@/hooks/use-toast";
  
 
@@ -92,6 +92,28 @@ export const getSelectedUserByIdFetcher = async (userId: string) => {
     return null;
   }
 }
+
+export const getAllMatchRequestsFetcher = async () =>{
+  try {
+    const response = await getMatchRequests()
+    if(!response){
+      toast({
+        title:'Failed to load match requests',
+        variant:'destructive'
+      })
+    }
+    if(response)
+      return response.additional
+  }
+  catch(err){
+    toast({
+      title: "Failed to load match requests",
+      description: "Please try again later",
+      variant: "destructive",
+    });
+  }
+}
+
 
 export const getProfileSetupStatus = async () =>{
   try {
