@@ -49,7 +49,7 @@ export function NewRequestsCard({matchRequests}:{matchRequests:any}) {
   }
 
   return (
-    <Card className="h-full">
+    <Card className="h-full flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
           <CardTitle className="text-xl">New Requests</CardTitle>
@@ -57,7 +57,7 @@ export function NewRequestsCard({matchRequests}:{matchRequests:any}) {
         </div>
         <UserPlus className="h-5 w-5 text-muted-foreground" />
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1">
         <div className="space-y-4">
           {matchRequests && matchRequests.length > 0 ? (
             matchRequests.map((request:MatchRequest) => {
@@ -96,7 +96,7 @@ export function NewRequestsCard({matchRequests}:{matchRequests:any}) {
           )}
         </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="mt-auto">
         <Button variant="outline" asChild className="w-full">
           <Link href="/matches">
             View all requests
