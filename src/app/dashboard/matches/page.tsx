@@ -1,24 +1,19 @@
 "use client";
-import { useEffect, useState } from "react";
-import {
-  getMyMatches,
-  getMatchRequests,
-  respondToMatchRequest,
-} from "@/actions/match.action";
+import { useState } from "react";
+import { respondToMatchRequest } from "@/actions/match.action";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Check, X, Heart } from "lucide-react";
-
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
-import useSWR from "swr";
 import { useRouter } from "next/navigation";
+import { useMyMatches } from "@/components/hooks/useMyMatches";
+import { useMatchRequest } from "@/components/hooks/useMatchRequests";
 
 interface Profile {
   name: string;
   image: string;
   bio: string;
-  // other properties from GitDateProfile
 }
 
 interface Match {
@@ -33,51 +28,20 @@ interface MatchRequest {
   sender: {
     gitDateProfile: Profile;
   };
-
   createdAt: Date;
 }
 
 export default function MatchesPage() {
-  const [matches, setMatches] = useState<Match[]>([]);
-  const [requests, setRequests] = useState<MatchRequest[]>([]);
   const [activeTab, setActiveTab] = useState("matches");
-  const [loading, setLoading] = useState(true);
-
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [matchesData, requestsData] = await Promise.all([
-        getMyMatches(),
-        getMatchRequests(),
-      ]);
-      //@ts-ignore
-      setMatches(matchesData || []);
-      //@ts-ignore
-      setRequests(requestsData || []);
-    } catch (error) {
-      console.error("Error loading match data:", error);
-      toast({
-        title: "Failed to load matches",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
+  const { data: matches, isLoading: matchesLoading } = useMyMatches();
+  const { data: requests, isLoading: requestsLoading } = useMatchRequest();
 
   const handleAccept = async (matchId: string) => {
     try {
       await respondToMatchRequest(matchId, "ACCEPT");
       toast({
         title: "Match request accepted",
-        variant: "destructive",
       });
-      loadData(); // Refresh data
     } catch (error) {
       toast({
         title: "Failed to accept match request",
@@ -91,9 +55,7 @@ export default function MatchesPage() {
       await respondToMatchRequest(matchId, "REJECT");
       toast({
         title: "Match request rejected",
-        variant: "destructive",
       });
-      loadData(); // Refresh data
     } catch (error) {
       toast({
         title: "Failed to reject match request",
@@ -130,7 +92,7 @@ export default function MatchesPage() {
         <TabsList className="mb-6">
           <TabsTrigger value="matches">
             Matches
-            {matches.length > 0 && (
+            {matches?.length > 0 && (
               <span className="ml-2 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
                 {matches.length}
               </span>
@@ -138,7 +100,7 @@ export default function MatchesPage() {
           </TabsTrigger>
           <TabsTrigger value="requests">
             Requests
-            {requests.length > 0 && (
+            {requests?.length > 0 && (
               <span className="ml-2 bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full">
                 {requests.length}
               </span>
@@ -147,9 +109,9 @@ export default function MatchesPage() {
         </TabsList>
 
         <TabsContent value="matches">
-          {loading ? (
+          {matchesLoading ? (
             renderLoadingSkeleton()
-          ) : matches.length === 0 ? (
+          ) : !matches?.length ? (
             <div className="text-center py-12">
               <Heart className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium">No matches yet</h3>
@@ -167,9 +129,9 @@ export default function MatchesPage() {
         </TabsContent>
 
         <TabsContent value="requests">
-          {loading ? (
+          {requestsLoading ? (
             renderLoadingSkeleton()
-          ) : requests.length === 0 ? (
+          ) : !requests?.length ? (
             <div className="text-center py-12">
               <Heart className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium">No pending requests</h3>
@@ -195,7 +157,7 @@ export default function MatchesPage() {
   );
 }
 
-function MatchCard({ match }: { match: Match }) {
+function MatchCard({ match }: { match: any }) {
   const router = useRouter();
   
   if (!match.profile) return null;
@@ -258,7 +220,7 @@ function RequestCard({
   onAccept,
   onReject,
 }: {
-  request: MatchRequest;
+  request: any;
   onAccept: () => void;
   onReject: () => void;
 }) {
