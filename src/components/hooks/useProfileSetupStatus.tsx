@@ -10,9 +10,7 @@ export const useProfileSetupStatus = () => {
     queryKey: ['profile-setup', email],
     queryFn: () => getProfileSetupStatus(),
     enabled: !!email,
-    staleTime: 300000, // 5 minutes
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false
+ 
   })
 
   return {
