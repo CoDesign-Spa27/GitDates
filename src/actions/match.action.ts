@@ -509,21 +509,24 @@ export const getMyMatches = async () => {
     if (!matches) {
       throw new Error("No matches found");
     }
+   const formattedResponse = matches.map((match) => {
+      const isUserSender = match.senderId === user.id;
+      const otherPerson = isUserSender ? match.receiver : match.sender;
+      
+      return {
+        matchId: match.id,
+        userId: otherPerson.id,
+        profile: otherPerson.gitDateProfile,
+        createdAt: match.createdAt,
+      };
+    })
+    console.log(formattedResponse, 'formatted response')
     const response = new SuccessResponse(
       "Matches fetched successfully",
       200,
-      matches.map((match) => {
-        const isUserSender = match.senderId === user.id;
-        const otherPerson = isUserSender ? match.receiver : match.sender;
-
-        return {
-          matchId: match.id,
-          userId: otherPerson.id,
-          profile: otherPerson.gitDateProfile,
-          createdAt: match.createdAt,
-        };
-      })
+      formattedResponse
     );
+
     return response.serialize();
   } catch (error) {
     console.error("Error getting matches:", error);
