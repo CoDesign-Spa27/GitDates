@@ -12,6 +12,7 @@ import { ActiveSummary } from '@/components/dashboard/active-summary'
 import useSWR from 'swr'
 import { getProfileSetupStatus } from '@/fetchers/fetchers'
 import { useProfileSetupStatus } from '@/components/hooks/useProfileSetupStatus'
+import { useMatchRequest } from '@/components/hooks/useMatchRequests'
 
 export interface UserData {
   basicInfo: {
@@ -55,9 +56,8 @@ export default function Dashboard() {
   const {data:session} = useSession();
  
   const { data: profileSetupStatus, isLoading : isProfileStatusLoading } = useProfileSetupStatus()
+  const {data: matchRequests} = useMatchRequest()
  
- 
-
   // if (isLoading) {
   //   return (
   //     <div className="container mx-auto p-4 flex justify-center items-center min-h-screen">
@@ -80,7 +80,10 @@ export default function Dashboard() {
      <div className="container mx-auto p-4 md:p-6">
  
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <div className="md:col-span-2 lg:col-span-3">
+          <div className='lg:col-span-2'>
+          {/* some kind of graphical representation */}
+          </div>
+          <div className="md:col-span-2 lg:col-span-1">
             <ProfileSetupSuccess 
               isMatchPreferenceCreated={profileSetupStatus?.isMatchPreferenceCreated ?? false} 
               isProfileCreated={profileSetupStatus?.isProfileCreated ?? false} 
@@ -88,7 +91,7 @@ export default function Dashboard() {
           </div>
 
           <div className="lg:col-span-1">
-            <NewRequestsCard />
+            <NewRequestsCard matchRequests={matchRequests} />
         </div>
  
         <div className="lg:col-span-1">
