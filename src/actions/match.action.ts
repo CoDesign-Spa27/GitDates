@@ -390,10 +390,17 @@ export const getMatchRequests = async () => {
         },
       },
     });
-    return pendingRequests;
+
+    console.log(pendingRequests, "pendingReuqests")
+    const response = new SuccessResponse(
+     "All request fetched successfully",
+      200,
+      pendingRequests
+     )
+     return response.serialize()
   } catch (error) {
     console.error("Error getting match requests", error);
-    throw error;
+    throw new ErrorHandler("Error getting all accounts", "DATABASE_ERROR");
   }
 };
 
