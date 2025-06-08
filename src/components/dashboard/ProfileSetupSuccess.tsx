@@ -4,18 +4,65 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import {motion} from 'motion/react'
+import { motion } from 'motion/react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export interface ProfileSetupStatus {
   isProfileCreated: boolean;
   isMatchPreferenceCreated: boolean;
 }
 
+const ProfileSetupSkeleton = () => {
+  return (
+    <Card className="overflow-hidden">
+      <div className="h-1.5 bg-muted animate-pulse" />
+      
+      <CardHeader className="text-center py-4">
+        <div className="mx-auto">
+          <Skeleton className="h-6 w-6 rounded-full mx-auto mb-2" />
+          <Skeleton className="h-6 w-48 mx-auto mb-2" />
+          <Skeleton className="h-4 w-64 mx-auto" />
+        </div>
+      </CardHeader>
+
+      <CardContent className="px-4 pb-3">
+        <div className="space-y-3">
+          {[...Array(2)].map((_, i) => (
+            <div key={i} className="rounded-lg p-3 bg-muted border border-muted-foreground/20">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                  <div>
+                    <Skeleton className="h-4 w-32 mb-1" />
+                    <Skeleton className="h-3 w-48" />
+                  </div>
+                </div>
+                <Skeleton className="h-8 w-20" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+
+      <CardFooter className="px-4 pb-3">
+        <div className="w-full">
+          <Skeleton className="h-4 w-48 mx-auto mb-2" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      </CardFooter>
+    </Card>
+  );
+};
+
 export function ProfileSetupSuccess({
   isProfileCreated,
   isMatchPreferenceCreated,
   isLoading
 }: ProfileSetupStatus & { isLoading?: boolean }) {
+  if (isLoading) {
+    return <ProfileSetupSkeleton />;
+  }
+
   const allComplete = isProfileCreated && isMatchPreferenceCreated;
   const completedSteps = [isProfileCreated, isMatchPreferenceCreated].filter(Boolean).length;
   const totalSteps = 2;

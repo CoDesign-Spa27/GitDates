@@ -6,7 +6,7 @@ export const useProfileSetupStatus = () => {
   const { data: session } = useSession()
   const email = session?.user?.email
 
-  const {data, isLoading } = useQuery({
+  const {data, isLoading, isFetching } = useQuery({
     queryKey: ['profile-setup', email],
     queryFn: () => getProfileSetupStatus(),
     enabled: !!email,
@@ -15,6 +15,6 @@ export const useProfileSetupStatus = () => {
 
   return {
         data,
-        isLoading
+        isLoading: isLoading || isFetching
   }
 }
