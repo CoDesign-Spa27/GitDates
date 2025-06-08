@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Skeleton } from "@/components/ui/skeleton"
 
-interface ActivitySummary {
+export interface ActivitySummary {
   profileViews: number
   newConnections: number
   pendingRequests: number
@@ -26,37 +26,42 @@ const chartConfig = {
     label: "New Connections",
     color: "hsl(var(--chart-2))",
   },
- 
   pending: {
     label: "Pending Requests",
     color: "hsl(var(--chart-4))",
   },
 }
 
+const ActiveSummarySkeleton = () => {
+  return (
+    <div className="w-full max-w-4xl mx-auto space-y-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        {[...Array(3)].map((_, i) => (
+          <Card key={i} className="text-center">
+            <CardContent className="pt-6">
+              <Skeleton className="h-5 w-5 mx-auto mb-2" />
+              <Skeleton className="h-8 w-12 mx-auto" />
+              <Skeleton className="h-4 w-24 mx-auto mt-1" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-48 mb-2" />
+          <Skeleton className="h-4 w-64" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[100px] w-full" />
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
 export const ActiveSummary = ({activityData, loading}:{activityData:ActivitySummary, loading:boolean}) => { 
   if (loading) {
-    return (
-      <div className="w-full max-w-4xl mx-auto p-6 space-y-6">
-        <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Activity className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold">Activity Summary</h1>
-          </div>
-          <p className="text-muted-foreground">Your network activity this week</p>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i} className="text-center">
-              <CardContent className="pt-6">
-                <Skeleton className="h-5 w-5 mx-auto mb-2" />
-                <Skeleton className="h-8 w-12 mx-auto" />
-                <Skeleton className="h-4 w-24 mx-auto mt-1" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    )
+    return <ActiveSummarySkeleton />
   }
 
   const chartData = [
@@ -84,8 +89,6 @@ export const ActiveSummary = ({activityData, loading}:{activityData:ActivitySumm
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
-   
- 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
         {chartData.map((item, index) => {
           const IconComponent = item.icon
@@ -152,8 +155,6 @@ export const ActiveSummary = ({activityData, loading}:{activityData:ActivitySumm
           </ChartContainer>
         </CardContent>
       </Card>
-
-  
     </div>
   )
 }

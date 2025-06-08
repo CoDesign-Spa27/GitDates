@@ -60,7 +60,7 @@ export default function Dashboard() {
   const { data: profileSetupStatus, isLoading : isProfileStatusLoading } = useProfileSetupStatus()
   const {data: matchRequests, isLoading:isMatchRequestsLoading} = useMatchRequest()
   const {data: matches, isLoading:isMyMatchesLoading } = useMyMatches();
-  const {data:activity, isLoading:isActivityLoading} = useGetActivitySummary();
+  const {data:activity, isLoading:isActivityLoading } = useGetActivitySummary();
   // if (isLoading) {
   //   return (
   //     <div className="container mx-auto p-4 flex justify-center items-center min-h-screen">
@@ -87,7 +87,7 @@ export default function Dashboard() {
           <div className='lg:col-span-8'>
             <ActiveSummary loading={isActivityLoading} activityData={activity ?? { profileViews: 0, newConnections: 0, pendingRequests: 0 }} />
           </div>
-          <div className="  lg:col-span-4">
+          <div className="lg:col-span-4">
             <ProfileSetupSuccess 
               isMatchPreferenceCreated={profileSetupStatus?.isMatchPreferenceCreated ?? false} 
               isProfileCreated={profileSetupStatus?.isProfileCreated ?? false} 
