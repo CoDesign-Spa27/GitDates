@@ -1,31 +1,32 @@
 "use client";
 
-import type React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  Edit3, 
+  Github, 
+  MapPin, 
+  Code2, 
+  ExternalLink, 
+  X, 
+  Check,
+  Users,
+  GitBranch,
+  Star,
+  Calendar,
+  Globe
+} from "lucide-react";
+import { useForm } from "react-hook-form";
 import {
   createGithubProfile,
   getGithubProfile,
   updateGithubProfile,
 } from "@/actions/user.profile.action";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Edit2, Github, MapPin, Code, ArrowUpRight, X 
-} from "lucide-react";
-import { useForm } from "react-hook-form";
-import Link from "next/link";
+import { Card } from "@/components/ui/card";
 
 interface GitDateProfileType {
   githubUsername: string;
@@ -47,7 +48,7 @@ interface EditProfileForm {
   name: string;
   city: string;
   state: string;
-  country: string;  
+  country: string;
   bio: string;
   blog: string;
 }
@@ -59,12 +60,12 @@ const GitDateProfile = () => {
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  const { 
-    register, 
-    handleSubmit, 
-    setValue, 
+  const {
+    register,
+    handleSubmit,
+    setValue,
     reset,
-    formState: { errors } 
+    formState: { errors }
   } = useForm<EditProfileForm>({
     defaultValues: {
       city: "",
@@ -140,7 +141,6 @@ const GitDateProfile = () => {
 
   const cancelEditing = () => {
     setIsEditing(false);
-    // Reset form to original profile values
     if (profile) {
       reset({
         city: profile.city || "",
@@ -153,292 +153,288 @@ const GitDateProfile = () => {
     }
   };
 
-  // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-4xl rounded-2xl border-none shadow-xl">
-          <CardHeader>
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center space-x-6">
-              <Skeleton className="h-24 w-24 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-6 w-48" />
-                <Skeleton className="h-4 w-32" />
+      <div className="min-h-screen ">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <div className="animate-pulse space-y-8">
+            <div className=" rounded-3xl p-8 shadow-sm border border-slate-200/60 dark:border-slate-800">
+              <div className="flex items-start gap-6">
+                <div className="w-24 h-24 bg-slate-200 dark:bg-slate-700 rounded-2xl"></div>
+                <div className="flex-1 space-y-3">
+                  <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded-lg w-1/3"></div>
+                  <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/4"></div>
+                </div>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-4">
-              {[...Array(3)].map((_, i) => (
-                <Skeleton key={i} className="h-24 rounded-xl" />
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className=" rounded-3xl p-6 shadow-sm border border-slate-200/60 dark:border-slate-800 h-40"></div>
+              <div className=" rounded-3xl p-6 shadow-sm border border-slate-200/60 dark:border-slate-800 h-40"></div>
             </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-3/4" />
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }
 
-  // Error state
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800 flex items-center justify-center p-4">
-        <Card className="w-full max-w-4xl rounded-2xl border-none shadow-xl">
-          <CardHeader>
-            <CardTitle className="text-red-600 flex items-center gap-2">
-              <X className="h-5 w-5" />
-              Error
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">{error}</p>
-            <Button 
-              onClick={() => window.location.reload()} 
-              className="mt-4"
-              variant="outline"
-            >
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
- 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800 flex items-center justify-center p-4">
-        <Card className="w-full max-w-xl rounded-2xl border-none shadow-xl">
-          <CardHeader>
-            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-gitdate to-gitdate-500 bg-clip-text text-transparent">
-              Create Your GitDate Profile
-            </CardTitle>
-            <CardDescription className="text-lg">
-              Get started by creating your profile in just one click.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button 
-              onClick={handleCreateProfile} 
-              variant="pressed"
-              className="w-full h-12 text-lg"
-            >
-              Create Profile
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen   flex items-center justify-center p-4">
+        <div className=" rounded-3xl p-8 shadow-xl border border-slate-200/60 dark:border-slate-800 max-w-md w-full text-center">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mx-auto mb-6">
+            <Github className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+            Create Your Profile
+          </h1>
+          <p className="text-slate-600 dark:text-slate-300 mb-6">
+            Get started by creating your GitHub profile in just one click.
+          </p>
+          <Button
+            onClick={handleCreateProfile}
+            className="w-full h-12 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium transition-all duration-200"
+          >
+            Create Profile
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen  flex items-center justify-center p-4">
-      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-12 gap-6">
-        {/* Left Column - Profile Info */}
-        <Card className="md:col-span-4 rounded-2xl border-none shadow-xl overflow-hidden">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-gitdate/30 to-transparent dark:from-gitdate/20" />
-            <div className="relative p-6">
-              <div className="flex flex-col items-center text-center space-y-4">
-                <Avatar className="h-32 w-32 ring-4 ring-white/20">
-                  <AvatarImage src={profile.image} alt={profile.githubUsername} />
-                  <AvatarFallback className="bg-white/20 text-white text-3xl">
-                    {profile.githubUsername.slice(0, 2).toUpperCase()}
+    <div className="min-h-screen">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Header Section */}
+        <Card className="rounded-lg p-8 shadow-sm mb-8">
+          <div className="flex items-start justify-between mb-6">
+            <div className="flex items-start gap-6">
+              <div className="relative">
+                <Avatar className="w-24 h-24 rounded-2xl">
+                  <AvatarImage src={profile.image} alt={profile.name} className="rounded-2xl" />
+                  <AvatarFallback className="rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 text-white text-2xl font-semibold">
+                    {profile.name.split(' ').map(n => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
-                
-                <div>
-                  <h1 className="text-3xl font-bold text-gitdate mb-2">
-                    {profile.name}
-                  </h1>
-                  <p className="text-neutral-950 dark:text-white/80 text-lg flex items-center justify-center gap-2">
-                    @{profile.githubUsername}
-                  </p>
+                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white dark:border-slate-900 flex items-center justify-center">
+                  <div className="w-3 h-3 bg-white rounded-full"></div>
                 </div>
-
-                <Button 
-                 
-                  size="icon" 
-                  onClick={() => setIsEditing(!isEditing)}
-                  className="absolute top-0 right-3 rounded-full backdrop-blur-sm transition-all duration-300"
-                >
-                  {isEditing ? (
-                    <X className="h-5 w-5  text-white" />
-                  ) : (
-                    <Edit2 className="h-5 w-5  text-white" />
+              </div>
+              
+              <div className="flex-1">
+                <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">
+                  {profile.name}
+                </h1>
+                <p className="text-slate-600 dark:text-slate-300 text-lg mb-3">
+                  @{profile.githubUsername}
+                </p>
+                <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+                  <div className="flex items-center gap-1">
+                    <MapPin className="w-4 h-4" />
+                    <span>
+                      {[profile.city, profile.state, profile.country]
+                        .filter(Boolean)
+                        .join(", ") || "Location not set"}
+                    </span>
+                  </div>
+                  {profile.blog && (
+                    <a
+                      href={profile.blog.startsWith('http') ? profile.blog : `https://${profile.blog}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    >
+                      <Globe className="w-4 h-4" />
+                      <span>Website</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
                   )}
-                </Button>
+                </div>
               </div>
             </div>
+            
+            <Button
+              onClick={() => setIsEditing(!isEditing)}
+              size="sm"
+            >
+              {isEditing ? (
+                <>
+                  <X className="w-4 h-4 mr-2" />
+                  Cancel
+                </>
+              ) : (
+                <>
+                  <Edit3 className="w-4 h-4 mr-2" />
+                  Edit
+                </>
+              )}
+            </Button>
           </div>
+          
+          {!isEditing && (
+            <p className="text-slate-700 dark:text-slate-300 text-lg leading-relaxed">
+              {profile.bio || "No bio provided yet."}
+            </p>
+          )}
+        </Card>
 
-          <div className="p-6 space-y-6">
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { label: "Repos", value: profile?.repositories },
-                { label: "Followers", value: profile?.followers },
-                { label: "Following", value: profile?.following }
-              ].map(({label, value }) => (
-                <div 
-                  key={label} 
-                  className="bg-zinc-50 dark:bg-zinc-900 rounded-xl p-4 text-center hover:shadow-lg transition-all duration-300 hover:scale-105"
-                >
-                  <p className="text-2xl font-bold text-gitdate">
-                    {value}
-                  </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">{label}</p>
+        {isEditing ? (
+          /* Edit Form */
+          <div className="space-y-6">
+            <Card className=" p-8 shadow-sm">
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-6">Edit Profile</h2>
+              
+              <div className="space-y-6">
+                <div>
+                  <Label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
+                    Name
+                  </Label>
+                  <Input
+                    {...register("name")}
+         
+                    placeholder="Your full name"
+                  />
                 </div>
-              ))}
-            </div>
 
-            <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">Main Languages</h3>
+                <div>
+                  <Label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
+                    Bio
+                  </Label>
+                  <Input
+                    {...register("bio", { maxLength: { value: 250, message: "Bio must be 250 characters or less" } })}
+              
+                    placeholder="Tell us about yourself..."
+                  />
+                  {errors.bio && (
+                    <p className="text-red-500 text-sm mt-1">{errors.bio.message}</p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
+                      City
+                    </Label>
+                    <Input
+                      {...register("city")}
+    
+                      placeholder="San Francisco"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
+                      State
+                    </Label>
+                    <Input
+                      {...register("state")}
+  
+                      placeholder="California"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
+                      Country
+                    </Label>
+                    <Input
+                      {...register("country")}
+       
+                      placeholder="United States"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
+                    Website
+                  </Label>
+                  <Input
+                    {...register("blog", { 
+                      pattern: { 
+                        value: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/, 
+                        message: "Please enter a valid URL" 
+                      } 
+                    })}
+     
+                    placeholder="https://your-website.com"
+                  />
+                  {errors.blog && (
+                    <p className="text-red-500 text-sm mt-1">{errors.blog.message}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-8">
+                <Button
+                  type="button"
+ 
+                  onClick={cancelEditing}
+ 
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => handleSubmit(onSubmit)()}
+ 
+                >
+                  <Check className="w-4 h-4 mr-2" />
+                  Save Changes
+                </Button>
+              </div>
+            </Card>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="p-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                <Github className="w-5 h-5 text-gitdate" />
+                GitHub Stats
+              </h2>
+              
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                {[
+                  { label: "Repositories", value: profile.repositories, icon: GitBranch, color: "text-green-600" },
+                  { label: "Followers", value: profile.followers, icon: Users, color: "text-blue-600" },
+                  { label: "Following", value: profile.following, icon: Users, color: "text-purple-600" },
+                  { label: "Contributions", value: profile.contributions, icon: Calendar, color: "text-orange-600" }
+                ].map(({ label, value, icon: Icon, color }) => (
+                  <div key={label} className="bg-neutral-100 dark:bg-neutral-900 rounded-md p-4 text-center   transition-colors">
+                    <Icon className={`w-5 h-5 mx-auto mb-2 ${color}`} />
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                      {value.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                      {label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Languages Card */}
+            <Card className=" p-6 shadow-sm ">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                <Code2 className="w-5 h-5 text-purple-600" />
+                Top Languages
+              </h2>
+              
               <div className="flex flex-wrap gap-2">
-                {profile?.mainLanguages.map((lang) => (
-                  <Badge 
-                    key={lang} 
-                    className="px-3 py-1 bg-gitdate/10 text-gitdate hover:bg-gitdate/20 transition-colors duration-300"
+                {profile.mainLanguages.map((lang, index) => (
+                  <Badge
+                    key={lang}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-all hover:scale-105 ${
+                      index === 0 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                      index === 1 ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' :
+                      index === 2 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                      'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'
+                    }`}
                   >
                     {lang}
                   </Badge>
                 ))}
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">Total Contributions</h3>
-              <div className="flex items-center gap-2">
-                <Github className="text-gitdate" />
-                <Badge variant="secondary" className="bg-gitdate/10 text-gitdate px-3 py-1">
-                  {profile.contributions}
-                </Badge>
-              </div>
-            </div>
+ 
+            </Card>
           </div>
-        </Card>
-
-        {/* Right Column - Bio and Details */}
-        <Card className="md:col-span-8 rounded-2xl border-none shadow-xl overflow-hidden">
-          {isEditing ? (
-            <form onSubmit={handleSubmit(onSubmit)} className="h-full">
-              <div className="p-6 space-y-6">
-                <div className="space-y-4">
-                  <Label className="text-lg font-semibold">Bio</Label>
-                  <Input 
-                    {...register("bio", { maxLength: { value: 250, message: "Bio must be 250 characters or less" } })}
-                    placeholder="Tell us about yourself" 
-                    className="border-b border-gitdate bg-transparent focus:border-gitdate-500"
-                  />
-                  {errors.bio && (
-                    <p className="text-red-500 text-sm">{errors.bio.message}</p>
-                  )}
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <Label className="text-lg font-semibold">Location</Label>
-                    <div className="space-y-3">
-                      <Input 
-                        {...register("city")}
-                        placeholder="City" 
-                        className="border-b border-gitdate bg-transparent focus:border-gitdate-500"
-                      />
-                      <Input 
-                        {...register("state")}
-                        placeholder="State/Province" 
-                        className="border-b border-gitdate bg-transparent focus:border-gitdate-500"
-                      />
-                      <Input 
-                        {...register("country")}
-                        placeholder="Country" 
-                        className="border-b border-gitdate bg-transparent focus:border-gitdate-500"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <Label className="text-lg font-semibold">Blog/Website</Label>
-                    <Input 
-                      {...register("blog", { 
-                        pattern: { 
-                          value: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/, 
-                          message: "Invalid URL" 
-                        } 
-                      })}
-                      placeholder="https://your-website.com" 
-                      className="border-b border-gitdate bg-transparent focus:border-gitdate-500"
-                    />
-                    {errors.blog && (
-                      <p className="text-red-500 text-sm">{errors.blog.message}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex justify-end gap-4">
-                  <Button 
-                    type="button"
-                    variant="outline"
-                    onClick={cancelEditing}
-                    className="px-6"
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    variant="pressed"
-                    className="px-6"
-                  >
-                    Save Changes
-                  </Button>
-                </div>
-              </div>
-            </form>
-          ) : (
-            <div className="h-full">
-              <div className="p-6 space-y-8">
-                <div className="space-y-4">
-                  <h2 className="text-xl font-semibold">About Me</h2>
-                  <p className="text-zinc-600 dark:text-zinc-300 text-lg leading-relaxed">
-                    {profile?.bio || "No bio provided yet."}
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  <h2 className="text-xl font-semibold">Location</h2>
-                  <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-300">
-                    <MapPin className="text-gitdate" size={20} />
-                    <span>
-                      {[
-                        profile?.city,
-                        profile?.state,
-                        profile?.country
-                      ].filter(Boolean).join(", ") || "No location provided"}
-                    </span>
-                  </div>
-                </div>
-
-                {profile?.blog && (
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-semibold">Website</h2>
-                    <Link 
-                      href={profile.blog.startsWith('http') ? profile.blog : `https://${profile.blog}`}
-                      target="_blank" 
-                      className="flex items-center gap-2 text-gitdate hover:text-gitdate-500 transition-colors duration-300"
-                    >
-                      {profile.blog} <ArrowUpRight size={16} />
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </Card>
+        )}
       </div>
     </div>
   );
