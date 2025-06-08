@@ -22,7 +22,7 @@ type Match = {
   createdAt: Date
 }
 
-export function ConnectionsCard({matches}:{matches:Match[]}) {
+export function ConnectionsCard({matches, isLoading}:{matches:Match[], isLoading?: boolean}) {
   return (
     <Card className="h-full flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between pb-2">

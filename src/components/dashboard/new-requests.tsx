@@ -37,7 +37,7 @@ interface MatchRequest {
   };
 }
 
-export function NewRequestsCard({matchRequests}:{matchRequests:any}) {
+export function NewRequestsCard({matchRequests,isLoading}:{matchRequests:any, isLoading:boolean}) {
   const formatDate = (dateString: string | Date) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-US', { 

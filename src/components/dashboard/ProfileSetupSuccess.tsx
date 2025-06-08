@@ -13,8 +13,9 @@ export interface ProfileSetupStatus {
 
 export function ProfileSetupSuccess({
   isProfileCreated,
-  isMatchPreferenceCreated
-}: ProfileSetupStatus) {
+  isMatchPreferenceCreated,
+  isLoading
+}: ProfileSetupStatus & { isLoading?: boolean }) {
   const allComplete = isProfileCreated && isMatchPreferenceCreated;
   const completedSteps = [isProfileCreated, isMatchPreferenceCreated].filter(Boolean).length;
   const totalSteps = 2;
