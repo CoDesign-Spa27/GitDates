@@ -5,6 +5,7 @@ import { getSelectedUserByIdFetcher } from "@/fetchers/fetchers";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import useSWR from "swr";
+import { recordProfileView } from "@/actions/activity.action";
 import { 
   User, 
   Github, 
@@ -30,6 +31,13 @@ export default function Profile() {
   const { id: userId } = useParams();
   const email = session?.user?.email;
   const router = useRouter();
+
+  // Record profile view when the profile is loaded
+  useEffect(() => {
+    if (userId && session?.user?.email) {
+      recordProfileView(userId as string).catch(console.error);
+    }
+  }, [userId, session?.user?.email]);
 
   // Animation variants
   const containerVariants = {

@@ -118,20 +118,6 @@ const Navbar = () => {
           </nav>
 
           <div className="flex items-center space-x-1">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="hidden md:block"
-            >
-              <Button
-                onClick={() => {
-                  window.location.href = "#login";
-                }}
-              >
-                Let's Date
-              </Button>
-            </motion.div>
-
             <div className="flex md:hidden">
               <motion.button
                 onClick={toggleNavigation}
@@ -178,20 +164,7 @@ const Navbar = () => {
                     </Link>
                   </motion.div>
                 ))}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: navigation.length * 0.05 }}
-                >
-                  <Button
-                    onClick={() => {
-                      window.location.href = "#login";
-                      handleClick();
-                    }}
-                  >
-                    Let's Date
-                  </Button>
-                </motion.div>
+                
               </nav>
             </div>
           </motion.div>

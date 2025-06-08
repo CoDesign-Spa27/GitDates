@@ -20,13 +20,14 @@ import {
 import Image from "next/image";
 import { undermark } from "../../../public/assets";
 import { FeatureCard } from "../feature-card";
+import { useRouter } from "next/navigation";
 
 const Hero = () => {
   const [isHovered, setIsHovered] = useState(false);
   const { scrollY } = useScroll();
   const containerRef = useRef(null);
   const controls = useAnimation();
-
+  const navigate = useRouter();
  
   const y1 = useTransform(scrollY, [0, 500], [0, -100]);
   const y2 = useTransform(scrollY, [0, 500], [0, -50]);
@@ -315,27 +316,29 @@ const Hero = () => {
             transition={{ delay: 0.9, duration: 0.8 }}
           >
             <motion.button
-              className="group relative px-6 py-4 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-full font-semibold text-lg transition-all overflow-hidden"
-              whileHover={{ scale: 1.05 }}
+              onClick={() => navigate.push('/dashboard')}
+              className="group relative px-8 py-4 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-full font-semibold text-lg transition-all overflow-hidden shadow-lg hover:shadow-xl"
+              whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
               onHoverStart={() => setIsHovered(true)}
               onHoverEnd={() => setIsHovered(false)}
             >
               <motion.span
-                className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500"
+                className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 initial={{ x: "-100%" }}
                 animate={isHovered ? { x: 0 } : { x: "-100%" }}
                 transition={{ duration: 0.4 }}
               />
               <motion.span
-                className="relative flex items-center justify-center gap-2"
+                className="relative flex items-center justify-center gap-3"
                 animate={isHovered ? { x: [0, 5, 0] } : {}}
                 transition={{ duration: 0.3, repeat: isHovered ? 1 : 0 }}
               >
-                <Github className="w-5 h-5" /> Let's Date
+                <Github className="w-6 h-6" /> 
+                <span className="tracking-wide">Let's Date</span>
               </motion.span>
             </motion.button>
-            <motion.button
+            {/* <motion.button
               className="px-6 py-4 bg-transparent border-2 border-white/30 backdrop-blur-sm text-white rounded-full font-semibold text-lg transition-all"
               whileHover={{
                 scale: 1.05,
@@ -345,7 +348,7 @@ const Hero = () => {
               whileTap={{ scale: 0.95 }}
             >
               Browse Matches
-            </motion.button>
+            </motion.button> */}
           </motion.div>
 
           <motion.div
