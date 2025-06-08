@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react"
 export const useMyMatches = () =>{
     const {data:session,} = useSession()
     const email = session?.user?.email;
-    const {data = [], isLoading} = useQuery({
+    const {data = [], isLoading, isFetching} = useQuery({
         queryKey:['my-matches'],
         queryFn:getMyMatchesFetcher,
         enabled:!!email,
@@ -13,6 +13,6 @@ export const useMyMatches = () =>{
 
     return {
         data,
-        isLoading
+        isLoading: isLoading || isFetching
     }
 }

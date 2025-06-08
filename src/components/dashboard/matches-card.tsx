@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 
 type Match = {
   matchId: string
@@ -22,7 +23,44 @@ type Match = {
   createdAt: Date
 }
 
+const ConnectionsSkeleton = () => {
+  return (
+    <Card className="h-full flex flex-col">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <div>
+          <Skeleton className="h-6 w-32 mb-2" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <Skeleton className="h-5 w-5" />
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {[...Array(2)].map((_, i) => (
+            <div key={i} className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div>
+                  <Skeleton className="h-4 w-32 mb-1" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+              </div>
+              <Skeleton className="h-5 w-24" />
+            </div>
+          ))}
+        </div>
+      </CardContent>
+      <CardFooter className="mt-auto">
+        <Skeleton className="h-10 w-full" />
+      </CardFooter>
+    </Card>
+  )
+}
+
 export function ConnectionsCard({matches, isLoading}:{matches:Match[], isLoading?: boolean}) {
+  if (isLoading) {
+    return <ConnectionsSkeleton />
+  }
+
   return (
     <Card className="h-full flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
