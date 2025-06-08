@@ -14,6 +14,7 @@ import { getProfileSetupStatus } from '@/fetchers/fetchers'
 import { useProfileSetupStatus } from '@/components/hooks/useProfileSetupStatus'
 import { useMatchRequest } from '@/components/hooks/useMatchRequests'
 import { useMyMatches } from '@/components/hooks/useMyMatches'
+import { useGetActivitySummary } from '@/components/hooks/useGetActivitySummary'
 
 export interface UserData {
   basicInfo: {
@@ -57,8 +58,9 @@ export default function Dashboard() {
   const {data:session} = useSession();
  
   const { data: profileSetupStatus, isLoading : isProfileStatusLoading } = useProfileSetupStatus()
-  const {data: matchRequests} = useMatchRequest()
-  const {data: matches } = useMyMatches();
+  const {data: matchRequests, isLoading:isMatchRequestsLoading} = useMatchRequest()
+  const {data: matches, isLoading:isMyMatchesLoading } = useMyMatches();
+  const {data:activity, isLoading:isActivityLoading} = useGetActivitySummary();
   // if (isLoading) {
   //   return (
   //     <div className="container mx-auto p-4 flex justify-center items-center min-h-screen">
@@ -81,26 +83,24 @@ export default function Dashboard() {
   return (
      <div className="container mx-auto p-4 md:p-6">
  
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <div className='lg:col-span-2'>
-          {/* some kind of graphical representation */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-12">
+          <div className='lg:col-span-8'>
+            <ActiveSummary loading={isActivityLoading} activityData={activity ?? { profileViews: 0, newConnections: 0, pendingRequests: 0 }} />
           </div>
-          <div className="md:col-span-2 lg:col-span-1">
+          <div className="  lg:col-span-4">
             <ProfileSetupSuccess 
               isMatchPreferenceCreated={profileSetupStatus?.isMatchPreferenceCreated ?? false} 
               isProfileCreated={profileSetupStatus?.isProfileCreated ?? false} 
+              isLoading={isProfileStatusLoading}
             />
           </div>
 
-          <div className="lg:col-span-1">
-            <NewRequestsCard matchRequests={matchRequests} />
-        </div>
+          <div className="lg:col-span-6">
+            <NewRequestsCard matchRequests={matchRequests} isLoading={isMatchRequestsLoading}/>
+          </div>
  
-        <div className="lg:col-span-1">
-          <ConnectionsCard matches={matches as []}/>
-        </div>
-        <div className="lg:col-span-1">
-          <ActiveSummary />
+        <div className="lg:col-span-6">
+          <ConnectionsCard matches={matches as []} isLoading={isMyMatchesLoading}/>
         </div>
         </div>
       
