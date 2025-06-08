@@ -5,7 +5,7 @@ export const useMatchRequest = ()=>{
     const { data: session } = useSession()
     const email = session?.user?.email
   
-    const {data = [], isLoading} = useQuery({
+    const {data = [], isLoading, isFetching} = useQuery({
         queryKey:['match-request-recieved',email],
         queryFn: getAllMatchRequestsFetcher,
         enabled: !!email,
@@ -13,6 +13,6 @@ export const useMatchRequest = ()=>{
 
     return {
         data,
-        isLoading
+        isLoading : isLoading || isFetching
     }
 }

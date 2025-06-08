@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from '../ui/badge'
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface GitDateProfile {
   id: string;
@@ -37,6 +38,42 @@ interface MatchRequest {
   };
 }
 
+const NewRequestsSkeleton = () => {
+  return (
+    <Card className="h-full flex flex-col">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <div>
+          <Skeleton className="h-6 w-32 mb-2" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <Skeleton className="h-5 w-5" />
+      </CardHeader>
+      <CardContent className="flex-1">
+        <div className="space-y-4">
+          {[...Array(2)].map((_, i) => (
+            <div key={i} className="flex items-center justify-between p-3 rounded-lg">
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="space-y-1">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+              </div>
+              <div className="flex flex-col items-end gap-1">
+                <Skeleton className="h-5 w-20" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+      <CardFooter className="mt-auto">
+        <Skeleton className="h-10 w-full" />
+      </CardFooter>
+    </Card>
+  )
+}
+
 export function NewRequestsCard({matchRequests,isLoading}:{matchRequests:any, isLoading:boolean}) {
   const formatDate = (dateString: string | Date) => {
     const date = new Date(dateString)
@@ -46,6 +83,10 @@ export function NewRequestsCard({matchRequests,isLoading}:{matchRequests:any, is
       hour: '2-digit',
       minute: '2-digit'
     })
+  }
+
+  if (isLoading) {
+    return <NewRequestsSkeleton />
   }
 
   return (
