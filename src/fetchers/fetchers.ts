@@ -1,3 +1,4 @@
+import { getActivitySummary } from "@/actions/activity.action";
 import { profileSetupStatus } from "@/actions/dashboard.action";
 import { getSelectedUserById } from "@/actions/explore.action";
 import { findMatches, getAllAccounts, getMatchPreference, getMatchRequests, getMyMatches } from "@/actions/match.action";
@@ -148,6 +149,27 @@ export const getProfileSetupStatus = async () =>{
     }
     if(response)
       return response;
+  }catch(err){
+    toast({
+      title: "Failed to load user profile",
+      description: "Please try again later",
+      variant: "destructive",
+    });
+  }
+}
+
+export const getActivitySummaryFetchers = async()=>{
+  try {
+    const response = await getActivitySummary();
+    if(!response){
+      toast({
+        title:'Failed to load Activity',
+        variant:'destructive'
+      })
+    }
+    if(response){
+      return response.additional;
+    }
   }catch(err){
     toast({
       title: "Failed to load user profile",

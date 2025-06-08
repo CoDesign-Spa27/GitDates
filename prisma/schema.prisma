@@ -36,7 +36,8 @@ model User {
   preferences   MatchPreference?
   sentMatches     Match[]         @relation("Sender")
   receivedMatches Match[]         @relation("Receiver")
-
+  viewedProfiles  ProfileView[]   @relation("Viewer")
+  profileViews    ProfileView[]   @relation("ViewedUser")
   @@map("users")
 }
 
@@ -175,3 +176,14 @@ model Message {
   Conversation Conversation[] @relation("LastMessage")
 }
 
+model ProfileView {
+  id String @id @default(uuid())
+  viewerId String
+  viewer User @relation("Viewer", fields: [viewerId], references: [id], onDelete: Cascade)
+  viewedUserId String
+  viewedUser User @relation("ViewedUser", fields: [viewedUserId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([viewerId, viewedUserId, createdAt])
+  @@map("profile_views")
+}
