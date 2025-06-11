@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { getConversations, getUnreadMessageCounts } from "@/actions/conversation.action";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -10,122 +9,33 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 import { useSocket } from "@/lib/client-socket";
+import { useConversations } from "@/components/hooks/useConversation";
 
-interface Conversation {
-  id: string | null;
-  matchId: string;
-  otherUserId: string;
-  name: string;
-  image: string;
-  lastMessage: {
-    id: string;
-    content: string;
-    createdAt: string;
-    read: boolean;
-    senderId: string;
-  } | null;
-  unreadCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
+interface Conversation { id: string | null; matchId: string; otherUserId: string; name: string; image: string; lastMessage: { id: string; content: string; senderId: string; createdAt: Date; updatedAt: Date; conversationId: string; read: boolean; } | null; unreadCount: number; createdAt: Date; updatedAt: Date; }
 
 export default function ConversationsPage() {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const router = useRouter();
-  const { subscribeToNewMessages, isConnected } = useSocket();
-
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const [conversationsData, unreadData] = await Promise.all([
-        getConversations(),
-        getUnreadMessageCounts()
-      ]);
-
-      setConversations(conversationsData);
-      setUnreadCounts(unreadData?.byConversation || {});
-    } catch (error) {
-      console.error("Error loading messages:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { subscribeToNewMessages } = useSocket();
+  const { conversations, unreadCounts, isLoading } = useConversations();
 
   useEffect(() => {
-    fetchData();
-    
     const unsubscribe = subscribeToNewMessages((message) => {
-      // Update conversations when a new message arrives
-      setConversations(prevConversations => {
-        // Find the conversation that contains this message
-        const conversationIndex = prevConversations.findIndex(
-          conv => conv.id === message.conversationId
-        );
-        
-        if (conversationIndex === -1) {
-          // If conversation not found, refresh all conversations
-          fetchData();
-          return prevConversations;
-        }
-        
-        // Create a copy of the conversations array
-        const updatedConversations = [...prevConversations];
-        
-        // Update the conversation with the new message
-        updatedConversations[conversationIndex] = {
-          ...updatedConversations[conversationIndex],
-          lastMessage: {
-            id: message.id,
-            content: message.content,
-            createdAt: message.createdAt,
-            read: message.read,
-            senderId: message.senderId
-          },
-          updatedAt: message.createdAt
-        };
-        
-        // Move this conversation to the top (most recent)
-        const [movedConversation] = updatedConversations.splice(conversationIndex, 1);
-        updatedConversations.unshift(movedConversation);
-        
-        return updatedConversations;
-      });
-      
-      // Update unread counts
-      setUnreadCounts(prevCounts => {
-        const conversationId = message.conversationId;
-        const currentCount = prevCounts[conversationId] || 0;
-        
-        // If message is from the other user, increment unread count
-        if (message.senderId !== conversations.find(c => c.id === conversationId)?.otherUserId) {
-          return {
-            ...prevCounts,
-            [conversationId]: currentCount + 1
-          };
-        }
-        
-        return prevCounts;
-      });
     });
 
     return () => {
       unsubscribe?.();
     };
-  }, []);
+  }, [subscribeToNewMessages]);
 
-  const filteredConversations = conversations.filter(
+  const filteredConversations = conversations?.filter(
     (conversation) =>
       conversation.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ) ?? [];
 
   const handleConversationClick = (conversation: Conversation) => {
     if (conversation.matchId) {
       router.push(`/dashboard/messages/${conversation.matchId}`);
-    } else if (conversation.matchId) {
-      router.push(`/dashboard/messages/new?matchId=${conversation.matchId}`);
     }
   };
 
@@ -161,7 +71,7 @@ export default function ConversationsPage() {
         </div>
 
         <div className="bg-card rounded-lg border border-border overflow-hidden">
-          {loading ? (
+          {isLoading ? (
             renderLoadingSkeleton()
           ) : filteredConversations.length === 0 ? (
             <div className="text-center py-12">
@@ -177,7 +87,7 @@ export default function ConversationsPage() {
           ) : (
             <div className="divide-y divide-border">
               {filteredConversations.map((conversation) => {
-                const unreadCount = unreadCounts[conversation.id || ""] || 0;
+                const unreadCount = unreadCounts?.byConversation[conversation.id || ""] || 0;
                 return (
                   <div
                     key={conversation.id || conversation.matchId}
