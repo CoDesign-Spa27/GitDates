@@ -8,7 +8,7 @@ import { QueryClient, QueryClientConfig, QueryClientProvider } from '@tanstack/r
 const config: QueryClientConfig = {
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 60 * 1, // 5 minutes
       retry: 2, // Retry failed requests 2 times
       refetchOnWindowFocus: false, // Prevent refetch when tab is focused
       refetchOnReconnect: true, // Refetch on network reconnect
