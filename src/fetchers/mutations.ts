@@ -1,5 +1,7 @@
+import { getOrCreateConversation } from "@/actions/conversation.action";
 import { createMatchPreference, MatchPreference } from "@/actions/match.action";
 import { updateUserAvatar } from "@/actions/user.profile.action";
+import { toast } from "@/hooks/use-toast";
 
 export const createMatchPreferenceMutation = async (matchData: MatchPreference) => {
 try{
@@ -28,4 +30,20 @@ try{
     console.error("Error updating avatar:", error);
     throw error;
 }
+}
+
+export const getOrCreateConversationMutation = async(matchId:string) =>{
+    try {
+        const response = await getOrCreateConversation(matchId)
+        if(!response) {
+            throw new Error("Failed to update avatar");
+        }
+        if (response)
+            return response;
+    }catch(err){
+        toast({
+            title: "Internal Server Error",
+            variant: "destructive",
+          })
+    }
 }
