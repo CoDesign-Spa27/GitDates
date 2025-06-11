@@ -24,7 +24,7 @@ import {
   preferenceIcon,
   profileIcon,
 } from "../../public/icons";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
   HeartHandshake, 
@@ -38,7 +38,9 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { ProfileSet } from "./profileSet";
 import { getUnreadMessageCounts } from "@/actions/conversation.action";
-
+import { useSocket } from "@/lib/client-socket";
+import { useConversations } from "./hooks/useConversation";
+import { useQueryClient } from "@tanstack/react-query";
 // Navigation items grouped by category
 const navigationItems = {
   main: [
@@ -60,13 +62,7 @@ const navigationItems = {
       icon: MessageCircle,
       tooltip: "Conversations",
     },
-    {
-      title: "Notifications",
-      url: "/dashboard/notifications",
-      icon: Bell,
-      tooltip: "View notifications",
-      badge: 3, // Optional badge count
-    }
+ 
   ],
   profile: [
     {
@@ -109,7 +105,20 @@ export function AppSidebar() {
     toggleSidebar,
   } = useSidebar();
   const pathname = usePathname();
-  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+  const router = useRouter();
+  const {unreadCounts} = useConversations();
+  const {subscribeToNewMessages} = useSocket();
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    const unsubscribe = subscribeToNewMessages((message) => {
+      queryClient.invalidateQueries({ queryKey: ['unread-counts'], });
+    });
+
+    return () => {
+      unsubscribe?.();
+    };
+  }, [subscribeToNewMessages, queryClient]);
+
   const isActive = (url: string) => {
     if (url === "/dashboard" && pathname === "/dashboard") {
       return true;
@@ -119,30 +128,6 @@ export function AppSidebar() {
     }
     return false;
   };
-
-  useEffect(() => {
-    let mounted = true;
- 
-    const fetchUnreadCounts = async () => {
-      try {
-        const counts = await getUnreadMessageCounts();
-        if (mounted) {
-          setUnreadMessageCount(counts?.total || 0);
-        }
-      } catch (error) {
-        console.error("Error fetching unread counts:", error);
-      }
-    };
-    
-    fetchUnreadCounts();
-   
-    const interval = setInterval(fetchUnreadCounts, 30000);
-    
-    return () => {
-      mounted = false;
-      clearInterval(interval);
-    };
-  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -172,21 +157,16 @@ export function AppSidebar() {
             <SidebarMenuButton 
               tooltip={item.tooltip}
               isActive={isActive(item.url)}
-             className='[&>svg]:size-8'
+              className='[&>svg]:size-8'
             >
               <item.icon className={cn(
                 "h-4 w-4 shrink-0 p-1 ",
                 isActive(item.url) && "bg-gitdate text-white rounded-full "
               )} />
               <span className="truncate">{item.title}</span>
-              {item.title === "Conversations" && unreadMessageCount > 0 && (
+              {item.title === "Conversations" && unreadCounts && unreadCounts.total > 0 && (
                 <SidebarMenuBadge className="bg-gitdate text-white">
-                  {unreadMessageCount}
-                </SidebarMenuBadge>
-              )}
-              {item.badge && item.title !== "Conversations" && (
-                <SidebarMenuBadge className="bg-gitdate text-white">
-                  {item.badge}
+                  {unreadCounts.total}
                 </SidebarMenuBadge>
               )}
             </SidebarMenuButton>
@@ -198,12 +178,11 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="overflow-hidden" collapsible="icon" >
-          <SidebarHeader >
-            <Logo />
-          </SidebarHeader>
+      <SidebarHeader>
+        <Logo />
+      </SidebarHeader>
       <SidebarContent className="w-full" >
         <SidebarGroup className="w-full">
-          
           <SidebarGroupContent className="w-full">
             <SidebarMenu className="w-full">
               <div className="py-3 w-full">
