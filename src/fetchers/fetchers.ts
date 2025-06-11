@@ -1,4 +1,5 @@
 import { getActivitySummary } from "@/actions/activity.action";
+import { getConversations, getUnreadMessageCounts } from "@/actions/conversation.action";
 import { profileSetupStatus } from "@/actions/dashboard.action";
 import { getSelectedUserById } from "@/actions/explore.action";
 import { findMatches, getAllAccounts, getMatchPreference, getMatchRequests, getMyMatches } from "@/actions/match.action";
@@ -178,3 +179,46 @@ export const getActivitySummaryFetchers = async()=>{
     });
   }
 }
+
+export const getConversationsFetcher=async()=>{
+  try {
+    const response = await getConversations();
+    if(!response){
+      toast({
+        title:'Failed to load conversation',
+        variant:'destructive'
+      })
+    }
+    if(response){
+      return response.additional;
+    }
+  }catch(err){
+    toast({
+      title: "Failed to load conversation",
+      description: "Please try again later",
+      variant: "destructive",
+    });
+  }
+}
+
+export const getUnreadConversationsFetcher=async()=>{
+  try {
+    const response = await getUnreadMessageCounts();
+    if(!response){
+      toast({
+        title:'Failed to load message counts',
+        variant:'destructive'
+      })
+    }
+    if(response){
+      return response.additional;
+    }
+  }catch(err){
+    toast({
+      title: "Failed to load message counts",
+      description: "Please try again later",
+      variant: "destructive",
+    });
+  }
+}
+

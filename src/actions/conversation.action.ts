@@ -4,6 +4,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../lib/auth";
 import prisma from "../lib/prisma";
 import { revalidatePath } from "next/cache";
+import { SuccessResponse } from "@/lib/success";
+import { ErrorHandler } from "@/lib/error";
 
 export async function getConversations() {
   try {
@@ -71,15 +73,20 @@ export async function getConversations() {
       };
     });
 
-    // Sort by latest message or match date
-    return conversations.sort((a, b) => {
+ 
+  const formattedResponse = conversations.sort((a, b) => {
       const dateA = a.lastMessage?.createdAt || a.updatedAt;
       const dateB = b.lastMessage?.createdAt || b.updatedAt;
       return new Date(dateB).getTime() - new Date(dateA).getTime();
-    });
+    })
+    const response =new SuccessResponse(
+      'Conversation Fetched SuccessFully',
+      200,
+      formattedResponse
+    )
+    return response.serialize()
   } catch (error) {
-    console.error("Error fetching conversations:", error);
-    throw error;
+    throw new ErrorHandler('Error while fetching conversations', 'DATABASE_ERROR')
   }
 }
 
@@ -159,14 +166,21 @@ export async function getOrCreateConversation(matchId: string) {
       });
     }
 
-    return {
+    const data= {
       ...conversation,
       currentUserId: user.id,
       otherUserId: match.senderId === user.id ? match.receiverId : match.senderId,
     };
+
+    const response = new SuccessResponse(
+      'Conversation Fetched SuccessFully',
+       200,
+       data
+    )
+    return response.serialize()
   } catch (error) {
-    console.error("Error getting or creating conversation:", error);
-    throw error;
+    throw new ErrorHandler('Error while fetching conversations', 'DATABASE_ERROR')
+
   }
 }
 
@@ -222,12 +236,14 @@ export async function sendMessage(
         updatedAt: new Date(),
       },
     });
-
-    revalidatePath(`/dashboard/messages/${conversationId}`);
-    return message;
+    const response = new SuccessResponse(
+      'Messages sent successfully',
+      200,
+      message
+    )
+     return response.serialize();
   } catch (error) {
-    console.error("Error sending message:", error);
-    throw error;
+    throw new ErrorHandler('Error while fetching sending message', 'DATABASE_ERROR')
   }
 }
 
@@ -252,7 +268,6 @@ export async function markConversationAsRead(conversationId: string) {
 
     return { success: true };
   } catch (error) {
-    console.error("Error marking conversation as read:", error);
     throw error;
   }
 }
@@ -265,40 +280,43 @@ export async function getUnreadMessageCounts() {
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
-    if (!user) throw new Error("User not found");
+    if (!user) throw new Error("User not found for email: " + session.user.email);
 
     const conversations = await prisma.conversation.findMany({
       where: {
         match: {
-          OR: [
-            { senderId: user.id },
-            { receiverId: user.id },
-          ],
+          OR: [{ senderId: user.id }, { receiverId: user.id }],
         },
       },
       include: {
-        messages: {
-          where: {
-            senderId: { not: user.id },
-            read: false,
-          },
+        _count: {
           select: {
-            id: true,
+            messages: {
+              where: {
+                senderId: { not: user.id },
+                read: false,
+              },
+            },
           },
         },
       },
     });
 
-    const counts = conversations.reduce((acc, conversation) => {
-      acc[conversation.id] = conversation.messages.length;
-      return acc;
-    }, {} as Record<string, number>);
+    const counts = Object.fromEntries(
+      conversations.map((conversation) => [conversation.id, conversation._count.messages])
+    );
 
     const totalUnread = Object.values(counts).reduce((sum, count) => sum + count, 0);
-
-    return { byConversation: counts, total: totalUnread };
+    const response = new SuccessResponse(
+      'Fetching unread messages details successfull',
+      200,
+      {
+        byConversation: counts, total: totalUnread 
+      }
+    )
+    return response.serialize();
   } catch (error) {
-    console.error("Error getting unread message counts:", error);
+ 
     throw error;
   }
 }
