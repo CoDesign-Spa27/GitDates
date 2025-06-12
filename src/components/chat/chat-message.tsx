@@ -49,7 +49,7 @@ export function ChatMessage({ message, isCurrentUser, showAvatar = true }: ChatM
       
       <div 
         className={cn(
-          "max-w-[75%] rounded-lg px-3 py-2 break-words", 
+          "max-w-[75%] rounded-lg px-3 py-1 break-words border-gitdate border", 
           isCurrentUser 
             ? "bg-primary text-primary-foreground rounded-br-none" 
             : "bg-muted rounded-bl-none"
@@ -57,13 +57,15 @@ export function ChatMessage({ message, isCurrentUser, showAvatar = true }: ChatM
       >
         <p className="whitespace-pre-wrap">{message.content}</p>
         <div className={cn(
-          "flex text-xs mt-1", 
+          "flex text-[10px] mt-0.5", 
           isCurrentUser ? "justify-end" : "justify-start",
           isCurrentUser ? "text-primary-foreground/70" : "text-muted-foreground"
         )}>
           <span>{formatMessageTime()}</span>
           {isCurrentUser && (
-            <span className="ml-1">
+            <span className={cn( 'ml-1',
+              message.read ? "text-gitdate/70 font-bold" : "text-muted-foreground"
+            )}>
               {message.read ? "✓✓" : "✓"}
             </span>
           )}

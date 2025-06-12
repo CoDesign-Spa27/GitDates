@@ -15,6 +15,7 @@ import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Conversations } from "@/components/conversations";
+import { Card } from "@/components/ui/card";
 
 export default function ConversationsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -82,7 +83,7 @@ export default function ConversationsPage() {
           </div>
         </div>
 
-      <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+      <Card className="bg-card rounded-xl shadow-sm overflow-hidden">
         {isLoading ? (
           renderLoadingSkeleton()
         ) : filteredConversations.length === 0 ? (
@@ -110,7 +111,7 @@ export default function ConversationsPage() {
         ) : (
           <Conversations filteredConversations={filteredConversations} unreadCounts={unreadCounts} />
         )}
-      </div>
+      </Card>
     </div>
   );
 }

@@ -54,7 +54,7 @@ const handlePageChange = (page: number) => {
             )}
             onClick={() => handleConversationClick(conversation)}
           >
-            <Avatar className="h-14 w-14 ring-2 ring-offset-2 ring-offset-background transition-all duration-200 group-hover:ring-primary">
+            <Avatar className="h-14 w-14 transition-all duration-200">
               <AvatarImage src={conversation.image} />
               <AvatarFallback className="text-lg">
                 {conversation.name.substring(0, 2)}
