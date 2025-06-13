@@ -1,49 +1,87 @@
 import { getOrCreateConversation } from "@/actions/conversation.action";
 import { createMatchPreference, MatchPreference } from "@/actions/match.action";
-import { updateUserAvatar } from "@/actions/user.profile.action";
+import { createGitDateProfile, updateGitDateProfile, updateUserAvatar } from "@/actions/user.profile.action";
+import { UserData } from "../../types/user";
 import { toast } from "@/hooks/use-toast";
 
 export const createMatchPreferenceMutation = async (matchData: MatchPreference) => {
-try{
+    try {
 
-    const response = await createMatchPreference(matchData);
-    if (!response?.status) {
-        throw new Error("Failed to create match preference");
+        const response = await createMatchPreference(matchData);
+        if (!response?.status) {
+            throw new Error("Failed to create match preference");
+        }
+        if (response?.status)
+            return response;
+    } catch (error) {
+        console.error("Error creating match preference:", error);
+        throw error;
     }
-    if (response?.status)
-        return response;
-}catch (error) {
-    console.error("Error creating match preference:", error);
-    throw error;
-}
 }
 
-export const updateAvatarMutation = async (email :string ,avatar: string) => {
-try{
-    const response = await updateUserAvatar(email, avatar);
-    if(!response?.success) {
-        throw new Error("Failed to update avatar");
+export const updateAvatarMutation = async (email: string, avatar: string) => {
+    try {
+        const response = await updateUserAvatar(email, avatar);
+        if (!response?.success) {
+            throw new Error("Failed to update avatar");
+        }
+        if (response?.success)
+            return response;
+    } catch (error) {
+        console.error("Error updating avatar:", error);
+        throw error;
     }
-    if (response?.success)
-        return response;
-}catch (error) {
-    console.error("Error updating avatar:", error);
-    throw error;
-}
 }
 
-export const getOrCreateConversationMutation = async(matchId:string) =>{
+export const getOrCreateConversationMutation = async (matchId: string) => {
     try {
         const response = await getOrCreateConversation(matchId)
-        if(!response) {
+        if (!response) {
             throw new Error("Failed to update avatar");
         }
         if (response)
             return response;
-    }catch(err){
+    } catch (err) {
         toast({
             title: "Internal Server Error",
             variant: "destructive",
-          })
+        })
+    }
+}
+
+export const createGitDateProfileMutation = async (githubData: UserData) => {
+    try {
+
+        const response = await createGitDateProfile(githubData);
+        if (!response?.status) {
+            throw new Error("Failed to create gitdate profile");
+        }
+        if (response?.status)
+            toast({
+                title: 'GitDate profile created successfully',
+                variant: 'success'
+            })
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+export const updateGitDateProfileMutation = async (githubData: UserData) => {
+    try {
+
+        const response = await updateGitDateProfile(githubData);
+        if (!response?.status) {
+            throw new Error("Failed to update gitdate profile");
+        }
+        if (response?.status)
+            toast({
+                title: 'GitDate profile updated successfully',
+                variant: 'success'
+            })
+        return response;
+    } catch (error) {
+        throw error;
     }
 }

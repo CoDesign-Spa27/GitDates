@@ -3,6 +3,7 @@ import { getConversations, getUnreadMessageCounts } from "@/actions/conversation
 import { profileSetupStatus } from "@/actions/dashboard.action";
 import { getSelectedUserById } from "@/actions/explore.action";
 import { findMatches, getAllAccounts, getMatchPreference, getMatchRequests, getMyMatches } from "@/actions/match.action";
+import { getGitDateProfile } from "@/actions/user.profile.action";
 import { toast } from "@/hooks/use-toast";
  
 
@@ -222,3 +223,23 @@ export const getUnreadConversationsFetcher=async()=>{
   }
 }
 
+export const getGitDateProfileFetcher = async() =>{
+  try {
+    const response = await getGitDateProfile();
+    if(!response){
+      toast({
+        title:'Failed to load gitdate profile',
+        variant:'destructive'
+      })
+    }
+    if(response.status){
+      return response.additional
+    }
+  }catch(err){
+    toast({
+      title: "Failed to load message counts",
+      description: "Please try again later",
+      variant: "destructive",
+    });
+  }
+}
