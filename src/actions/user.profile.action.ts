@@ -2,7 +2,9 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../lib/auth";
 import prisma from "../lib/prisma";
-import { UserData } from "@/app/dashboard/page";
+import { UserData } from "../../types/user";
+import { SuccessResponse } from "@/lib/success";
+import { ErrorHandler } from "@/lib/error";
 
 export const getUserProfile = async () => {
   try {
@@ -111,7 +113,7 @@ export const updateUserAvatar = async (email:string, image:string) =>{
   }
 }
 
-export const createGithubProfile = async (githubData: UserData) => {
+export const createGitDateProfile = async (githubData: UserData) => {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     throw new Error("Not authenticated");
@@ -151,14 +153,18 @@ export const createGithubProfile = async (githubData: UserData) => {
         blog: githubData.basicInfo.blog,
       },
     });
-    return githubProfile;
+   const response = new SuccessResponse(
+    'Successfully created gitdate profile',
+    200,
+    githubProfile
+   )
+   return response.serialize()
   } catch (error) {
-    console.error("Error creating github profile:", error);
-    throw new Error("Failed to create github profile");
+   return new ErrorHandler('Error created Gitdate profile', 'DATABASE_ERROR')
   }
 };
 
-export const getGithubProfile = async () => {
+export const getGitDateProfile = async () => {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     throw new Error("Not authenticated");
@@ -172,14 +178,26 @@ export const getGithubProfile = async () => {
         gitDateProfile: true,
       },
     });
-    return user?.gitDateProfile;
+    const response = new SuccessResponse(
+      'Successfully created gitdate profile',
+      200,
+      user?.gitDateProfile
+     )
+     return response.serialize()
   } catch (error) {
-    console.error("Error fetching github profile:", error);
-    throw new Error("Failed to fetch github profile");
+    return new ErrorHandler('Error fetching Gitdate profile', 'DATABASE_ERROR')
+
   }
 };
 
-export const updateGithubProfile = async (githubData: any) => {
+export const updateGitDateProfile = async (githubData: UserData & {
+  name?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  bio?: string;
+  blog?: string;
+}) => {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     throw new Error("Not authenticated");
@@ -207,9 +225,14 @@ export const updateGithubProfile = async (githubData: any) => {
         blog: githubData.blog,
       },
     });
-    return updatedGithubProfile;
+    const response = new SuccessResponse(
+      'Successfully updated gitdate profile',
+      200,
+      updatedGithubProfile
+     )
+     return response.serialize()
   } catch (error) {
-    console.error("Error updating github profile:", error);
-    throw new Error("Failed to update github profile");
+    return new ErrorHandler('Error updating Gitdate profile', 'DATABASE_ERROR')
+
   }
 };
