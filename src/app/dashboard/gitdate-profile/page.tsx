@@ -22,11 +22,16 @@ import {
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import {
-  createGithubProfile,
-  getGithubProfile,
-  updateGithubProfile,
+  updateUserAvatar,
 } from "@/actions/user.profile.action";
 import { Card } from "@/components/ui/card";
+import { uploadImage } from "@/lib/upload-image";
+import { useSession } from "next-auth/react";
+import { toast } from "@/hooks/use-toast";
+import useSWRMutation from "swr/mutation";
+import { useGitDate } from "@/components/hooks/useGitdate";
+import { UserData } from "../../../../types/user";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface GitDateProfileType {
   githubUsername: string;
@@ -44,7 +49,7 @@ interface GitDateProfileType {
   image: string;
 }
 
-interface EditProfileForm {
+export interface EditProfileForm {
   name: string;
   city: string;
   state: string;
@@ -54,29 +59,15 @@ interface EditProfileForm {
 }
 
 const GitDateProfile = () => {
-  const [gitDetails, setGitDetails] = useState<any | null>(null);
-  const [profile, setProfile] = useState<GitDateProfileType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const session = useSession();
+  const email = session.data?.user?.email;
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: { errors }
-  } = useForm<EditProfileForm>({
-    defaultValues: {
-      city: "",
-      state: "",
-      country: "",
-      bio: "",
-      blog: "",
-      name: "",
-    },
-  });
-
+  // Fetch GitHub stats
+  const [gitDetails, setGitDetails] = useState<any | null>(null);
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -85,9 +76,6 @@ const GitDateProfile = () => {
         const response = await fetch("/api/getUserStats");
         const data = await response.json();
         setGitDetails(data);
-
-        const existingProfile: any = await getGithubProfile();
-        setProfile(existingProfile);
       } catch (error) {
         console.error("Error fetching data:", error);
         setError("Failed to load profile data. Please try again.");
@@ -98,6 +86,81 @@ const GitDateProfile = () => {
 
     fetchUserData();
   }, []);
+
+  // Use the GitDate hook
+  const { 
+    gitdateProfile,
+    createGitDateProfile,
+    updateGitDateProfile 
+  } = useGitDate();
+
+  const profile = gitdateProfile.data
+  const {trigger:updateAvatar} = useSWRMutation(
+    email ? ['updateAvatar', email] : null,
+    (_key,{arg}:{arg:{email:string, avatar:string}}) => updateUserAvatar(arg.email,arg.avatar)
+  );
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors }
+  } = useForm<EditProfileForm & UserData>({
+    defaultValues: {
+      city: "",
+      state: "",
+      country: "",
+      bio: "",
+      blog: "",
+      name: "",
+    },
+  });
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+     
+      const publicUrl = await uploadImage(e);
+  
+      if (!publicUrl || !email) {
+        throw new Error("Failed to upload image");
+      }
+  
+      const result = await updateAvatar({email, avatar: publicUrl});
+     
+      if(result?.success){
+        toast({
+          title: "Avatar updated successfully",
+          variant:'success'
+        });
+  
+        // Update the profile state through the query client
+        if (profile) {
+          gitdateProfile.refetch();
+        }
+      } else {
+        throw new Error("Failed to update avatar");
+      }
+       
+    } catch(err) {
+      console.error("Error uploading image:", err);
+      toast({
+        title: "Error uploading image",
+        description: err instanceof Error ? err.message : "Please try again",
+        variant:'destructive'
+      });
+  
+      setImagePreview(profile?.image || null);
+    }
+  };
 
   useEffect(() => {
     if (profile) {
@@ -114,8 +177,8 @@ const GitDateProfile = () => {
     try {
       setLoading(true);
       setError(null);
-      const newProfile: any = await createGithubProfile(gitDetails);
-      setProfile(newProfile);
+     const response= await createGitDateProfile.mutateAsync(gitDetails);
+   
     } catch (error) {
       console.error("Error creating profile:", error);
       setError("Failed to create profile. Please try again.");
@@ -124,12 +187,12 @@ const GitDateProfile = () => {
     }
   };
 
-  const onSubmit = async (formData: EditProfileForm) => {
+  const onSubmit = async (formData: EditProfileForm & UserData) => {
+    console.log(formData, 'form data')
     try {
       setLoading(true);
       setError(null);
-      const updatedProfile: any = await updateGithubProfile(formData);
-      setProfile(updatedProfile);
+      await updateGitDateProfile.mutateAsync(formData);
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -153,23 +216,23 @@ const GitDateProfile = () => {
     }
   };
 
-  if (loading) {
+  if (loading || gitdateProfile.isLoading) {
     return (
       <div className="min-h-screen ">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <div className="animate-pulse space-y-8">
-            <div className=" rounded-3xl p-8 shadow-sm border border-slate-200/60 dark:border-slate-800">
+            <Skeleton className=" rounded-3xl p-8 shadow-sm border border-neutral-200/60 dark:border-neutral-800">
               <div className="flex items-start gap-6">
-                <div className="w-24 h-24 bg-slate-200 dark:bg-slate-700 rounded-2xl"></div>
+                <Skeleton className="w-24 h-24 bg-neutral-200 dark:bg-neutral-700 rounded-2xl"></Skeleton>
                 <div className="flex-1 space-y-3">
-                  <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded-lg w-1/3"></div>
-                  <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/4"></div>
+                  <Skeleton className="h-8  rounded-lg w-1/3" />
+                  <Skeleton className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-1/4"></Skeleton>
                 </div>
               </div>
-            </div>
+            </Skeleton>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className=" rounded-3xl p-6 shadow-sm border border-slate-200/60 dark:border-slate-800 h-40"></div>
-              <div className=" rounded-3xl p-6 shadow-sm border border-slate-200/60 dark:border-slate-800 h-40"></div>
+              <Skeleton className=" rounded-3xl p-6 shadow-sm border border-neutral-200/60 dark:border-neutral-800 h-96"></Skeleton>
+              <Skeleton className=" rounded-3xl p-6 shadow-sm border border-slaneutralte-200/60 dark:border-neutral-800 h-96"></Skeleton>
             </div>
           </div>
         </div>
@@ -177,7 +240,7 @@ const GitDateProfile = () => {
     );
   }
 
-  if (!profile) {
+  if (!profile && !gitdateProfile.isLoading) {
     return (
       <div className="min-h-screen   flex items-center justify-center p-4">
         <div className=" rounded-3xl p-8 shadow-xl border border-slate-200/60 dark:border-slate-800 max-w-md w-full text-center">
@@ -210,9 +273,9 @@ const GitDateProfile = () => {
             <div className="flex items-start gap-6">
               <div className="relative">
                 <Avatar className="w-24 h-24 rounded-2xl">
-                  <AvatarImage src={profile.image} alt={profile.name} className="rounded-2xl" />
+                  <AvatarImage src={profile?.image || ""} alt={profile?.name || ""} className="rounded-2xl" />
                   <AvatarFallback className="rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 text-white text-2xl font-semibold">
-                    {profile.name.split(' ').map(n => n[0]).join('')}
+                    {profile?.name ? profile.name.split(' ').map(n => n[0]).join('') : '?'}
                   </AvatarFallback>
                 </Avatar>
                 <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white dark:border-slate-900 flex items-center justify-center">
@@ -222,21 +285,21 @@ const GitDateProfile = () => {
               
               <div className="flex-1">
                 <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">
-                  {profile.name}
+                  {profile?.name}
                 </h1>
                 <p className="text-slate-600 dark:text-slate-300 text-lg mb-3">
-                  @{profile.githubUsername}
+                  @{profile?.githubUsername}
                 </p>
                 <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
                   <div className="flex items-center gap-1">
                     <MapPin className="w-4 h-4" />
                     <span>
-                      {[profile.city, profile.state, profile.country]
+                      {[profile?.city, profile?.state, profile?.country]
                         .filter(Boolean)
                         .join(", ") || "Location not set"}
                     </span>
                   </div>
-                  {profile.blog && (
+                  {profile?.blog && (
                     <a
                       href={profile.blog.startsWith('http') ? profile.blog : `https://${profile.blog}`}
                       target="_blank"
@@ -272,7 +335,7 @@ const GitDateProfile = () => {
           
           {!isEditing && (
             <p className="text-slate-700 dark:text-slate-300 text-lg leading-relaxed">
-              {profile.bio || "No bio provided yet."}
+              {profile?.bio || "No bio provided yet."}
             </p>
           )}
         </Card>
@@ -391,15 +454,15 @@ const GitDateProfile = () => {
               
               <div className="grid grid-cols-2 gap-4 mb-6">
                 {[
-                  { label: "Repositories", value: profile.repositories, icon: GitBranch, color: "text-green-600" },
-                  { label: "Followers", value: profile.followers, icon: Users, color: "text-blue-600" },
-                  { label: "Following", value: profile.following, icon: Users, color: "text-purple-600" },
-                  { label: "Contributions", value: profile.contributions, icon: Calendar, color: "text-orange-600" }
+                  { label: "Repositories", value: profile?.repositories, icon: GitBranch, color: "text-green-600" },
+                  { label: "Followers", value: profile?.followers, icon: Users, color: "text-blue-600" },
+                  { label: "Following", value: profile?.following, icon: Users, color: "text-purple-600" },
+                  { label: "Contributions", value: profile?.contributions, icon: Calendar, color: "text-orange-600" }
                 ].map(({ label, value, icon: Icon, color }) => (
                   <div key={label} className="bg-neutral-100 dark:bg-neutral-900 rounded-md p-4 text-center   transition-colors">
                     <Icon className={`w-5 h-5 mx-auto mb-2 ${color}`} />
                     <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                      {value.toLocaleString()}
+                      {value?.toLocaleString()}
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                       {label}
@@ -417,7 +480,7 @@ const GitDateProfile = () => {
               </h2>
               
               <div className="flex flex-wrap gap-2">
-                {profile.mainLanguages.map((lang, index) => (
+                {profile?.mainLanguages?.map((lang, index) => (
                   <Badge
                     key={lang}
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-all hover:scale-105 ${
