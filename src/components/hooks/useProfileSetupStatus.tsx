@@ -13,8 +13,11 @@ export const useProfileSetupStatus = () => {
  
   })
 
+  const setupDone = Boolean(data?.isProfileCreated && data?.isMatchPreferenceCreated)
+
   return {
         data,
-        isLoading: isLoading || isFetching
+        isLoading: isLoading || isFetching,
+        setupDone
   }
 }
