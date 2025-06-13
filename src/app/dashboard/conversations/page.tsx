@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Search, Plus, ChevronRight } from "lucide-react";
+import { MessageSquare, Search, Plus, ChevronRight, UserCircle2, Settings } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
@@ -16,6 +16,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Conversations } from "@/components/conversations";
 import { Card } from "@/components/ui/card";
+import { useProfileSetupStatus } from "@/components/hooks/useProfileSetupStatus";
+import { SetupReminder } from "@/components/setup-reminder";
+ 
 
 export default function ConversationsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,7 +28,8 @@ export default function ConversationsPage() {
   const queryClient = useQueryClient();
   const {data: session} = useSession();
   const email = session?.user?.email;
-
+  const {setupDone, isLoading: setupLoading} = useProfileSetupStatus();
+ 
   useEffect(() => {
     const unsubscribe = subscribeToNewMessages((message) => {
       queryClient.invalidateQueries({ queryKey: ['unread-counts', email] });
@@ -55,6 +59,14 @@ export default function ConversationsPage() {
     </div>
   );
 
+ 
+
+  if (!setupDone) {
+    return (
+      <SetupReminder />
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="flex items-center justify-between mb-8">
@@ -71,17 +83,17 @@ export default function ConversationsPage() {
         </Button>
       </div>
 
-        <div className="flex items-center gap-2 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search conversations..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+      <div className="flex items-center gap-2 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Search conversations..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
         </div>
+      </div>
 
       <Card className="bg-card rounded-xl shadow-sm overflow-hidden">
         {isLoading ? (

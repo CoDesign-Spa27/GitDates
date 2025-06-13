@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import useSWR from "swr";
 import { findMatchesFetcher, getAllAccountsFetcher } from "@/fetchers/fetchers";
+import { useProfileSetupStatus } from "@/components/hooks/useProfileSetupStatus";
+import { SetupReminder } from "@/components/setup-reminder";
 
 export default function Explore() {
   const { data: session } = useSession();
@@ -17,6 +19,8 @@ export default function Explore() {
     "matches"
   );
   const email = session?.user?.email;
+  const {setupDone, isLoading: setupLoading} = useProfileSetupStatus();
+  
   const {
     data: matches,
     error: matchesError,
@@ -71,6 +75,11 @@ export default function Explore() {
   }
 
  
+  if (!setupDone) {
+    return (
+      <SetupReminder />
+    );
+  }
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="mb-8">

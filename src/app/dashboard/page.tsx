@@ -1,6 +1,5 @@
 'use client'
 import { getMatchPreference, getMatchRequests } from '@/actions/match.action'
-import { getGithubProfile } from '@/actions/user.profile.action'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import {motion}  from 'motion/react'

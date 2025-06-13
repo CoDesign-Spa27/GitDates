@@ -9,6 +9,8 @@ import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { useMyMatches } from "@/components/hooks/useMyMatches";
 import { useMatchRequest } from "@/components/hooks/useMatchRequests";
+import { useProfileSetupStatus } from "@/components/hooks/useProfileSetupStatus";
+import { SetupReminder } from "@/components/setup-reminder";
 
 interface Profile {
   name: string;
@@ -35,6 +37,7 @@ export default function MatchesPage() {
   const [activeTab, setActiveTab] = useState("matches");
   const { data: matches, isLoading: matchesLoading } = useMyMatches();
   const { data: requests, isLoading: requestsLoading } = useMatchRequest();
+  const {setupDone, isLoading: setupLoading} = useProfileSetupStatus();
 
   const handleAccept = async (matchId: string) => {
     try {
@@ -79,7 +82,11 @@ export default function MatchesPage() {
       ))}
     </div>
   );
-
+  if (!setupDone) {
+    return (
+      <SetupReminder />
+    );
+  }
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Your Matches</h1>
