@@ -33,7 +33,7 @@ const HowItWorks = () => {
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         
       <motion.div
-          className="absolute bottom-20 left-10 w-80 h-80 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-[100px]"
+          className="absolute bottom-20 left-30 w-80 h-80 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-[100px]"
           animate={{
             x: [0, -60, 30, -50, 20, 0],
             y: [0, 30, -40, 20, -30, 0],
@@ -47,7 +47,7 @@ const HowItWorks = () => {
         />
 
         <motion.div
-          className="absolute  left-20 w-72 h-72 rounded-full bg-gradient-to-r from-[#FF88DC]/30 to-pink-500/20 blur-[90px]"
+          className="absolute top-20 left-20 w-72 h-72 rounded-full bg-gradient-to-r from-[#FF88DC]/30 to-pink-500/20 blur-[90px]"
           animate={{
             x: [0, 50, -40, 30, -20, 0],
             y: [0, -30, 20, -40, 30, 0],

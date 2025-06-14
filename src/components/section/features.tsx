@@ -14,7 +14,7 @@ export const Features = () => {
    
 
         <motion.div
-          className="absolute bottom-20 right-20 w-80 h-80 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-[100px]"
+          className="absolute bottom-20 right-30 w-80 h-80 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-[100px]"
           animate={{
             x: [0, -10, 10, -10, 20, 0],
             y: [0, 30, -10, 20, -30, 0],

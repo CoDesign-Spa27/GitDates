@@ -99,7 +99,7 @@ const Hero = () => {
           }}
         />
         <motion.div
-          className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full bg-gradient-to-r from-blue-500/20 to-cyan-500/20 blur-[120px]"
+          className="absolute bottom-10 right-1/4 w-[500px] h-[500px] rounded-full bg-gradient-to-r from-blue-500/20 to-cyan-500/20 blur-[120px]"
           animate={{
             x: [0, -40, 30, -20, 40, 0],
             y: [0, 30, -40, 20, -30, 0],
