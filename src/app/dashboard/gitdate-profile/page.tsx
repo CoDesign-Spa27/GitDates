@@ -30,8 +30,9 @@ import { useSession } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
 import useSWRMutation from "swr/mutation";
 import { useGitDate } from "@/components/hooks/useGitdate";
-import { UserData } from "../../../../types/user";
+import { UserData } from "../../../types/user";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CreateGitDateProfile } from "@/components/create-gitdate-profile";
 
 interface GitDateProfileType {
   githubUsername: string;
@@ -177,7 +178,7 @@ const GitDateProfile = () => {
     try {
       setLoading(true);
       setError(null);
-     const response= await createGitDateProfile.mutateAsync(gitDetails);
+     await createGitDateProfile.mutateAsync(gitDetails);
    
     } catch (error) {
       console.error("Error creating profile:", error);
@@ -242,25 +243,7 @@ const GitDateProfile = () => {
 
   if (!profile && !gitdateProfile.isLoading) {
     return (
-      <div className="min-h-screen   flex items-center justify-center p-4">
-        <div className=" rounded-3xl p-8 shadow-xl border border-slate-200/60 dark:border-slate-800 max-w-md w-full text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mx-auto mb-6">
-            <Github className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-            Create Your Profile
-          </h1>
-          <p className="text-slate-600 dark:text-slate-300 mb-6">
-            Get started by creating your GitHub profile in just one click.
-          </p>
-          <Button
-            onClick={handleCreateProfile}
-            className="w-full h-12 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium transition-all duration-200"
-          >
-            Create Profile
-          </Button>
-        </div>
-      </div>
+    <CreateGitDateProfile handleCreateProfile={handleCreateProfile} />
     );
   }
 

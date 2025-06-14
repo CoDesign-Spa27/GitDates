@@ -1,0 +1,1 @@
+export type AsyncFunctionType = () => Promise<void>;
