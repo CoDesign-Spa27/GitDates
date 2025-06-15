@@ -29,37 +29,10 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="relative py-20 overflow-hidden bg-[#0C0A09]">
+    <section id="how-it-works" className="relative py-20 overflow-hidden bg-[#0C0A09] px-10">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
-        
-      <motion.div
-          className="absolute bottom-20 left-30 w-80 h-80 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-[100px]"
-          animate={{
-            x: [0, -60, 30, -50, 20, 0],
-            y: [0, 30, -40, 20, -30, 0],
-            scale: [1, 0.9, 1.1, 0.8, 1.2, 1],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-
-        <motion.div
-          className="absolute top-20 left-20 w-72 h-72 rounded-full bg-gradient-to-r from-[#FF88DC]/30 to-pink-500/20 blur-[90px]"
-          animate={{
-            x: [0, 50, -40, 30, -20, 0],
-            y: [0, -30, 20, -40, 30, 0],
-            scale: [1, 1.1, 0.8, 1.2, 3, 1],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-           
+ 
+ 
         <motion.div
           className="text-center mb-16"
           initial={{ opacity: 0, y: 20 }}
