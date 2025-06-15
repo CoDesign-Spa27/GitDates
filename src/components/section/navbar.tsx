@@ -67,11 +67,11 @@ const Navbar = () => {
       animate={{ y: 0 }}
       transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Logo Section */}
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="flex w-full items-center h-16 lg:h-20">
+          {/* Logo Section - Left Side */}
           <motion.div
-            className="flex-shrink-0 flex items-center"
+            className="flex-shrink-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
@@ -83,46 +83,46 @@ const Navbar = () => {
             </Link>
           </motion.div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center justify-center flex-1 max-w-md mx-8">
-            <div className="flex items-center space-x-1">
-              {navigation.map((item, index) => (
-                <motion.div
-                  key={item.title}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                >
-                  <Link
-                    href={item.url}
-                    className={cn(
-                      "relative px-3 py-2 text-sm font-medium rounded-md transition-all duration-300 whitespace-nowrap",
-                      hash === item.url
-                        ? "text-neutral-200 font-semibold"
-                        : "text-neutral-400 hover:text-neutral-100 hover:bg-neutral-100/5"
-                    )}
-                    onClick={handleClick}
+          {/* Desktop Navigation - Right Side */}
+          <div className="flex-1 flex justify-end">
+            <nav className="hidden md:block">
+              <div className="flex items-center space-x-1">
+                {navigation.map((item, index) => (
+                  <motion.div
+                    key={item.title}
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
                   >
-                    {item.title}
-                    {hash === item.url && (
-                      <motion.div
-                        className="absolute -bottom-1 left-0 h-0.5 w-full bg-primary rounded-full"
-                        layoutId="navHighlight"
-                        transition={{
-                          type: "spring",
-                          stiffness: 350,
-                          damping: 30,
-                        }}
-                      />
-                    )}
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </nav>
+                    <Link
+                      href={item.url}
+                      className={cn(
+                        "relative px-3 py-2 text-sm font-medium rounded-md transition-all duration-300 whitespace-nowrap",
+                        hash === item.url
+                          ? "text-neutral-200 font-semibold"
+                          : "text-neutral-400 hover:text-neutral-100 hover:bg-neutral-100/5"
+                      )}
+                      onClick={handleClick}
+                    >
+                      {item.title}
+                      {hash === item.url && (
+                        <motion.div
+                          className="absolute -bottom-1 left-0 h-0.5 w-full bg-primary rounded-full"
+                          layoutId="navHighlight"
+                          transition={{
+                            type: "spring",
+                            stiffness: 350,
+                            damping: 30,
+                          }}
+                        />
+                      )}
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </nav>
 
-          {/* Right Section - Mobile Menu Button */}
-          <div className="flex items-center">
+            {/* Mobile Menu Button */}
             <div className="md:hidden">
               <motion.button
                 onClick={toggleNavigation}
