@@ -1,6 +1,6 @@
 import { createGitDateProfileMutation, updateGitDateProfileMutation } from "@/fetchers/mutations"
 import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query"
-import { UserData } from "../../../types/user"
+import { UserData } from "../../types/user"
 import { toast } from "@/hooks/use-toast"
 import { useSession } from "next-auth/react"
 import { getGitDateProfileFetcher } from "@/fetchers/fetchers"
