@@ -1,7 +1,7 @@
 import { getOrCreateConversation } from "@/actions/conversation.action";
 import { createMatchPreference, MatchPreference } from "@/actions/match.action";
 import { createGitDateProfile, updateGitDateProfile, updateUserAvatar } from "@/actions/user.profile.action";
-import { UserData } from "../../types/user";
+import { UserData } from "../types/user";
 import { toast } from "@/hooks/use-toast";
 
 export const createMatchPreferenceMutation = async (matchData: MatchPreference) => {
