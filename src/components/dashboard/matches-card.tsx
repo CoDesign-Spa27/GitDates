@@ -78,18 +78,18 @@ export function ConnectionsCard({matches, isLoading}:{matches:Match[], isLoading
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <Avatar>
-                      <AvatarImage src={match.profile.image || "/placeholder.svg"} alt={match.profile.name} />
-                      <AvatarFallback>{match.profile.name.substring(0, 2)}</AvatarFallback>
+                      <AvatarImage src={match?.profile?.image || "/placeholder.svg"} alt={match?.profile?.name} />
+                      <AvatarFallback>{match?.profile?.name?.substring(0, 2)}</AvatarFallback>
                     </Avatar>
                     <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background bg-green-500" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium leading-none">{match.profile.name}</p>
-                    <p className="text-xs text-muted-foreground">@{match.profile.githubUsername}</p>
+                    <p className="text-sm font-medium leading-none">{match?.profile?.name}</p>
+                    <p className="text-xs text-muted-foreground">@{match?.profile?.githubUsername}</p>
                   </div>
                 </div>
                 <Badge variant="outline" className="bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400">
-                  {match.profile.contributions} contributions
+                  {match?.profile?.contributions} contributions
                 </Badge>
               </div>
             ))
