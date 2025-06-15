@@ -11,7 +11,7 @@ export default async function Home() {
   const session = await getServerSession();
 
   return (
-    <div>
+    <div className="dark">
       <Navbar />
  
       <Hero />
