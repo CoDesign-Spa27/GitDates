@@ -36,12 +36,12 @@ interface MatchRequest {
 export default function MatchesPage() {
   const [activeTab, setActiveTab] = useState("matches");
   const { data: matches, isLoading: matchesLoading } = useMyMatches();
-  const { data: requests, isLoading: requestsLoading } = useMatchRequest();
+  const { data: requests, mutateAsync: respondToMatchRequest, isLoading: requestsLoading } = useMatchRequest();
   const {setupDone, isLoading: setupLoading} = useProfileSetupStatus();
-
+ 
   const handleAccept = async (matchId: string) => {
     try {
-      await respondToMatchRequest(matchId, "ACCEPT");
+      await respondToMatchRequest({matchId, action: "ACCEPT"});
       toast({
         title: "Match request accepted",
       });
@@ -55,7 +55,7 @@ export default function MatchesPage() {
 
   const handleReject = async (matchId: string) => {
     try {
-      await respondToMatchRequest(matchId, "REJECT");
+      await respondToMatchRequest({ matchId, action: 'REJECT' })
       toast({
         title: "Match request rejected",
       });
@@ -82,10 +82,8 @@ export default function MatchesPage() {
       ))}
     </div>
   );
-  if (!setupDone) {
-    return (
-      <SetupReminder />
-    );
+  if (!setupDone && !matchesLoading && !requestsLoading) {
+    return <SetupReminder />
   }
   return (
     <div className="container mx-auto px-4 py-8">
