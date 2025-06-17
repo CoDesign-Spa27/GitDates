@@ -119,7 +119,7 @@ export function ProfileSetupSuccess({
                 label: "Set match preferences",
                 description: "Define what you're looking for in a coding partner",
                 completed: isMatchPreferenceCreated,
-                href: "/dashboard/match-preferences"
+                href: "/dashboard/match-preference"
               }
             ].map((item, i) => (
               <motion.div
