@@ -58,7 +58,7 @@ const Navbar = () => {
   return (
     <motion.header
       className={cn(
-        "fixed top-0 left-0 w-full z-50 transition-all duration-300",
+        "fixed top-0 left-0 w-full z-50 transition-all duration-300 font-riffic",
         scrolled
           ? "bg-[#0C0A09]/90 backdrop-blur-lg shadow-lg border-b border-border/20"
           : "bg-transparent"
@@ -97,7 +97,7 @@ const Navbar = () => {
                     <Link
                       href={item.url}
                       className={cn(
-                        "relative px-3 py-2 text-sm font-medium rounded-md transition-all duration-300 whitespace-nowrap",
+                        "relative px-3 py-2 uppercase text-sm font-medium rounded-md transition-all duration-300 whitespace-nowrap",
                         hash === item.url
                           ? "text-neutral-200 font-semibold"
                           : "text-neutral-400 hover:text-neutral-100 hover:bg-neutral-100/5"
@@ -188,7 +188,7 @@ const Navbar = () => {
                       <Link
                         href={item.url}
                         className={cn(
-                          "block px-4 py-4 text-base font-medium rounded-xl transition-all duration-300 text-center",
+                          "block px-4 py-4 text-base uppercase font-medium rounded-xl transition-all duration-300 text-center",
                           hash === item.url
                             ? "bg-primary/15 text-primary font-bold shadow-sm border border-primary/20"
                             : "text-muted-foreground hover:text-foreground hover:bg-muted/50 font-semibold"

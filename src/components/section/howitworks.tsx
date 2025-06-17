@@ -88,7 +88,7 @@ const HowItWorks = () => {
                   {React.cloneElement(step.icon, { size: 28, className: "stroke-2" })}
                 </motion.div>
  
-                <h3 className="text-xl font-semibold mb-3 text-white group-hover:text-[#7FBAFF] transition-colors duration-300">
+                <h3 className="text-xl font-semibold mb-3 text-white group-hover:text-[#7FBAFF] transition-colors duration-300 font-riffic">
                   {step.title}
                 </h3>
  
