@@ -436,40 +436,40 @@ export const getMatchStatus = async (otherUserId: string) => {
   }
 };
 
-export const respondToMatchRequest = async (
-  matchId: string,
-  action: "ACCEPT" | "REJECT"
-) => {
+export const respondToMatchRequest = async ({
+  matchId,
+  action,
+}: respondToMatchRequestArgumentsType) => {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) throw new Error("Not Authenticated");
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.email) throw new Error('Not Authenticated')
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-    });
-    if (!user) throw new Error("User not found");
+    })
+    if (!user) throw new Error('User not found')
 
     const match = await prisma.match.findFirst({
       where: {
         id: matchId,
         receiverId: user.id,
       },
-    });
+    })
 
-    if (!match) throw new Error("Match not found");
+    if (!match) throw new Error('Match not found')
 
-    const status = action === "ACCEPT" ? "ACCEPTED" : "REJECTED";
+    const status = action === 'ACCEPT' ? 'ACCEPTED' : 'REJECTED'
 
     const updateMatch = await prisma.match.update({
       where: { id: matchId },
       data: { status: status },
-    });
-    return updateMatch;
+    })
+    return updateMatch
   } catch (error) {
-    console.error("Error getting match requests:", error);
-    throw error;
+    console.error('Error getting match requests:', error)
+    throw error
   }
-};
+}
 
 export const getMyMatches = async () => {
   try {
