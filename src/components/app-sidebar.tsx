@@ -66,10 +66,10 @@ const navigationItems = {
   ],
   profile: [
     {
-      title: "GitDate Profile",
+      title: "GitDates Profile",
       url: "/dashboard/gitdate-profile",
       icon: gitIcon,
-      tooltip: "Manage GitDate profile",
+      tooltip: "Manage GitDates profile",
     },
     {
       title: "Match Preference",

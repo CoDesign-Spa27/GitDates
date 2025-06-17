@@ -99,7 +99,7 @@ export function ProfileSetupSuccess({
           
           <p className="text-sm text-muted-foreground">
             {allComplete
-              ? "Your GitDate profile is ready to find your perfect coding match."
+              ? "Your GitDates profile is ready to find your perfect coding match."
               : "Complete the remaining steps to start matching with other developers."}
           </p>
         </CardHeader>
@@ -109,7 +109,7 @@ export function ProfileSetupSuccess({
             {[
               {
                 step: 1,
-                label: "Create your GitDate profile",
+                label: "Create your GitDates profile",
                 description: "Tell others about yourself and your coding interests",
                 completed: isProfileCreated,
                 href: "/dashboard/gitdate-profile"

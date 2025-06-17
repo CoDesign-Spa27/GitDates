@@ -1,64 +1,61 @@
-"use client";
-import { useSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { signIn } from "next-auth/react";
-import { GithubOauthButton } from "./social-auth";
+'use client'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { signIn } from 'next-auth/react'
+import { GithubOauthButton } from './social-auth'
 
 const Signin = () => {
-  const { data: session, status } = useSession();
-  const [isMounted, setIsMounted] = useState(false);
-  const [error, setError] = useState("");
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const { data: session, status } = useSession()
+  const [isMounted, setIsMounted] = useState(false)
+  const [error, setError] = useState('')
+  const router = useRouter()
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    setIsMounted(true)
+  }, [])
   useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/dashboard");
+    if (status === 'authenticated') {
+      router.push('/dashboard')
     }
-  }, [status, router]);
+  }, [status, router])
 
- 
   const handleSignInWithGithub = async (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
     try {
-      await signIn('github', { redirect: true, callbackUrl } );
-     
+      await signIn('github', { redirect: true, callbackUrl: '/dashboard' })
     } catch (error) {
-      console.error(error);
-      setError("An error occurred during Google sign-in");
+      console.error(error)
+      setError('An error occurred during Google sign-in')
     }
-  };
+  }
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div
-    className="max-w-xs w-full h-40 rounded-lg shadow-lg bg-neutral-800 border "
-  > 
-  <div className="flex flex-col space-y-4 py-4 justify-center items-center">
-    <h1 className="text-white font-riffic text-center w-full">Get started with GitDate</h1>
-      <div className="flex items-center w-full">
-        <div className="flex-1 h-px bg-[#D1627B]"></div>
-        <span className="px-4 text-sm text-gray-200 font-mono">Sign in with</span>
-        <div className="flex-1 h-px bg-[#D1627B] "></div>
-      </div>
-   
-            <GithubOauthButton
-              handleSignIn={(e) => handleSignInWithGithub(e)}
-              label="Github"
-              />
-              </div>
- 
-       </div>
-    </div>
-  );
-};
+    <div className="flex sm:min-h-screen items-center justify-center">
+      <div className="h-40 w-full max-w-xs px-5 rounded-lg border bg-neutral-800 shadow-lg">
+        <div className="flex flex-col items-center justify-center space-y-4 py-4">
+          <h1 className="w-full text-center font-riffic text-white">
+            Get started with GitDates
+          </h1>
+          <div className="flex w-full items-center">
+            <div className="h-px flex-1 bg-[#D1627B]"></div>
+            <span className="px-4 font-mono text-sm text-gray-200">
+              Sign in with
+            </span>
+            <div className="h-px flex-1 bg-[#D1627B]"></div>
+          </div>
 
-export default Signin;
+          <GithubOauthButton
+            handleSignIn={(e) => handleSignInWithGithub(e)}
+            label="Github"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default Signin
