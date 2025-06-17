@@ -75,10 +75,8 @@ export default function Explore() {
   }
 
  
-  if (!setupDone) {
-    return (
-      <SetupReminder />
-    );
+  if (!setupDone && !isAccountsLoading && !isMatchesLoading) {
+    return <SetupReminder />
   }
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
