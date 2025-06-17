@@ -11,9 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, ArrowLeft } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-
-// Custom logic/hooks
-import { getOrCreateConversation } from "@/actions/conversation.action"; // unused import removed
+ 
 import { useSocket } from "@/lib/client-socket";
 import { useMessage } from "@/components/hooks/useMessage";
 

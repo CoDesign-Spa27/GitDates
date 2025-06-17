@@ -25,7 +25,7 @@ export default function NewConversationPage() {
         setLoading(true);
         const conversation = await getOrCreateConversation(matchId);
         if (conversation) {
-          router.push(`/dashboard/messages/${conversation.id}`);
+          router.push(`/dashboard/messages/${conversation.additional.id}`);
         } else {
           setError("Could not create conversation");
           setLoading(false);
