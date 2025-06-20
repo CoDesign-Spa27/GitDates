@@ -204,7 +204,7 @@ export function AppSidebar() {
               </div>
             </SidebarMenu>
 
-            <div className="mt-auto pt-4 w-full">
+            <div className="mt-auto w-full">
               <SidebarMenuButton
                 onClick={handleSignOut}
                 className="text-red-500 hover:bg-red-50 dark:hover:bg-red-950/50 w-full"
