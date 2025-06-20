@@ -1,76 +1,90 @@
-import React from 'react';
-import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { cn } from '@/lib/utils';
+import React, { forwardRef } from 'react'
+import { format, isToday, isYesterday } from 'date-fns'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { cn } from '@/lib/utils'
 
 interface ChatMessageProps {
   message: {
-    id: string;
-    content: string;
-    senderId: string;
-    read: boolean;
-    createdAt: string;
+    id: string
+    content: string
+    senderId: string
+    read: boolean
+    createdAt: string
     sender: {
-      id: string;
-      name: string;
-      image: string;
-    };
-  };
-  isCurrentUser: boolean;
-  showAvatar?: boolean;
+      id: string
+      name: string
+      image: string
+    }
+  }
+  isCurrentUser: boolean
+  showAvatar?: boolean
 }
 
-export function ChatMessage({ message, isCurrentUser, showAvatar = true }: ChatMessageProps) {
-  const messageDate = new Date(message.createdAt);
-  
-  const formatMessageTime = () => {
-    if (isToday(messageDate)) {
-      return format(messageDate, 'HH:mm');
-    } else if (isYesterday(messageDate)) {
-      return `Yesterday, ${format(messageDate, 'HH:mm')}`;
-    } else {
-      return format(messageDate, 'MMM d, HH:mm');
+export const ChatMessage = forwardRef<HTMLDivElement, ChatMessageProps>(
+  ({ message, isCurrentUser, showAvatar = true }, ref) => {
+    const messageDate = new Date(message.createdAt)
+
+    const formatMessageTime = () => {
+      if (isToday(messageDate)) {
+        return format(messageDate, 'HH:mm')
+      } else if (isYesterday(messageDate)) {
+        return `Yesterday, ${format(messageDate, 'HH:mm')}`
+      } else {
+        return format(messageDate, 'MMM d, HH:mm')
+      }
     }
-  };
-  
-  return (
-    <div className={cn(
-      "flex items-end gap-2 mb-2", 
-      isCurrentUser ? "justify-end" : "justify-start"
-    )}>
-      {!isCurrentUser && showAvatar && (
-        <Avatar className="h-8 w-8">
-          <AvatarImage src={message.sender.image} />
-          <AvatarFallback>
-            {message.sender.name.substring(0, 2)}
-          </AvatarFallback>
-        </Avatar>
-      )}
-      
-      <div 
+
+    return (
+      <div
+        ref={ref}
         className={cn(
-          "max-w-[75%] rounded-lg px-3 py-1 break-words border-gitdate border", 
-          isCurrentUser 
-            ? "bg-primary text-primary-foreground rounded-br-none" 
-            : "bg-muted rounded-bl-none"
-        )}
-      >
-        <p className="whitespace-pre-wrap">{message.content}</p>
-        <div className={cn(
-          "flex text-[10px] mt-0.5", 
-          isCurrentUser ? "justify-end" : "justify-start",
-          isCurrentUser ? "text-primary-foreground/70" : "text-muted-foreground"
+          'mb-2 flex min-h-[60px] items-end gap-2',
+          isCurrentUser ? 'justify-end' : 'justify-start'
         )}>
-          <span>{formatMessageTime()}</span>
-          {isCurrentUser && (
-            <span className={cn( 'ml-1',
-              message.read ? "text-gitdate/70 font-bold" : "text-muted-foreground"
+        {!isCurrentUser && showAvatar && (
+          <Avatar className="h-8 w-8 flex-shrink-0">
+            <AvatarImage src={message.sender.image} />
+            <AvatarFallback>
+              {message.sender.name.substring(0, 2)}
+            </AvatarFallback>
+          </Avatar>
+        )}
+
+        <div
+          className={cn(
+            'max-w-[75%] break-words rounded-lg border border-gitdate px-3 py-2',
+            isCurrentUser
+              ? 'rounded-br-none bg-primary text-primary-foreground'
+              : 'rounded-bl-none bg-muted'
+          )}>
+          <p className="whitespace-pre-wrap text-sm leading-relaxed">
+            {message.content}
+          </p>
+          <div
+            className={cn(
+              'mt-1 flex text-[10px]',
+              isCurrentUser ? 'justify-end' : 'justify-start',
+              isCurrentUser
+                ? 'text-primary-foreground/70'
+                : 'text-muted-foreground'
             )}>
-              {message.read ? "✓✓" : "✓"}
-            </span>
-          )}
+            <span>{formatMessageTime()}</span>
+            {isCurrentUser && (
+              <span
+                className={cn(
+                  'ml-1',
+                  message.read
+                    ? 'font-bold text-gitdate/70'
+                    : 'text-muted-foreground'
+                )}>
+                {message.read ? '✓✓' : '✓'}
+              </span>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
+    )
+  }
+)
+
+ChatMessage.displayName = 'ChatMessage'
