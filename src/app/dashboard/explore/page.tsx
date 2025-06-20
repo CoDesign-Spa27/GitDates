@@ -74,7 +74,6 @@ export default function Explore() {
     );
   }
 
- 
   if (!setupDone && !isAccountsLoading && !isMatchesLoading) {
     return <SetupReminder />
   }
