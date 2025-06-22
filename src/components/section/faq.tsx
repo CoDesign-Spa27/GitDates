@@ -7,23 +7,23 @@ import { Plus, Minus } from "lucide-react";
 const faqs = [
   {
     question: "How does your matching algorithm work?",
-    answer: "Our algorithm analyzes GitHub repositories, commit patterns, language preferences, and coding style to identify compatibility between developers. We also consider communication style, work habits, and personal values from your profile to ensure well-rounded matches."
+    answer: "Our unique algorithm is the secret sauce behind GitDates. It analyzes your GitHub activity—commit patterns, language preferences, and coding style—to find developers whose passion and work ethic truly complement yours."
   },
   {
     question: "Is my code data secure?",
-    answer: "Absolutely. We only analyze public repositories by default, and any private repository analysis requires explicit permission. We never store your actual code, only metadata and patterns. All data is encrypted and we comply with GDPR, CCPA, and other privacy regulations."
+    answer: "Absolutely. Your privacy is paramount. We only analyze public repository metadata and require explicit permission for private repos. We never store your code, and all data is encrypted and handled in compliance with strict privacy standards."
   },
   {
     question: "Can I match with developers outside my location?",
-    answer: "Yes! You can set location preferences to match locally or globally. Remote collaboration is at the heart of modern development, and we support finding your perfect match regardless of geography."
+    answer: "Yes! Code and chemistry know no borders. You can set your preferences to find matches in your city or across the globe, embracing the remote-first culture of modern development."
   },
   {
     question: "What if I'm not looking for romantic connections?",
-    answer: "gitConnected offers multiple relationship types: romantic partners, coding buddies, mentorship, and project collaborators. Just set your preferences and we'll match accordingly."
+    answer: "GitDates is for all kinds of connections! Whether you're seeking a 'pair programmer for life,' a coding buddy, a mentor, or a project collaborator, you can set your intent and we'll find your match."
   },
   {
     question: "How much does it cost?",
-    answer: "We offer a free basic tier with limited matches monthly. Our Pro tier at $14.99/month provides unlimited matches and advanced features. Enterprise plans are available for companies looking to foster team building."
+    answer: "Getting started on GitDates is free! Our basic tier lets you explore and make initial connections. For unlimited matches and advanced features, you can upgrade to our Pro plan."
   }
 ];
 
