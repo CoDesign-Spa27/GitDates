@@ -41,6 +41,10 @@ import { getUnreadMessageCounts } from "@/actions/conversation.action";
 import { useSocket } from "@/lib/client-socket";
 import { useConversations } from "./hooks/useConversation";
 import { useQueryClient } from "@tanstack/react-query";
+import { gitDarkLogo, gitLightLogo } from "../../public/assets";
+import Image from "next/image";
+import { useTheme } from "next-themes";
+import { motion } from "motion/react";
 // Navigation items grouped by category
 const navigationItems = {
   main: [
@@ -109,6 +113,7 @@ export function AppSidebar() {
   const {unreadCounts} = useConversations();
   const {subscribeToNewMessages} = useSocket();
   const queryClient = useQueryClient();
+  const {theme} = useTheme();
   useEffect(() => {
     const unsubscribe = subscribeToNewMessages((message) => {
       queryClient.invalidateQueries({ queryKey: ['unread-counts'], });
@@ -177,29 +182,57 @@ export function AppSidebar() {
   );
 
   return (
-    <Sidebar className="overflow-hidden" collapsible="icon" >
-      <SidebarHeader>
-        <Logo />
+    <Sidebar className="overflow-hidden" collapsible="icon">
+      <SidebarHeader className="flex items-center justify-center pt-4 md:pt-6">
+        <motion.div
+          initial={false}
+          animate={{ 
+            scale: isCollapsed !== 'expanded' ? 1 : 0,
+            opacity: isCollapsed !== 'expanded' ? 1 : 0
+          }}
+          transition={{ duration: 0.2 }}
+          className={isCollapsed !== 'expanded' ? 'block' : 'hidden'}
+        >
+          <Image
+            src={theme === 'dark' ? gitDarkLogo : gitLightLogo}
+            className="h-8 w-8"
+            alt="GitDate"
+            width={50}
+            height={50}
+          />
+        </motion.div>
+
+        <motion.div
+          initial={false} 
+          animate={{
+            scale: isCollapsed === 'expanded' ? 1 : 0,
+            opacity: isCollapsed === 'expanded' ? 1 : 0
+          }}
+          transition={{ duration: 0.2 }}
+          className={isCollapsed === 'expanded' ? 'block' : 'hidden'}
+        >
+          <Logo />
+        </motion.div>
       </SidebarHeader>
-      <SidebarContent className="w-full" >
+      <SidebarContent className="w-full">
         <SidebarGroup className="w-full">
           <SidebarGroupContent className="w-full">
             <SidebarMenu className="w-full">
-              <div className="py-3 w-full">
+              <div className="w-full py-3">
                 <NavigationSection items={navigationItems.main} />
-                
+
                 <SidebarSeparator className="my-4" />
-                
-                <NavigationSection 
-                  items={navigationItems.profile} 
-                  title="Profile" 
+
+                <NavigationSection
+                  items={navigationItems.profile}
+                  title="Profile"
                 />
-                
+
                 <SidebarSeparator className="my-4" />
-                
-                <NavigationSection 
-                  items={navigationItems.settings} 
-                  title="Settings" 
+
+                <NavigationSection
+                  items={navigationItems.settings}
+                  title="Settings"
                 />
               </div>
             </SidebarMenu>
@@ -207,12 +240,11 @@ export function AppSidebar() {
             <div className="mt-auto w-full">
               <SidebarMenuButton
                 onClick={handleSignOut}
-                className="text-red-500 hover:bg-red-50 dark:hover:bg-red-950/50 w-full"
-              >
+                className="w-full text-red-500 hover:bg-red-50 dark:hover:bg-red-950/50">
                 <LogOut className="h-8 w-8 shrink-0" />
-                {isCollapsed === 'expanded' &&
+                {isCollapsed === 'expanded' && (
                   <span className="truncate">Sign out</span>
-                }
+                )}
               </SidebarMenuButton>
             </div>
           </SidebarGroupContent>
@@ -222,5 +254,5 @@ export function AppSidebar() {
         <ProfileSet isCollapsed={isCollapsed} />
       </SidebarFooter>
     </Sidebar>
-  );
+  )
 }

@@ -1,27 +1,33 @@
-import Link from "next/link";
-import { gitDark, gitLight, heart } from "../../../public/assets";
-import Image from "next/image";
-import { cn } from "../../lib/utils";
+import Link from 'next/link'
+import { gitdark, gitlight } from '../../../public/assets'
+import Image from 'next/image'
+import { cn } from '../../lib/utils'
+
 export const Logo = () => {
   return (
     <div>
-      <Link href="#hero" className={cn(`block w-56 xl:mr-5`)}>
-        {/* <Image src={heart} alt="heart" width={22} height={22} className="absolute left-32 top-6" /> */}
-        <Image
-          src={gitDark}
-          alt="gitDark"
-          width={440}
-          height={70}
-          className="hidden dark:block"
-        />
-        <Image
-          src={gitLight}
-          alt="gitLight"
-          width={440}
-          height={70}
-          className="block dark:hidden"
-        />
+      <Link href="#hero" className={cn('flex w-auto items-center xl:mr-5')}>
+        {/* Dark Mode Logo */}
+        <div className="hidden items-center dark:flex">
+          <Image
+            src={gitdark}
+            alt="GitDate Logo"
+            width={150}
+            height={150}
+            className="object-contain"
+          />
+        </div>
+
+        <div className="flex items-center dark:hidden">
+          <Image
+            src={gitlight}
+            alt="GitDate Logo"
+            width={150}
+            height={150}
+            className="object-contain"
+          />
+        </div>
       </Link>
     </div>
-  );
-};
+  )
+}
