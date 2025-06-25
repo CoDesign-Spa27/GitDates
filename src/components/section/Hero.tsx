@@ -27,6 +27,7 @@ import { AnimatedGradientText } from '../ui/animated-gradient-text'
 import { cn } from '@/lib/utils'
 import { CTAButton } from '../ui/cta-button'
 import Link from 'next/link'
+import heroIntro from '../../../public/hero-intro.svg'
 
 const Hero = () => {
   const [isHovered, setIsHovered] = useState(false)
@@ -73,7 +74,7 @@ const Hero = () => {
     <section
       id="home"
       ref={containerRef}
-      className="relative min-h-screen w-full overflow-hidden bg-[url('/hero-bg-mobile.png')] bg-cover bg-fixed bg-center bg-no-repeat md:bg-[url('/hero-bg.png')]">
+      className="relative min-h-screen w-full overflow-hidden bg-[url('/hero-bg.png')] bg-cover bg-fixed bg-center bg-no-repeat md:bg-[url('/hero-bg.png')]">
       <div className="pointer-events-none absolute inset-0">
         {codeSnippets.map((snippet, index) => (
           <motion.div
@@ -161,7 +162,7 @@ const Hero = () => {
       </div>
 
       <motion.div
-        className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 text-center"
+        className="relative z-20 flex min-h-screen flex-col items-center justify-center px-4 text-center"
         style={{ y: y1, opacity }}>
         <div className="mb-8">
           <div onClick={()=>router.push('/signin')} className="cursor-pointer group relative mx-auto flex w-full max-w-max items-center justify-center rounded-full px-4 py-1.5 shadow-[inset_0_-8px_10px_#8fdfff1f] transition-shadow duration-500 ease-out hover:shadow-[inset_0_-5px_10px_#8fdfff3f]">
@@ -198,7 +199,7 @@ const Hero = () => {
             <ChevronRight className="ml-1 size-4 stroke-neutral-500 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
           </div>
           <motion.h1
-            className="relative mb-8 pt-2 font-riffic text-5xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl"
+            className="relative mb-8 pt-5 font-riffic text-5xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}>
@@ -248,6 +249,7 @@ const Hero = () => {
           </motion.div>
         </div>
       </motion.div>
+      
 
       <style jsx global>{`
         @keyframes pulse {
@@ -286,6 +288,7 @@ const Hero = () => {
           }
         }
       `}</style>
+      
     </section>
   )
 }

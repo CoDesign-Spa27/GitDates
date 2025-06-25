@@ -1,20 +1,15 @@
-"use client"
-import {motion, useScroll, useTransform} from 'motion/react'
-import { FeatureCard } from '../feature-card';
-import { Code, Github, Heart } from 'lucide-react';
+'use client'
+import { motion, useScroll, useTransform } from 'motion/react'
+import { FeatureCard } from '../feature-card'
+import { Code, Github, Heart } from 'lucide-react'
 export const Features = () => {
-  const { scrollY } = useScroll();
-  
+  const { scrollY } = useScroll()
+
   return (
-    <section
-    id='features'
-    >
+    <section id="features" className="relative">
+      <motion.div className="relative z-10 flex min-h-[80vh] flex-col items-center justify-center bg-[#0C0A09] px-6 py-10">
         <motion.div
-        className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-20 bg-[#0C0A09]">
-   
-
-        <motion.div
-          className="absolute bottom-20 right-30 w-80 h-80 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-[100px]"
+          className="right-30 absolute bottom-20 h-80 w-80 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-[100px]"
           animate={{
             x: [0, -10, 10, -10, 20, 0],
             y: [0, 30, -10, 20, -30, 0],
@@ -23,12 +18,12 @@ export const Features = () => {
           transition={{
             duration: 5,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: 'easeInOut',
           }}
         />
 
         <motion.div
-          className="absolute top-40 right-20 w-72 h-72 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 blur-[90px]"
+          className="absolute right-20 top-40 h-72 w-72 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 blur-[90px]"
           animate={{
             x: [0, -10, 10, -10, 20, 0],
             y: [0, 30, -10, 20, -30, 0],
@@ -37,22 +32,20 @@ export const Features = () => {
           transition={{
             duration: 5,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: 'easeInOut',
           }}
         />
-           
-         
+
         <motion.h2
-          className="text-4xl md:text-5xl font-riffic font-bold mb-16 text-center text-transparent bg-clip-text bg-gradient-to-r from-[#C0F4B8] to-[#FFD4E5]"
+          className="mb-16 bg-gradient-to-r from-[#C0F4B8] to-[#FFD4E5] bg-clip-text text-center font-riffic text-4xl font-bold text-transparent md:text-5xl"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
+          transition={{ duration: 0.6 }}>
           Where Developers Find Their Match
         </motion.h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl w-full">
+        <div className="grid w-full max-w-6xl grid-cols-1 gap-8 md:grid-cols-3">
           <FeatureCard
             icon={<Code className="text-blue-400" size={32} />}
             title="Language Compatibility"
@@ -69,10 +62,7 @@ export const Features = () => {
             description="Beyond technical skills, we match based on coding style, problem-solving approach, and values."
           />
         </div>
-
-          
-            </motion.div>
-
+      </motion.div>
     </section>
-  );
+  )
 }

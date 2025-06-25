@@ -76,7 +76,7 @@ const Footer = () => {
             <Link href="/" className="inline-block mb-4">
               <Logo />
             </Link>
-            <p className="text-muted-foreground mb-6 max-w-md">
+            <p className="text-muted-foreground mb-6">
               Find your perfect coding partner. Connect with developers who share your passion, style, and vision through our intelligent matching platform.
             </p>
    
@@ -85,7 +85,7 @@ const Footer = () => {
         </div>
  
         <div className="pt-8 border-t border-border/30 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex space-x-4">
+          {/* <div className="flex space-x-4">
             {socialLinks.map((social, index) => (
               <motion.a
                 key={index}
@@ -100,16 +100,20 @@ const Footer = () => {
                 {social.icon}
               </motion.a>
             ))}
-          </div>
+          </div> */}
           
           <div className="text-muted-foreground text-sm flex flex-col md:flex-row items-center gap-2 md:gap-6">
             <div className="flex items-center space-x-1">
               <span>Made with</span>
               <Heart size={14} className="text-red-500 fill-red-500" />
               <span>for developers</span>
+              <span>by</span>
+              <span className="bg-gradient-to-r from-gitdate to-pink-500 bg-clip-text font-semibold text-transparent hover:from-purple-600 hover:to-pink-600 transition-colors">
+                roohbuilds
+              </span>
             </div>
-            <div>© {currentYear} GitDates. All rights reserved.</div>
           </div>
+            <div>© {currentYear} GitDates. All rights reserved.</div>
         </div>
       </div>
     </footer>
