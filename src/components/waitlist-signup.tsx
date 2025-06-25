@@ -110,7 +110,7 @@ export function WaitlistSignup({ className }: WaitlistSignupProps) {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className={`${className}`}>
-        <div className="group relative mx-auto w-full max-w-md cursor-pointer">
+        <div className="group relative mx-auto w-full max-w-[250px] cursor-pointer">
           <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 opacity-30 blur transition duration-300 group-hover:opacity-50"></div>
           <div className="relative rounded-full border border-green-500/30 bg-green-950/30 px-4 py-2 backdrop-blur-sm">
             <div className="flex items-center justify-center gap-2">
@@ -137,16 +137,15 @@ export function WaitlistSignup({ className }: WaitlistSignupProps) {
       className={`${className}`}>
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>
-          <div className="group relative mx-auto w-full max-w-md cursor-pointer">
+          <div className="group relative mx-auto w-full max-w-[300px] cursor-pointer">
             <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-gitdate to-purple-500 opacity-30 blur transition duration-300 group-hover:opacity-50"></div>
-            <div className="relative rounded-full border border-gitdate/30 bg-gray-900/50 px-4 py-2 backdrop-blur-sm transition-all duration-300 hover:border-gitdate/50">
-              <div className="flex items-center justify-center gap-2">
-                <Users className="h-4 w-4 text-gitdate" />
-                <span className="text-sm font-medium text-white">
-                  Joined by{' '}
-                  {totalSignups > 0 ? `${totalSignups} developers` : 'waitlist'}
+            <div className="relative rounded-full border border-gitdate/30 bg-gray-900/50 px-5 py-3 backdrop-blur-sm transition-all duration-300 hover:border-gitdate/50">
+              <div className="flex items-center justify-center gap-3">
+                <Users className="h-5 w-5 text-gitdate" />
+                <span className="text-base font-medium text-white">
+                  {totalSignups > 0 ? `Joined by ${totalSignups} developers` : 'Be the first one to join!'}
                 </span>
-                <Plus className="h-4 w-4 text-gitdate/70 transition-colors group-hover:text-gitdate" />
+                <Plus className="h-5 w-5 text-gitdate/70 transition-colors group-hover:text-gitdate" />
               </div>
             </div>
           </div>

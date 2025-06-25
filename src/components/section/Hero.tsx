@@ -204,7 +204,7 @@ const Hero = () => {
         className="relative z-20 flex min-h-screen flex-col items-center justify-center px-4 text-center"
         style={{ y: y1, opacity }}>
         <div className="mb-8">
-          <div className="group relative mx-auto flex w-full max-w-max items-center justify-center rounded-full px-4 py-1.5 shadow-[inset_0_-8px_10px_#8fdfff1f] transition-shadow duration-500 ease-out hover:shadow-[inset_0_-5px_10px_#8fdfff3f]">
+          <div className="group relative mx-auto flex w-full max-w-[250px] items-center justify-center rounded-full px-2 py-1.5 shadow-[inset_0_-8px_10px_#8fdfff1f] transition-shadow duration-500 ease-out hover:shadow-[inset_0_-5px_10px_#8fdfff3f]">
             <span
               className={cn(
                 'animate-gradient absolute inset-0 block h-full w-full rounded-[inherit] bg-gradient-to-r from-gitdate/50 via-[#9c40ff]/50 to-gitdate/50 bg-[length:300%_100%] p-[1px]'
@@ -232,7 +232,7 @@ const Hero = () => {
             </motion.div>
 
             <AnimatedGradientText className="text-sm font-medium">
-              Coming Soon - Private Beta
+              Coming Soon
             </AnimatedGradientText>
 
             <Badge
@@ -242,7 +242,7 @@ const Hero = () => {
             </Badge>
           </div>
           <motion.h1
-            className="relative mb-8 pt-5 font-riffic text-5xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl"
+            className="relative mb-8 pt-5 font-riffic text-6xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}>
