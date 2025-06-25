@@ -1,0 +1,16 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "target": "ES2020",
+        "outDir": "./dist",
+        "moduleResolution": "NodeNext",
+        "strict": true,
+        "noEmit": false,
+        "isolatedModules": false,
+        "module": "NodeNext",
+        "paths": {
+            "@/*": ["./src/*"]
+        }
+    },
+    "include": ["server.ts"]
+}
