@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getOrCreateConversation } from "@/actions/conversation.action";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
-export default function NewConversationPage() {
+function ConversationCreator() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const matchId = searchParams.get("matchId");
@@ -71,5 +71,20 @@ export default function NewConversationPage() {
         <h3 className="text-lg font-medium">Creating conversation...</h3>
       </div>
     </div>
+  );
+}
+
+export default function NewConversationPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center py-12">
+          <Skeleton className="h-8 w-56 mx-auto mb-4" />
+          <Skeleton className="h-4 w-80 mx-auto" />
+        </div>
+      </div>
+    }>
+      <ConversationCreator />
+    </Suspense>
   );
 }

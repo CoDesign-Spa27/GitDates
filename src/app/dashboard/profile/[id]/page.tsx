@@ -166,14 +166,14 @@ export default function Profile() {
       <div className="container px-4 mx-auto max-w-6xl">
         <motion.div
           className="grid grid-cols-1 gap-8 md:grid-cols-3"
-          variants={containerVariants}
+          variants={containerVariants as any}
           initial="hidden"
           animate="visible"
         >
    
           <motion.div
             className="md:col-span-1 h-full"
-            variants={itemVariants}
+            variants={itemVariants as any}
           >
             <div className="p-6 overflow-hidden bg-white rounded-2xl shadow-md dark:bg-neutral-900">
               <div className="flex flex-col items-center">
@@ -273,7 +273,7 @@ export default function Profile() {
           <div className="md:col-span-2 space-y-6">
             <motion.div 
               className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2"
-              variants={itemVariants}
+              variants={itemVariants as any}
             >
               <motion.div 
                 className="p-6 bg-white rounded-2xl shadow-md dark:bg-neutral-900"
@@ -301,7 +301,7 @@ export default function Profile() {
  
             <motion.div
               className="p-6 bg-white rounded-2xl shadow-md dark:bg-neutral-900"
-              variants={itemVariants}
+              variants={itemVariants as any}
             >
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold">Main Languages</h2>
@@ -314,7 +314,7 @@ export default function Profile() {
                     No languages found
                   </div>
                 ) : (
-                  mainLanguages?.map((lang, index) => (
+                  mainLanguages?.map((lang: any, index: any) => (
                     <motion.div
                       key={index}
                       className="px-4 py-3 text-center bg-gray-100 rounded-lg dark:bg-neutral-800"
@@ -335,7 +335,7 @@ export default function Profile() {
  
             <motion.div
               className="p-6 bg-white rounded-2xl shadow-md dark:bg-neutral-900"
-              variants={itemVariants}
+              variants={itemVariants as any}
             >
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold">Contributions Overview</h2>
@@ -343,7 +343,7 @@ export default function Profile() {
               </div>
               
               <div className="grid grid-cols-1 gap-6">
-                {contributionOverview?.map((item, index) => (
+                {contributionOverview?.map((item: any, index: any) => (
                   <motion.div 
                     key={index}
                     className="p-4 bg-neutral-100 dark:bg-neutral-800 rounded-xl"

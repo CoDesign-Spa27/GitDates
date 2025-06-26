@@ -4,7 +4,6 @@ import { authOptions } from "../lib/auth";
 import prisma from "../lib/prisma";
 import { SuccessResponse } from "@/lib/success";
 import { ErrorHandler } from "@/lib/error";
-import { GitDateProfile } from "@prisma/client";
 
 export interface MatchPreference {
   ageMin: number;
@@ -190,19 +189,19 @@ export const findMatches = async (email: string | undefined | null) => {
     });
 
     const matchesWithScores: PotentialMatch[] = allProfiles
-      .filter((profile) => {
+      .filter((profile: any) => {
         return !existingMatches.some(
-          (match) =>
+          (match: any) =>
             match.senderId === profile.userId ||
             match.receiverId === profile.userId
         );
       })
-      .map((profile) => {
+      .map((profile: any) => {
         let score = 0;
 
         // Calculate language match score
         if (userPreference.languages?.length && profile.mainLanguages?.length) {
-          const commonLanguages = profile.mainLanguages.filter((lang) =>
+          const commonLanguages = profile.mainLanguages.filter((lang: any) =>
             userPreference.languages?.includes(lang)
           );
           score +=
@@ -268,7 +267,7 @@ export const findMatches = async (email: string | undefined | null) => {
         };
       });
 
-    const sortedMatches = matchesWithScores.sort((a, b) => b.score - a.score);
+    const sortedMatches = matchesWithScores.sort((a: any, b: any) => b.score - a.score);
     const response = new SuccessResponse(
       "Matches found successfully",
       200,
@@ -509,7 +508,7 @@ export const getMyMatches = async () => {
     if (!matches) {
       throw new Error("No matches found");
     }
-   const formattedResponse = matches.map((match) => {
+   const formattedResponse = matches.map((match: any) => {
       const isUserSender = match.senderId === user.id;
       const otherPerson = isUserSender ? match.receiver : match.sender;
       

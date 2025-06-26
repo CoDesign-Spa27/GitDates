@@ -284,7 +284,7 @@ const GitDateProfile = () => {
                 <AvatarFallback>
                   {profile?.name
                     ?.split(' ')
-                    .map((n) => n[0])
+                    .map((n: any) => n[0])
                     .join('') || 'U'}
                 </AvatarFallback>
               </Avatar>
@@ -520,7 +520,7 @@ const GitDateProfile = () => {
               </h2>
 
               <div className="flex flex-wrap gap-2">
-                {profile?.mainLanguages?.map((lang, index) => (
+                {profile?.mainLanguages?.map((lang: any, index: any) => (
                   <Badge
                     key={lang}
                     className={`rounded-md px-3 py-2 text-sm font-medium transition-all hover:scale-105 ${

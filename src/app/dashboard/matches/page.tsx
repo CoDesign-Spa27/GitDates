@@ -124,7 +124,7 @@ export default function MatchesPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {matches.map((match) => (
+              {matches.map((match: any) => (
                 <MatchCard key={match.matchId} match={match} />
               ))}
             </div>
@@ -144,7 +144,7 @@ export default function MatchesPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {requests.map((request) => (
+              {requests.map((request: any) => (
                 <RequestCard
                   key={request.id}
                   request={request}

@@ -55,7 +55,7 @@ export async function getConversations() {
     });
 
     // Format the conversations
-    const conversations = matches.map((match) => {
+    const conversations = matches.map((match: any) => {
       // Determine the other user (not the current user)
       const otherUser = match.senderId === user.id ? match.receiver : match.sender;
       const profile = otherUser.gitDateProfile;
@@ -74,7 +74,7 @@ export async function getConversations() {
     });
 
  
-  const formattedResponse = conversations.sort((a, b) => {
+  const formattedResponse = conversations.sort((a: any, b: any) => {
       const dateA = a.lastMessage?.createdAt || a.updatedAt;
       const dateB = b.lastMessage?.createdAt || b.updatedAt;
       return new Date(dateB).getTime() - new Date(dateA).getTime();
@@ -303,10 +303,10 @@ export async function getUnreadMessageCounts() {
     });
 
     const counts = Object.fromEntries(
-      conversations.map((conversation) => [conversation.id, conversation._count.messages])
+      conversations.map((conversation: any) => [conversation.id, conversation._count.messages])
     );
 
-    const totalUnread = Object.values(counts).reduce((sum, count) => sum + count, 0);
+    const totalUnread = Object.values(counts).reduce((sum: any, count: any) =>  sum + count, 0);
     const response = new SuccessResponse(
       'Fetching unread messages details successfull',
       200,

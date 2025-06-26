@@ -41,7 +41,7 @@ export default function ConversationsPage() {
   }, [subscribeToNewMessages, queryClient,unreadCounts]);
  
   const filteredConversations = conversations?.filter(
-    (conversation) =>
+    (conversation: any) =>
       conversation.name.toLowerCase().includes(searchQuery.toLowerCase())
   ) ?? [];
 

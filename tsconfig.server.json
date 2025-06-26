@@ -6,6 +6,7 @@
         "moduleResolution": "NodeNext",
         "strict": true,
         "noEmit": false,
+        "noEmitOnError": false,
         "isolatedModules": false,
         "module": "NodeNext",
         "paths": {

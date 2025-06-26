@@ -98,7 +98,7 @@ async function startServer() {
       include: { conversation: true },
     });
     
-    matches.forEach(match => {
+    matches.forEach((match: any) => {
       if (match.conversation) {
         socket.join(`conversation:${match.conversation.id}`);
       }
