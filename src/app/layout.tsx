@@ -20,7 +20,7 @@ const riffic = localFont({
 })
 
 export const metadata: Metadata = {
-  title: 'GitDate - Connect with Developers',
+  title: 'GitDate - Dating Specialized for Developers',
   description:
     'GitDate helps developers find meaningful connections through shared interests in coding and technology. Match, chat and collaborate with like-minded developers.',
   metadataBase: new URL('https://gitdates.com'),
@@ -72,10 +72,15 @@ export const metadata: Metadata = {
     description: 'Find meaningful connections in the developer community',
     type: 'website',
     locale: 'en_US',
+    images: [
+      {
+        url: './opengraph-image.png',
+      },
+    ],
     url: 'https://gitdates.com',
   },
   twitter: {
-    images: ['/opengraph-image.png'],
+    images: ['./opengraph-image.png'],
     creator: '@roohbuilds',
     card: 'summary_large_image',
     title: 'GitDate - Connect with Developers',
