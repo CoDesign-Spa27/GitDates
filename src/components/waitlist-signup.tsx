@@ -151,7 +151,7 @@ export function WaitlistSignup({ className }: WaitlistSignupProps) {
           </div>
         </DialogTrigger>
 
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-white">Join the Waitlist</DialogTitle>
             <DialogDescription className="text-gray-300">

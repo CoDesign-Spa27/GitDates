@@ -85,9 +85,7 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  themeColor: '#000000',
   manifest: '/manifest.json',
-  viewport: 'width=device-width, initial-scale=1',
   alternates: {
     canonical: 'https://gitdates.com',
   },

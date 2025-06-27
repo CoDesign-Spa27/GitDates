@@ -86,7 +86,7 @@ const Hero = () => {
     <section
       id="home"
       ref={containerRef}
-      className="relative min-h-screen w-full overflow-hidden bg-[url('/hero-bg.png')] bg-cover bg-fixed bg-center bg-no-repeat md:bg-[url('/hero-bg.png')]">
+      className="relative min-h-screen w-full overflow-hidden bg-[url('/rectangle.svg')] bg-cover bg-fixed bg-center bg-no-repeat md:bg-[url('/rectangle.svg')]">
       {/* Waitlist redirect message */}
       <AnimatePresence>
         {showWaitlistMessage && (
@@ -204,7 +204,7 @@ const Hero = () => {
         className="relative z-20 flex min-h-screen flex-col items-center justify-center px-4 text-center"
         style={{ y: y1, opacity }}>
         <div className="mb-8">
-          <div className="group relative mx-auto flex w-full max-w-[250px] items-center justify-center rounded-full px-2 py-1.5 shadow-[inset_0_-8px_10px_#8fdfff1f] transition-shadow duration-500 ease-out hover:shadow-[inset_0_-5px_10px_#8fdfff3f]">
+          <div className="group relative mx-auto flex w-full max-w-[300px] items-center justify-center rounded-full px-2 py-1.5 shadow-[inset_0_-8px_10px_#8fdfff1f] transition-shadow duration-500 ease-out hover:shadow-[inset_0_-5px_10px_#8fdfff3f]">
             <span
               className={cn(
                 'animate-gradient absolute inset-0 block h-full w-full rounded-[inherit] bg-gradient-to-r from-gitdate/50 via-[#9c40ff]/50 to-gitdate/50 bg-[length:300%_100%] p-[1px]'
@@ -237,8 +237,8 @@ const Hero = () => {
 
             <Badge
               variant="secondary"
-              className="ml-2 border-orange-500/50 bg-orange-500/20 text-orange-300">
-              Waitlist Open
+              className="ml-2 border-orange-500/50 bg-orange-500/20 text-orange-300 font-riffic">
+             on 50 joiners
             </Badge>
           </div>
           <motion.h1
