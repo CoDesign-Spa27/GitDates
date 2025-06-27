@@ -23,7 +23,7 @@ const faqs = [
   },
   {
     question: "How much does it cost?",
-    answer: "Getting started on GitDates is free! Our basic tier lets you explore and make initial connections. For unlimited matches and advanced features, you can upgrade to our Pro plan."
+    answer: "Currently, GitDates is completely free for everyone! We may introduce pricing plans in the future, but for now, enjoy all features without any cost."
   }
 ];
 
