@@ -27,14 +27,9 @@ import { useRouter } from 'next/navigation'
 import { AnimatedGradientText } from '../ui/animated-gradient-text'
 import { cn } from '@/lib/utils'
 import { CTAButton } from '../ui/cta-button'
-import Link from 'next/link'
-import heroIntro from '../../../public/hero-intro.svg'
-import { WaitlistSignup } from '../waitlist-signup'
-import { Badge } from '../ui/badge'
+ 
 
 const Hero = () => {
-  const [isHovered, setIsHovered] = useState(false)
-  const [showWaitlistMessage, setShowWaitlistMessage] = useState(false)
   const { scrollY } = useScroll()
   const containerRef = useRef(null)
   const controls = useAnimation()
@@ -50,14 +45,6 @@ const Hero = () => {
       y: 0,
       transition: { duration: 0.8, ease: 'easeOut' },
     })
-
-    // Check if user was redirected due to restricted access
-    const urlParams = new URLSearchParams(window.location.search)
-    if (urlParams.get('waitlist') === 'true') {
-      setShowWaitlistMessage(true)
-      // Remove the parameter from URL
-      window.history.replaceState({}, '', '/')
-    }
   }, [controls])
 
   const codeSnippets = [
@@ -69,50 +56,12 @@ const Hero = () => {
     'for(let i = 0; i < infinity; i++) { loveCoding(with: you); }',
     'class Relationship extends Perfect { constructor(you, me) {...} }',
   ]
-
-  const patternVariants: any = {
-    animate: {
-      backgroundPosition: ['0% 0%', '100% 100%'],
-      transition: {
-        duration: 20,
-        ease: 'linear',
-        repeat: Infinity,
-        repeatType: 'reverse',
-      },
-    },
-  }
-
+ 
   return (
     <section
       id="home"
       ref={containerRef}
       className="relative min-h-screen w-full overflow-hidden bg-[url('/rectangle.svg')] bg-cover bg-fixed bg-center bg-no-repeat md:bg-[url('/rectangle.svg')]">
-      {/* Waitlist redirect message */}
-      <AnimatePresence>
-        {showWaitlistMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            className="fixed left-4 right-4 top-4 z-50 mx-auto max-w-md">
-            <div className="rounded-lg border border-orange-500/50 bg-orange-500/20 p-4 backdrop-blur-sm">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-orange-400" />
-                <p className="text-sm text-orange-200">
-                  GitDates is currently in private beta. Join our waitlist to
-                  get early access!
-                </p>
-              </div>
-              <button
-                onClick={() => setShowWaitlistMessage(false)}
-                className="absolute right-2 top-2 text-orange-300 hover:text-orange-100"
-                aria-label="Close">
-                ×
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <div className="pointer-events-none absolute inset-0">
         {codeSnippets.map((snippet, index) => (
@@ -204,7 +153,7 @@ const Hero = () => {
         className="relative z-20 flex min-h-screen flex-col items-center justify-center px-4 text-center"
         style={{ y: y1, opacity }}>
         <div className="mb-8">
-          <div className="group relative mx-auto flex w-full max-w-[300px] items-center justify-center rounded-full px-2 py-1.5 shadow-[inset_0_-8px_10px_#8fdfff1f] transition-shadow duration-500 ease-out hover:shadow-[inset_0_-5px_10px_#8fdfff3f]">
+          <div className="group relative mx-auto flex w-full max-w-[250px] items-center justify-center rounded-full px-2 py-1.5 shadow-[inset_0_-8px_10px_#8fdfff1f] transition-shadow duration-500 ease-out hover:shadow-[inset_0_-5px_10px_#8fdfff3f]">
             <span
               className={cn(
                 'animate-gradient absolute inset-0 block h-full w-full rounded-[inherit] bg-gradient-to-r from-gitdate/50 via-[#9c40ff]/50 to-gitdate/50 bg-[length:300%_100%] p-[1px]'
@@ -228,18 +177,12 @@ const Hero = () => {
                 repeat: Infinity,
                 ease: 'linear',
               }}>
-              <Clock className="size-6 text-orange-400/80" />
+              <Settings className="size-6 text-pink-400/80" />
             </motion.div>
 
             <AnimatedGradientText className="text-sm font-medium">
-              Coming Soon
+              Introducing GitDates
             </AnimatedGradientText>
-
-            <Badge
-              variant="secondary"
-              className="ml-2 border-orange-500/50 bg-orange-500/20 text-orange-300 font-riffic">
-             on 50 joiners
-            </Badge>
           </div>
           <motion.h1
             className="relative mb-8 pt-5 font-riffic text-6xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl"
@@ -275,13 +218,9 @@ const Hero = () => {
             <br className="hidden md:block" /> Where code meets chemistry.
           </motion.p>
 
-          {/* Waitlist Signup Component */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9, duration: 0.8 }}>
-            <WaitlistSignup />
-          </motion.div>
+          <CTAButton onClick={() => router.push('/signin')}>
+            Let's Match
+          </CTAButton>
 
           <motion.div
             className="absolute bottom-10 left-0 right-0 flex justify-center"

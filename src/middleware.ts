@@ -1,72 +1,34 @@
+import { getToken } from 'next-auth/jwt'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export default async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-
-  // Define public paths that are accessible during waitlist period
-  const publicPaths = [
-    '/', // Landing page
-    '/api/waitlist', // Waitlist API
-    '/api/waitlist/admin', // Waitlist admin API
-    '/admin/waitlist', // Admin waitlist page
-    '/favicon.ico', // Favicon
-    '/_next', // Next.js assets
-    '/assets', // Static assets
-    '/hero-bg.png', // Hero background
-    '/hero-intro.svg', // Hero intro
-  ]
-
-  // Allow access to specific file types and Next.js internals
-  const allowedExtensions = [
-    '.png',
-    '.jpg',
-    '.jpeg',
-    '.gif',
-    '.svg',
-    '.ico',
-    '.css',
-    '.js',
-    '.woff',
-    '.woff2',
-    '.ttf',
-  ]
-  const isAssetRequest =
-    allowedExtensions.some((ext) => pathname.endsWith(ext)) ||
-    pathname.startsWith('/_next/') ||
-    pathname.startsWith('/assets/')
-
-  // Check if the current path is allowed
-  const isPublicPath = publicPaths.some((path) => {
-    if (path === '/') {
-      return pathname === '/'
-    }
-    return pathname.startsWith(path)
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
   })
+  const { pathname } = new URL(request.url)
 
-  // Allow access to public paths and assets
-  if (isPublicPath || isAssetRequest) {
-    return NextResponse.next()
+  const publicPaths = [
+    '/',
+    '/api/auth/signin',
+    '/api/auth/callback',
+    '/api/auth/error',
+  ]
+
+  if (!token && pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/api/auth/signin', request.url))
   }
 
-  // For all other routes, redirect to landing page with a message
-  const url = request.nextUrl.clone()
-  url.pathname = '/'
-  url.searchParams.set('waitlist', 'true')
+  if (token && publicPaths.includes(pathname)) {
+    // Redirect to dashboard if authenticated and trying to access public page
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
 
-  return NextResponse.redirect(url)
+  return NextResponse.next()
 }
 
-// Apply middleware to all routes except API routes and static files
+// Apply middleware to specific routes
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api/waitlist (waitlist API)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!api/waitlist|_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: ['/', '/dashboard/:path*', '/api/auth/:path*'],
 }
