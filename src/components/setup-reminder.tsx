@@ -38,7 +38,7 @@ export const SetupReminder = () =>{
           </p>
           <div className="space-y-4">
             <Button 
-              onClick={() => router.push("/dashboard/profile")}
+              onClick={() => router.push("/dashboard")}
               size="lg"
               className="gap-2 w-full sm:w-auto"
             >
