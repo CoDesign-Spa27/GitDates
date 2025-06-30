@@ -1,54 +1,60 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { MessageSquare, Search, Plus, ChevronRight, UserCircle2, Settings } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
-import { formatDistanceToNow } from "date-fns";
-import { useSocket } from "@/lib/client-socket";
-import { useConversations } from "@/components/hooks/useConversation";
-import { useQueryClient } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { Conversations } from "@/components/conversations";
-import { Card } from "@/components/ui/card";
-import { useProfileSetupStatus } from "@/components/hooks/useProfileSetupStatus";
-import { SetupReminder } from "@/components/setup-reminder";
- 
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import {
+  MessageSquare,
+  Search,
+  Plus,
+  ChevronRight,
+  UserCircle2,
+  Settings,
+} from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
+import { formatDistanceToNow } from 'date-fns'
+import { useSocket } from '@/lib/client-socket'
+import { useConversations } from '@/components/hooks/useConversation'
+import { useQueryClient } from '@tanstack/react-query'
+import { useSession } from 'next-auth/react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { cn } from '@/lib/utils'
+import { Conversations } from '@/components/conversations'
+import { Card } from '@/components/ui/card'
+import { useProfileSetupStatus } from '@/components/hooks/useProfileSetupStatus'
+import { SetupReminder } from '@/components/setup-reminder'
 
 export default function ConversationsPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const router = useRouter();
-  const { subscribeToNewMessages } = useSocket();
-  const { conversations, unreadCounts, isLoading } = useConversations();
-  const queryClient = useQueryClient();
-  const {data: session} = useSession();
-  const email = session?.user?.email;
-  const {setupDone, isLoading: setupLoading} = useProfileSetupStatus();
- 
+  const [searchQuery, setSearchQuery] = useState('')
+  const router = useRouter()
+  const { subscribeToNewMessages } = useSocket()
+  const { conversations, unreadCounts, isLoading } = useConversations()
+  const queryClient = useQueryClient()
+  const { data: session } = useSession()
+  const email = session?.user?.email
+  const { setupDone, isLoading: setupLoading } = useProfileSetupStatus()
+
   useEffect(() => {
     const unsubscribe = subscribeToNewMessages((message) => {
-      queryClient.invalidateQueries({ queryKey: ['unread-counts', email] });
-    });
+      queryClient.invalidateQueries({ queryKey: ['unread-counts', email] })
+    })
 
     return () => {
-      unsubscribe?.();
-    };
-  }, [subscribeToNewMessages, queryClient,unreadCounts]);
- 
-  const filteredConversations = conversations?.filter(
-    (conversation: any) =>
+      unsubscribe?.()
+    }
+  }, [subscribeToNewMessages, queryClient, unreadCounts])
+
+  const filteredConversations =
+    conversations?.filter((conversation: any) =>
       conversation.name.toLowerCase().includes(searchQuery.toLowerCase())
-  ) ?? [];
+    ) ?? []
 
   const renderLoadingSkeleton = () => (
     <div className="space-y-2">
       {[...Array(5)].map((_, i) => (
-        <div key={i} className="flex items-center gap-4 p-4 animate-pulse">
+        <div key={i} className="flex animate-pulse items-center gap-4 p-4">
           <Skeleton className="h-14 w-14 rounded-full" />
           <div className="flex-1 space-y-2">
             <Skeleton className="h-5 w-32" />
@@ -57,35 +63,32 @@ export default function ConversationsPage() {
         </div>
       ))}
     </div>
-  );
+  )
 
- 
-
-  if (!setupDone) {
-    return (
-      <SetupReminder />
-    );
+  if (!setupDone && !setupLoading && !isLoading) {
+    return <SetupReminder />
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="flex items-center justify-between mb-8">
+    <div className="container mx-auto max-w-4xl px-4 py-8">
+      <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-4xl font-bold tracking-tight">Messages</h1>
-          <p className="text-muted-foreground mt-1">Connect with your matches</p>
+          <p className="mt-1 text-muted-foreground">
+            Connect with your matches
+          </p>
         </div>
-        <Button 
-          onClick={() => router.push("/dashboard/matches")}
-          className="gap-2"
-        >
+        <Button
+          onClick={() => router.push('/dashboard/matches')}
+          className="gap-2">
           <Plus className="h-4 w-4" />
           New Message
         </Button>
       </div>
 
-      <div className="flex items-center gap-2 mb-6">
+      <div className="mb-6 flex items-center gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
           <Input
             placeholder="Search conversations..."
             value={searchQuery}
@@ -95,35 +98,39 @@ export default function ConversationsPage() {
         </div>
       </div>
 
-      <Card className="bg-card rounded-xl shadow-sm overflow-hidden">
+      <Card className="overflow-hidden rounded-xl bg-card shadow-sm">
         {isLoading ? (
           renderLoadingSkeleton()
         ) : filteredConversations.length === 0 ? (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-16 px-4"
-          >
-            <div className="bg-muted/50 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+            className="px-4 py-16 text-center">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-muted/50 p-4">
               <MessageSquare className="h-10 w-10 text-muted-foreground" />
             </div>
-            <h3 className="text-2xl font-semibold mb-2">No conversations yet</h3>
-            <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-              Start connecting with your matches to begin meaningful conversations
+            <h3 className="mb-2 text-2xl font-semibold">
+              No conversations yet
+            </h3>
+            <p className="mx-auto mb-6 max-w-sm text-muted-foreground">
+              Start connecting with your matches to begin meaningful
+              conversations
             </p>
-            <Button 
-              onClick={() => router.push("/dashboard/matches")}
+            <Button
+              onClick={() => router.push('/dashboard/matches')}
               size="lg"
-              className="gap-2"
-            >
+              className="gap-2">
               <Plus className="h-5 w-5" />
               Find Matches
             </Button>
           </motion.div>
         ) : (
-          <Conversations filteredConversations={filteredConversations} unreadCounts={unreadCounts} />
+          <Conversations
+            filteredConversations={filteredConversations}
+            unreadCounts={unreadCounts}
+          />
         )}
       </Card>
     </div>
-  );
+  )
 }

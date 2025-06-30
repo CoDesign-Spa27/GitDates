@@ -1,78 +1,82 @@
-"use client";
-import { useState } from "react";
-import { respondToMatchRequest } from "@/actions/match.action";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Check, X, Heart } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
-import { useMyMatches } from "@/components/hooks/useMyMatches";
-import { useMatchRequest } from "@/components/hooks/useMatchRequests";
-import { useProfileSetupStatus } from "@/components/hooks/useProfileSetupStatus";
-import { SetupReminder } from "@/components/setup-reminder";
+'use client'
+import { useState } from 'react'
+import { respondToMatchRequest } from '@/actions/match.action'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Check, X, Heart } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { toast } from '@/hooks/use-toast'
+import { useRouter } from 'next/navigation'
+import { useMyMatches } from '@/components/hooks/useMyMatches'
+import { useMatchRequest } from '@/components/hooks/useMatchRequests'
+import { useProfileSetupStatus } from '@/components/hooks/useProfileSetupStatus'
+import { SetupReminder } from '@/components/setup-reminder'
 
 interface Profile {
-  name: string;
-  image: string;
-  bio: string;
+  name: string
+  image: string
+  bio: string
 }
 
 interface Match {
-  matchId: string;
-  userId: string;
-  profile: Profile;
-  createdAt: Date;
+  matchId: string
+  userId: string
+  profile: Profile
+  createdAt: Date
 }
 
 interface MatchRequest {
-  id: string;
+  id: string
   sender: {
-    gitDateProfile: Profile;
-  };
-  createdAt: Date;
+    gitDateProfile: Profile
+  }
+  createdAt: Date
 }
 
 export default function MatchesPage() {
-  const [activeTab, setActiveTab] = useState("matches");
-  const { data: matches, isLoading: matchesLoading } = useMyMatches();
-  const { data: requests, mutateAsync: respondToMatchRequest, isLoading: requestsLoading } = useMatchRequest();
-  const {setupDone, isLoading: setupLoading} = useProfileSetupStatus();
- 
+  const [activeTab, setActiveTab] = useState('matches')
+  const { data: matches, isLoading: matchesLoading } = useMyMatches()
+  const {
+    data: requests,
+    mutateAsync: respondToMatchRequest,
+    isLoading: requestsLoading,
+  } = useMatchRequest()
+  const { setupDone, isLoading: setupLoading } = useProfileSetupStatus()
+
   const handleAccept = async (matchId: string) => {
     try {
-      await respondToMatchRequest({matchId, action: "ACCEPT"});
+      await respondToMatchRequest({ matchId, action: 'ACCEPT' })
       toast({
-        title: "Match request accepted",
-      });
+        title: 'Match request accepted',
+      })
     } catch (error) {
       toast({
-        title: "Failed to accept match request",
-        variant: "destructive",
-      });
+        title: 'Failed to accept match request',
+        variant: 'destructive',
+      })
     }
-  };
+  }
 
   const handleReject = async (matchId: string) => {
     try {
       await respondToMatchRequest({ matchId, action: 'REJECT' })
       toast({
-        title: "Match request rejected",
-      });
+        title: 'Match request rejected',
+      })
     } catch (error) {
       toast({
-        title: "Failed to reject match request",
-        variant: "destructive",
-      });
+        title: 'Failed to reject match request',
+        variant: 'destructive',
+      })
     }
-  };
+  }
 
   const renderLoadingSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       {[...Array(4)].map((_, i) => (
-        <div key={i} className="bg-card p-4 rounded-lg border border-border">
+        <div key={i} className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-center gap-4">
-            <Skeleton className="w-16 h-16 rounded-full" />
+            <Skeleton className="h-16 w-16 rounded-full" />
             <div className="space-y-2">
               <Skeleton className="h-5 w-32" />
               <Skeleton className="h-4 w-48" />
@@ -81,8 +85,8 @@ export default function MatchesPage() {
         </div>
       ))}
     </div>
-  );
-  if (!setupDone && !matchesLoading && !requestsLoading) {
+  )
+  if (!setupDone && !setupLoading && !matchesLoading && !requestsLoading) {
     return <SetupReminder />
   }
   return (
@@ -90,13 +94,12 @@ export default function MatchesPage() {
       <Tabs
         defaultValue="matches"
         value={activeTab}
-        onValueChange={setActiveTab}
-      >
+        onValueChange={setActiveTab}>
         <TabsList className="mb-6">
           <TabsTrigger value="matches">
             Matches
             {matches?.length > 0 && (
-              <span className="ml-2 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
+              <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
                 {matches.length}
               </span>
             )}
@@ -104,7 +107,7 @@ export default function MatchesPage() {
           <TabsTrigger value="requests">
             Requests
             {requests?.length > 0 && (
-              <span className="ml-2 bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full">
+              <span className="ml-2 rounded-full bg-amber-500 px-2 py-0.5 text-xs text-white">
                 {requests.length}
               </span>
             )}
@@ -115,15 +118,15 @@ export default function MatchesPage() {
           {matchesLoading ? (
             renderLoadingSkeleton()
           ) : !matches?.length ? (
-            <div className="text-center py-12">
-              <Heart className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <div className="py-12 text-center">
+              <Heart className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
               <h3 className="text-lg font-medium">No matches yet</h3>
               <p className="text-muted-foreground">
                 When you match with someone, they'll appear here
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {matches.map((match: any) => (
                 <MatchCard key={match.matchId} match={match} />
               ))}
@@ -135,15 +138,15 @@ export default function MatchesPage() {
           {requestsLoading ? (
             renderLoadingSkeleton()
           ) : !requests?.length ? (
-            <div className="text-center py-12">
-              <Heart className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <div className="py-12 text-center">
+              <Heart className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
               <h3 className="text-lg font-medium">No pending requests</h3>
               <p className="text-muted-foreground">
                 When someone sends you a match request, it will appear here
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {requests.map((request: any) => (
                 <RequestCard
                   key={request.id}
@@ -157,65 +160,60 @@ export default function MatchesPage() {
         </TabsContent>
       </Tabs>
     </div>
-  );
+  )
 }
 
 function MatchCard({ match }: { match: any }) {
-  const router = useRouter();
-  
-  if (!match.profile) return null;
+  const router = useRouter()
+
+  if (!match.profile) return null
 
   const handleMessage = () => {
-    router.push(`/dashboard/messages/new?matchId=${match.matchId}`);
-  };
+    router.push(`/dashboard/messages/new?matchId=${match.matchId}`)
+  }
 
   const handleViewProfile = () => {
-    router.push(`/dashboard/profile/${match.userId}`);
-  };
+    router.push(`/dashboard/profile/${match.userId}`)
+  }
 
   return (
-    <div className="bg-card rounded-lg border border-border overflow-hidden flex flex-col">
-      <div className="p-4 flex gap-4">
+    <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-card">
+      <div className="flex gap-4 p-4">
         <div className="relative">
           <img
-            src={match.profile.image || "/placeholder-avatar.png"}
+            src={match.profile.image || '/placeholder-avatar.png'}
             alt={match.profile.name}
-            className="w-16 h-16 rounded-full object-cover border-2 border-primary"
+            className="h-16 w-16 rounded-full border-2 border-primary object-cover"
           />
-          <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full w-5 h-5 flex items-center justify-center">
-            <Check className="w-3 h-3 text-white" />
+          <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
+            <Check className="h-3 w-3 text-white" />
           </div>
         </div>
 
         <div>
-          <h3 className="font-bold text-lg">{match.profile.name}</h3>
-          <p className="text-muted-foreground text-sm line-clamp-2">
-            {match.profile.bio || "No bio available"}
+          <h3 className="text-lg font-bold">{match.profile.name}</h3>
+          <p className="line-clamp-2 text-sm text-muted-foreground">
+            {match.profile.bio || 'No bio available'}
           </p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="mt-1 text-xs text-muted-foreground">
             Matched {new Date(match.createdAt).toLocaleDateString()}
           </p>
         </div>
       </div>
 
-      <div className="mt-auto p-4 pt-0 flex gap-2">
-        <Button 
-          variant="outline" 
+      <div className="mt-auto flex gap-2 p-4 pt-0">
+        <Button
+          variant="outline"
           className="flex-1"
-          onClick={handleViewProfile}
-        >
+          onClick={handleViewProfile}>
           View Profile
         </Button>
-        <Button 
-          variant="pressed" 
-          className="flex-1"
-          onClick={handleMessage}
-        >
+        <Button variant="pressed" className="flex-1" onClick={handleMessage}>
           Message
         </Button>
       </div>
     </div>
-  );
+  )
 }
 
 function RequestCard({
@@ -223,66 +221,64 @@ function RequestCard({
   onAccept,
   onReject,
 }: {
-  request: any;
-  onAccept: () => void;
-  onReject: () => void;
+  request: any
+  onAccept: () => void
+  onReject: () => void
 }) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleAccept = async () => {
-    setIsLoading(true);
-    await onAccept();
-    setIsLoading(false);
-  };
+    setIsLoading(true)
+    await onAccept()
+    setIsLoading(false)
+  }
 
   const handleReject = async () => {
-    setIsLoading(true);
-    await onReject();
-    setIsLoading(false);
-  };
+    setIsLoading(true)
+    await onReject()
+    setIsLoading(false)
+  }
 
   return (
-    <div className="bg-card rounded-lg border border-border overflow-hidden">
-      <div className="p-4 flex gap-4">
+    <div className="overflow-hidden rounded-lg border border-border bg-card">
+      <div className="flex gap-4 p-4">
         <img
           src={
-            request.sender.gitDateProfile?.image || "/placeholder-avatar.png"
+            request.sender.gitDateProfile?.image || '/placeholder-avatar.png'
           }
           alt={request.sender.gitDateProfile?.name}
-          className="w-16 h-16 rounded-full object-cover"
+          className="h-16 w-16 rounded-full object-cover"
         />
 
         <div>
           <h3 className="font-bold">{request.sender.gitDateProfile?.name}</h3>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             {request.sender.gitDateProfile?.bio?.substring(0, 60) ||
-              "No bio available"}
-            {request.sender.gitDateProfile?.bio?.length > 60 ? "..." : ""}
+              'No bio available'}
+            {request.sender.gitDateProfile?.bio?.length > 60 ? '...' : ''}
           </p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="mt-1 text-xs text-muted-foreground">
             Sent request {new Date(request.createdAt).toLocaleDateString()}
           </p>
         </div>
       </div>
 
-      <div className="p-4 pt-0 flex gap-2">
+      <div className="flex gap-2 p-4 pt-0">
         <Button
           variant="outline"
           className="flex-1"
           onClick={handleReject}
-          disabled={isLoading}
-        >
-          <X className="mr-1 w-4 h-4" /> Reject
+          disabled={isLoading}>
+          <X className="mr-1 h-4 w-4" /> Reject
         </Button>
         <Button
           variant="default"
           className="flex-1"
           onClick={handleAccept}
-          disabled={isLoading}
-        >
-          <Check className="mr-1 w-4 h-4" /> Accept
+          disabled={isLoading}>
+          <Check className="mr-1 h-4 w-4" /> Accept
         </Button>
       </div>
     </div>
-  );
+  )
 }

@@ -9,19 +9,7 @@ import { Skeleton } from './ui/skeleton';
 export const SetupReminder = () =>{
      const router = useRouter();
       const {setupDone, isLoading: setupLoading} = useProfileSetupStatus();
- if (setupLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center space-y-4">
-            <Skeleton className="h-12 w-12 rounded-full mx-auto" />
-            <Skeleton className="h-4 w-48 mx-auto" />
-            <Skeleton className="h-4 w-32 mx-auto" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+ 
     return  <div className="container mx-auto px-4 py-8 max-w-4xl">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}

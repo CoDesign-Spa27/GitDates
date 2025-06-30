@@ -1,38 +1,38 @@
-import { NextRequest, NextResponse } from "next/server";
-import { Octokit } from "@octokit/rest";
-import { getToken } from "next-auth/jwt";
-import prisma from "../../../lib/prisma";
+import { NextRequest, NextResponse } from 'next/server'
+import { Octokit } from '@octokit/rest'
+import { getToken } from 'next-auth/jwt'
+import prisma from '../../../lib/prisma'
 
 export async function GET(req: NextRequest) {
   try {
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
 
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
     const account = await prisma.account.findFirst({
       where: {
         userId: token.sub,
-        provider: "github",
+        provider: 'github',
       },
       select: {
         access_token: true,
       },
-    });
+    })
 
     if (!account?.access_token) {
       return NextResponse.json(
-        { error: "No GitHub access token found" },
+        { error: 'No GitHub access token found' },
         { status: 401 }
-      );
+      )
     }
 
     const octokit = new Octokit({
       auth: account.access_token,
-    });
+    })
 
-    const { data: userData } = await octokit.rest.users.getAuthenticated();
+    const { data: userData } = await octokit.rest.users.getAuthenticated()
 
     const contributionsQuery = `query {
       user(login: "${userData.login}") {
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
           }
         }
       }
-    }`;
+    }`
 
     const [repos, gists, followers, following, starredRepos, contributions] =
       await Promise.all([
@@ -65,11 +65,11 @@ export async function GET(req: NextRequest) {
         octokit.graphql<{
           user: {
             contributionsCollection: {
-              contributionCalendar: { totalContributions: number };
-            };
-          };
+              contributionCalendar: { totalContributions: number }
+            }
+          }
         }>(contributionsQuery),
-      ]);
+      ])
 
     const repoLanguages = await Promise.all(
       repos.data.slice(0, 5).map((repo) =>
@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
           repo: repo.name,
         })
       )
-    );
+    )
 
     const userProfile = {
       basicInfo: {
@@ -86,9 +86,9 @@ export async function GET(req: NextRequest) {
         name: userData.name,
         bio: userData.bio,
         avatar_url: userData.avatar_url,
-        city: "",
-        state: "",
-        country: "",
+        city: '',
+        state: '',
+        country: '',
         company: userData.company,
         blog: userData.blog,
         twitter_username: userData.twitter_username,
@@ -118,8 +118,8 @@ export async function GET(req: NextRequest) {
           .map((lang) => Object.keys(lang.data))
           .flat()
           .reduce((acc: Record<string, number>, curr) => {
-            acc[curr] = (acc[curr] || 0) + 1;
-            return acc;
+            acc[curr] = (acc[curr] || 0) + 1
+            return acc
           }, {}),
         starredReposCount: starredRepos.data.length,
       },
@@ -140,14 +140,14 @@ export async function GET(req: NextRequest) {
           created_at: gist.created_at,
         })),
       },
-    };
+    }
 
-    return NextResponse.json(userProfile);
+    return NextResponse.json(userProfile)
   } catch (error) {
-    console.error("Error fetching GitHub data:", error);
+    console.error('Error fetching GitHub data:', error)
     return NextResponse.json(
-      { error: "Failed to fetch GitHub data" },
+      { error: 'Failed to fetch GitHub data' },
       { status: 500 }
-    );
+    )
   }
 }

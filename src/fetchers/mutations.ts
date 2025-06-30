@@ -60,6 +60,11 @@ export const createGitDateProfileMutation = async (githubData: UserData) => {
   try {
     const response = await createGitDateProfile(githubData)
     if (!response?.status) {
+      toast({
+        title: 'Failed to create GitDate profile',
+        description: response?.message,
+        variant: 'destructive',
+      })
       throw new Error('Failed to create gitdate profile')
     }
     if (response?.status)
@@ -95,7 +100,7 @@ export const respondToMatchRequestMutation = async ({
   action,
 }: respondToMatchRequestArgumentsType) => {
   try {
-    const response = await respondToMatchRequest({matchId, action})
+    const response = await respondToMatchRequest({ matchId, action })
     if (!response?.status) {
       throw new ErrorHandler('Failed to respond', 'VALIDATION_ERROR')
     }
