@@ -154,14 +154,14 @@ const MatchPreferencePage = () => {
     return (
       <div>
         <div className="flex items-center justify-center p-4">
-          <Card className="w-full max-w-4xl rounded-2xl border-none">
+          <Card className="w-full rounded-2xl border-none ">
             <CardHeader>
               <Skeleton className="h-14 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-5 ">
+            <CardContent className="grid grid-cols-2 gap-16 ">
               {[...Array(6)].map((_, i) => (
-                <Skeleton key={i} className="h-4 w-full" />
+                <Skeleton key={i} className="h-6 w-full" />
               ))}
             </CardContent>
           </Card>
@@ -174,11 +174,7 @@ const MatchPreferencePage = () => {
     <div className="">
       <div className="w-full mx-auto">
         <Card className="border-none">
-          {matchPreferenceLoding ? (
-            <CardContent className="flex justify-center py-6">
-              <div>Loading...</div>
-            </CardContent>
-          ) : (
+        
             <CardHeader>
               <CardTitle className="text-3xl font-bold text-gitdate">
                 Match Preferences
@@ -187,7 +183,7 @@ const MatchPreferencePage = () => {
                 Set your preferences to find the perfect coding partner
               </CardDescription>
             </CardHeader>
-          )}
+          
           <CardContent>
             <Form {...form}>
               <form
