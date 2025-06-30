@@ -10,6 +10,7 @@ import useSWR from "swr";
 import { findMatchesFetcher, getAllAccountsFetcher } from "@/fetchers/fetchers";
 import { useProfileSetupStatus } from "@/components/hooks/useProfileSetupStatus";
 import { SetupReminder } from "@/components/setup-reminder";
+import { ShareGitDate } from "@/components/share-gitdate";
 
 export default function Explore() {
   const { data: session } = useSession();
@@ -66,14 +67,6 @@ export default function Explore() {
     []
   );
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen text-red-500">
-        Error: {error}
-      </div>
-    );
-  }
-
   if (!setupDone && !isAccountsLoading && !isMatchesLoading) {
     return <SetupReminder />
   }
@@ -95,9 +88,12 @@ export default function Explore() {
       ) : activeTab === "matches" ? (
         <div className="mb-12">
           {!filteredMatches || filteredMatches.length === 0 ? (
-            <div className="text-gray-500 text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <p className="text-lg">No matches found</p>
-              <p className="text-sm mt-2">Keep exploring to find potential matches!</p>
+            <div className="text-center py-12 bg-gray-50 dark:bg-neutral-900 rounded-lg">
+              <p className="text-lg font-medium text-neutral-900 dark:text-neutral-100">No matches found</p>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2">Keep exploring to find potential matches!</p>
+              <div className="mt-6">
+                <ShareGitDate />
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -115,9 +111,12 @@ export default function Explore() {
       ) : (
         <div>
           {!accounts?.additional || accounts.additional.length === 0 ? (
-            <div className="text-gray-500 text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <p className="text-lg">No developers found</p>
-              <p className="text-sm mt-2">Be the first to join our community!</p>
+            <div className="text-neutral-500 text-center py-12 bg-neutral-50 dark:bg-neutral-900 rounded-lg">
+              <p className="text-lg font-medium text-neutral-900 dark:text-neutral-100">No developers found</p>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2">Be the first to join our community!</p>
+              <div className="mt-6">
+                <ShareGitDate />
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
