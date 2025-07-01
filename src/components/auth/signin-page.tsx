@@ -26,7 +26,7 @@ const Signin = () => {
     e.preventDefault()
     e.stopPropagation()
     try {
-      await signIn('github', { redirect: true, callbackUrl: '/dashboard' })
+      await signIn('github', { redirect: false, callbackUrl: '/dashboard' })
     } catch (error) {
       console.error(error)
       setError('An error occurred during Google sign-in')
