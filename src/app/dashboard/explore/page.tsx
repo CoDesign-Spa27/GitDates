@@ -127,11 +127,16 @@ export default function Explore() {
       ) : (
         <div>
           {!accounts?.additional || accounts.additional.length === 0 ? (
-            <div className="rounded-lg bg-gray-50 py-12 text-center text-gray-500 dark:bg-gray-800">
-              <p className="text-lg">No developers found</p>
-              <p className="mt-2 text-sm">
+              <div className="rounded-lg bg-gray-50 py-12 text-center dark:bg-neutral-900">
+              <p className="text-lg font-medium text-neutral-900 dark:text-neutral-100">
+                No developers found
+              </p>
+              <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
                 Be the first to join our community!
               </p>
+              <div className="mt-6">
+                <ShareGitDate />
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

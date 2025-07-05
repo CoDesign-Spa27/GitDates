@@ -2,6 +2,8 @@ import NextAuth, { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import prisma from './prisma'
 import GithubProvider from 'next-auth/providers/github'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: 'jwt' },
@@ -17,10 +19,54 @@ export const authOptions: NextAuthOptions = {
         },
       },
     }),
+    CredentialsProvider({
+      name: 'credentials',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null
+        }
+
+        const user = await prisma.user.findUnique({
+          where: {
+            email: credentials.email,
+          },
+        })
+
+        if (!user || !user.password) {
+          return null
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password,
+          user.password
+        )
+
+        if (!isPasswordValid) {
+          return null
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
+        }
+      },
+    }),
   ],
 
   callbacks: {
     async signIn({ user, account, profile, email }) {
+      // Handle credentials (email/password) login
+      if (account?.provider === 'credentials') {
+        return true
+      }
+
+      // Handle GitHub login
       if (!profile || !user.email) {
         console.error('Missing profile or user email')
         return false
@@ -40,41 +86,75 @@ export const authOptions: NextAuthOptions = {
             include: { accounts: true },
           })
 
-          if (existingUser && existingUser.accounts.length === 0) {
-            // If user exists but has no linked accounts, create the account link
-            await prisma.account.create({
+          if (existingUser) {
+            // Check if this GitHub account is already linked
+            const existingGitHubAccount = existingUser.accounts.find(
+              (acc) =>
+                acc.provider === 'github' &&
+                acc.providerAccountId === account.providerAccountId
+            )
+
+            if (!existingGitHubAccount) {
+              // Link the GitHub account to existing user
+              await prisma.account.create({
+                data: {
+                  userId: existingUser.id,
+                  type: account.type,
+                  provider: account.provider,
+                  providerAccountId: account.providerAccountId,
+                  access_token: account.access_token,
+                  token_type: account.token_type,
+                  scope: account.scope,
+                },
+              })
+            }
+
+            // Update user with GitHub data
+            await prisma.user.update({
+              where: { id: existingUser.id },
               data: {
-                userId: existingUser.id,
-                type: account.type,
-                provider: account.provider,
-                providerAccountId: account.providerAccountId,
-                access_token: account.access_token,
-                token_type: account.token_type,
-                scope: account.scope,
+                name: githubProfile.name || existingUser.name,
+                image: githubProfile.avatar_url || existingUser.image,
+                username: githubProfile.login,
+              },
+            })
+          } else {
+            // Create new user (GitHub signup)
+            await prisma.user.create({
+              data: {
+                email: user.email,
+                name: githubProfile.name || user.name,
+                image: githubProfile.avatar_url || user.image,
+                username: githubProfile.login,
               },
             })
           }
-
-          await prisma.user.upsert({
-            where: { email: user.email },
-            create: {
-              email: user.email,
-              name: githubProfile.name || user.name,
-              image: githubProfile.avatar_url || user.image,
-              username: githubProfile.login,
-            },
-            update: {
-              name: githubProfile.name || user.name,
-              image: githubProfile.avatar_url || user.image,
-              username: githubProfile.login,
-            },
-          })
         } catch (error) {
           console.error('Error managing user profile:', error)
           return false
         }
       }
       return true
+    },
+
+    async jwt({ token, user, account }) {
+      // Persist user id and account info in token
+      if (user) {
+        token.id = user.id
+      }
+      if (account?.provider === 'github') {
+        token.githubLinked = true
+      }
+      return token
+    },
+
+    async session({ session, token }) {
+      // Send properties to the client
+      if (token) {
+        session.user.id = token.id as string
+        session.githubLinked = token.githubLinked as boolean
+      }
+      return session
     },
   },
 

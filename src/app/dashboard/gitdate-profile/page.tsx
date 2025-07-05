@@ -32,7 +32,10 @@ import { useGitDate } from '@/components/hooks/useGitdate'
 import { UserData } from '../../../types/user'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CreateGitDateProfile } from '@/components/create-gitdate-profile'
+import { ConnectGitHub } from '@/components/connect-github'
 import imageCompression from 'browser-image-compression'
+import { checkUserGitHubConnection } from '@/actions/auth.action'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface GitDateProfileType {
   githubUsername: string
@@ -67,14 +70,67 @@ const GitDateProfile = () => {
   const session = useSession()
   const email = session.data?.user?.email
   const [uploading, setUploading] = useState(false)
+  const [needsGitHubConnection, setNeedsGitHubConnection] = useState(false)
+  const [checkingConnection, setCheckingConnection] = useState(true)
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
   const [gitDetails, setGitDetails] = useState<any | null>(null)
+
+  // Check if user needs to connect GitHub account
+  useEffect(() => {
+    const checkGitHubConnection = async () => {
+      if (!email) return
+
+      try {
+        setCheckingConnection(true)
+        const response = await checkUserGitHubConnection()
+
+        if (response.status) {
+          setNeedsGitHubConnection(response.additional.needsGitHubConnection)
+
+          // If user just connected GitHub (coming from OAuth), show success message
+          if (
+            searchParams.get('connected') === 'true' &&
+            !response.additional.needsGitHubConnection
+          ) {
+            toast({
+              title: 'GitHub connected successfully!',
+              description:
+                'Your GitHub account has been linked. Loading your profile...',
+              variant: 'success',
+            })
+            // Clean up URL
+            router.replace('/dashboard/gitdate-profile')
+          }
+        }
+      } catch (error) {
+        console.error('Error checking GitHub connection:', error)
+      } finally {
+        setCheckingConnection(false)
+      }
+    }
+
+    checkGitHubConnection()
+  }, [email, searchParams, router])
+
   useEffect(() => {
     const fetchUserData = async () => {
+      // Skip fetching GitHub stats if user needs to connect GitHub first
+      if (needsGitHubConnection) {
+        setLoading(false)
+        return
+      }
+
       try {
         setLoading(true)
         setError(null)
         const response = await fetch('/api/getUserStats')
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch user stats')
+        }
+
         const data = await response.json()
         setGitDetails(data)
       } catch (error) {
@@ -85,8 +141,10 @@ const GitDateProfile = () => {
       }
     }
 
-    fetchUserData()
-  }, [])
+    if (!checkingConnection) {
+      fetchUserData()
+    }
+  }, [needsGitHubConnection, checkingConnection])
 
   // Use the GitDate hook
   const { gitdateProfile, createGitDateProfile, updateGitDateProfile } =
@@ -212,6 +270,15 @@ const GitDateProfile = () => {
     }
   }
 
+  const handleGitHubConnectionSuccess = () => {
+    // Refresh the connection status
+    setCheckingConnection(true)
+    setNeedsGitHubConnection(false)
+
+    // Add connected parameter to URL so we can show success message on redirect
+    router.push('/dashboard/gitdate-profile?connected=true')
+  }
+
   const onSubmit = async (formData: EditProfileForm & UserData) => {
     console.log(formData, 'form data')
     try {
@@ -241,7 +308,7 @@ const GitDateProfile = () => {
     }
   }
 
-  if (loading || gitdateProfile.isLoading) {
+  if (checkingConnection || loading || gitdateProfile.isLoading) {
     return (
       <div className="min-h-screen">
         <div className="container mx-auto max-w-4xl px-4 py-8">
@@ -263,6 +330,11 @@ const GitDateProfile = () => {
         </div>
       </div>
     )
+  }
+
+  // Show GitHub connection component for email/password users who haven't connected
+  if (needsGitHubConnection) {
+    return <ConnectGitHub onSuccess={handleGitHubConnectionSuccess} />
   }
 
   if (!profile && !gitdateProfile.isLoading) {
@@ -515,29 +587,28 @@ const GitDateProfile = () => {
             {/* Languages Card */}
             <Card className="p-6 shadow-sm">
               <h2 className="mb-6 flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
-                <Code2 className="h-5 w-5 text-purple-600" />
+                <Code2 className="h-5 w-5 text-gitdate" />
                 Top Languages
               </h2>
 
-              <div className="flex flex-wrap gap-2">
-                {profile?.mainLanguages?.map((lang: any, index: any) => (
-                  <Badge
-                    key={lang}
-                    className={`rounded-md px-3 py-2 text-sm font-medium transition-all hover:scale-105 ${
-                      index === 0
-                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-                        : index === 1
-                          ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
-                          : index === 2
-                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                            : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'
-                    }`}>
-                    {lang}
-                  </Badge>
-                ))}
-                {(!profile?.mainLanguages ||
-                  profile.mainLanguages.length === 0) && (
-                  <p className="text-sm text-gray-500">No languages found</p>
+              <div className="space-y-3">
+                {profile?.mainLanguages && profile.mainLanguages.length > 0 ? (
+                  profile.mainLanguages.slice(0, 5).map((language, index) => (
+                    <div key={language} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                          {language}
+                        </span>
+                        <Badge variant="secondary" className="text-xs">
+                          #{index + 1}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-sm text-slate-500 dark:text-slate-400">
+                    No languages data available
+                  </p>
                 )}
               </div>
             </Card>
