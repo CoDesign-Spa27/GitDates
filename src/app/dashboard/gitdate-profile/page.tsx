@@ -174,6 +174,34 @@ const GitDateProfile = () => {
     },
   })
 
+  const cropImageToSquare = async (file: File): Promise<Blob> => {
+    return new Promise((resolve) => {
+      const img = new Image()
+      img.src = URL.createObjectURL(file)
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const size = Math.min(img.width, img.height)
+        canvas.width = size
+        canvas.height = size
+
+        const ctx = canvas.getContext('2d')
+        if (!ctx) throw new Error('Could not get canvas context')
+
+        // Calculate dimensions to crop from center
+        const offsetX = (img.width - size) / 2
+        const offsetY = (img.height - size) / 2
+
+        ctx.drawImage(img, offsetX, offsetY, size, size, 0, 0, size, size)
+
+        canvas.toBlob((blob) => {
+          if (!blob) throw new Error('Could not create blob')
+          resolve(blob)
+        }, file.type)
+      }
+    })
+  }
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const file = e.target.files?.[0]
@@ -197,21 +225,36 @@ const GitDateProfile = () => {
         return
       }
 
+      // Crop image to square before preview
+      const croppedBlob = await cropImageToSquare(file)
       const reader = new FileReader()
       reader.onloadend = () => {
         setImagePreview(reader.result as string)
       }
-      reader.readAsDataURL(file)
+      reader.readAsDataURL(croppedBlob)
 
       setUploading(true)
 
-      const publicUrl = await uploadImage(e)
+      // Create a new File from the cropped blob
+      const croppedFile = new File([croppedBlob], file.name, {
+        type: file.type,
+      })
+
+      // Replace the original file with cropped one in the event
+      const newEvent = {
+        ...e,
+        target: {
+          ...e.target,
+          files: [croppedFile],
+        },
+      } as unknown as React.ChangeEvent<HTMLInputElement>
+
+      const publicUrl = await uploadImage(newEvent)
 
       if (!publicUrl || !email) {
         throw new Error('Failed to upload image')
       }
 
-      // Update avatar in database
       const result = await updateAvatar({ email, image: publicUrl })
 
       if (result?.success) {
@@ -221,12 +264,10 @@ const GitDateProfile = () => {
           variant: 'success',
         })
 
-        // Refresh the profile data
         if (gitdateProfile.refetch) {
           await gitdateProfile.refetch()
         }
 
-        // Clear preview after successful upload
         setImagePreview(null)
       } else {
         throw new Error(result?.error || 'Failed to update avatar')
@@ -271,11 +312,9 @@ const GitDateProfile = () => {
   }
 
   const handleGitHubConnectionSuccess = () => {
-    // Refresh the connection status
     setCheckingConnection(true)
     setNeedsGitHubConnection(false)
 
-    // Add connected parameter to URL so we can show success message on redirect
     router.push('/dashboard/gitdate-profile?connected=true')
   }
 
