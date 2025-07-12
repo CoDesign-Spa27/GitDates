@@ -25,6 +25,7 @@ const Signin = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showSignUpPassword, setShowSignUpPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const router = useRouter()
 
   const {
@@ -60,6 +61,7 @@ const Signin = () => {
     e.preventDefault()
     e.stopPropagation()
     setIsLoading(true)
+    setError('')
     try {
       await signIn('github', { redirect: false, callbackUrl: '/dashboard' })
     } catch (error) {
@@ -142,28 +144,30 @@ const Signin = () => {
   }
 
   return (
-    <div className="flex items-center justify-center sm:min-h-screen mx-5">
-      <Card className="w-full max-w-4xl rounded-lg border bg-neutral-800 px-8 py-8 shadow-lg">
+    <div className="mx-5 flex items-center justify-center sm:min-h-screen">
+      <Card className="w-full max-w-4xl rounded-lg border bg-neutral-800 px-8 py-8 shadow-lg transition-all duration-300 hover:shadow-xl">
         <div className="flex flex-col items-center justify-center space-y-6">
-          <h1 className="w-full text-center font-riffic text-xl text-white">
+          <h1 className="w-full text-center font-riffic text-xl text-white transition-opacity duration-300">
             Get started with GitDates
           </h1>
 
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-2 transition-all duration-300">
               <TabsTrigger
                 value="signin"
-                className="px-0 py-1 focus:border-b-2">
+                className="px-0 py-2 transition-all duration-300  ">
                 Sign In
               </TabsTrigger>
               <TabsTrigger
                 value="signup"
-                className="px-0 py-1 focus:border-b-2">
+                className="px-0 py-2 transition-all duration-300 ">
                 Sign Up
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="signin" className="space-y-4 pt-4">
+            <TabsContent
+              value="signin"
+              className="space-y-6 pt-6 duration-300 animate-in fade-in-0 slide-in-from-bottom-2">
               <div className="flex justify-center">
                 <GithubOauthButton
                   handleSignIn={(e) => handleSignInWithGithub(e)}
@@ -172,21 +176,22 @@ const Signin = () => {
               </div>
 
               <div className="flex w-full items-center">
-                <div className="h-px flex-1 bg-neutral-600"></div>
-                <span className="px-4 font-mono text-sm text-gray-400">or</span>
-                <div className="h-px flex-1 bg-neutral-600"></div>
+                <div className="h-px flex-1 bg-neutral-600 transition-colors duration-300"></div>
+                <span className="px-4 font-mono text-sm text-gray-400 transition-colors duration-300">
+                  or
+                </span>
+                <div className="h-px flex-1 bg-neutral-600 transition-colors duration-300"></div>
               </div>
 
               <form
                 onSubmit={handleSubmitSignIn(handleSignInWithCredentials)}
                 className="space-y-4">
-                <div>
-
+                <div className="space-y-2">
                   <Input
                     id="signin-email"
                     type="email"
                     placeholder="Enter your email"
-                    className="border-neutral-600 bg-neutral-800 text-white"
+                    className="border-neutral-600 bg-neutral-800 text-white transition-all duration-300 hover:border-neutral-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     {...registerSignIn('email', {
                       required: 'Email is required',
                       pattern: {
@@ -196,19 +201,19 @@ const Signin = () => {
                     })}
                   />
                   {signInErrors.email && (
-                    <p className="mt-1 text-sm text-red-400">
+                    <p className="mt-1 text-sm text-red-400 duration-200 animate-in fade-in-0 slide-in-from-top-1">
                       {signInErrors.email.message}
                     </p>
                   )}
                 </div>
 
-                <div>
+                <div className="space-y-2">
                   <div className="relative">
                     <Input
                       id="signin-password"
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Enter your password"
-                      className="border-neutral-600 bg-neutral-800 pr-10 text-white"
+                      className="border-neutral-600 bg-neutral-800 pr-10 text-white transition-all duration-300 hover:border-neutral-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                       {...registerSignIn('password', {
                         required: 'Password is required',
                       })}
@@ -216,22 +221,29 @@ const Signin = () => {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-400 hover:text-gray-200">
+                      className="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-400 transition-all duration-200 hover:scale-110 hover:text-gray-200">
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
                   {signInErrors.password && (
-                    <p className="mt-1 text-sm text-red-400">
+                    <p className="mt-1 text-sm text-red-400 duration-200 animate-in fade-in-0 slide-in-from-top-1">
                       {signInErrors.password.message}
                     </p>
                   )}
                 </div>
 
                 {error && (
-                  <p className="text-center text-sm text-red-400">{error}</p>
+                  <div className="duration-300 animate-in fade-in-0 slide-in-from-top-2">
+                    <p className="rounded-md border border-red-400/20 bg-red-400/10 px-3 py-2 text-center text-sm text-red-400 transition-all duration-300">
+                      {error}
+                    </p>
+                  </div>
                 )}
 
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button
+                  type="submit"
+                  className="w-full transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:scale-100"
+                  disabled={isLoading}>
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -244,121 +256,143 @@ const Signin = () => {
               </form>
             </TabsContent>
 
-            <TabsContent value="signup" className="space-y-4 pt-4">
+            <TabsContent
+              value="signup"
+              className="space-y-6 pt-6 duration-300 animate-in fade-in-0 slide-in-from-bottom-2">
               <div className="flex justify-center">
-              <GithubOauthButton
+                <GithubOauthButton
                   handleSignIn={(e) => handleSignInWithGithub(e)}
                   label="Github"
                 />
               </div>
 
               <div className="flex w-full items-center">
-                <div className="h-px flex-1 bg-neutral-600"></div>
-                <span className="px-4 font-mono text-sm text-gray-400">
+                <div className="h-px flex-1 bg-neutral-600 transition-colors duration-300"></div>
+                <span className="px-4 font-mono text-sm text-gray-400 transition-colors duration-300">
                   or create account
                 </span>
-                <div className="h-px flex-1 bg-neutral-600"></div>
+                <div className="h-px flex-1 bg-neutral-600 transition-colors duration-300"></div>
               </div>
 
               <form
                 onSubmit={handleSubmitSignUp(handleSignUp)}
                 className="space-y-4">
-                <div>
+                <div className="space-y-2">
                   <Input
                     id="signup-name"
                     type="text"
                     placeholder="Enter your full name"
-                    className="border-neutral-600 bg-neutral-800 text-white"
+                    className="border-neutral-600 bg-neutral-800 text-white transition-all duration-300 hover:border-neutral-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     {...registerSignUp('name', {
                       required: 'Name is required',
                     })}
                   />
                   {signUpErrors.name && (
-                    <p className="mt-1 text-sm text-red-400">
+                    <p className="mt-1 text-sm text-red-400 duration-200 animate-in fade-in-0 slide-in-from-top-1">
                       {signUpErrors.name.message}
                     </p>
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
+                <div className="space-y-2">
+                  <Input
+                    id="signup-email"
+                    type="email"
+                    placeholder="Enter your email"
+                    className="border-neutral-600 bg-neutral-800 text-white transition-all duration-300 hover:border-neutral-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    {...registerSignUp('email', {
+                      required: 'Email is required',
+                      pattern: {
+                        value: /^\S+@\S+$/i,
+                        message: 'Please enter a valid email',
+                      },
+                    })}
+                  />
+                  {signUpErrors.email && (
+                    <p className="mt-1 text-sm text-red-400 duration-200 animate-in fade-in-0 slide-in-from-top-1">
+                      {signUpErrors.email.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <div className="relative">
                     <Input
-                      id="signup-email"
-                      type="email"
-                      placeholder="Enter your email"
-                      className="border-neutral-600 bg-neutral-800 text-white"
-                      {...registerSignUp('email', {
-                        required: 'Email is required',
-                        pattern: {
-                          value: /^\S+@\S+$/i,
-                          message: 'Please enter a valid email',
+                      id="signup-password"
+                      type={showSignUpPassword ? 'text' : 'password'}
+                      placeholder="Create a password"
+                      className="border-neutral-600 bg-neutral-800 pr-10 text-white transition-all duration-300 hover:border-neutral-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                      {...registerSignUp('password', {
+                        required: 'Password is required',
+                        minLength: {
+                          value: 8,
+                          message: 'Password must be at least 8 characters',
                         },
                       })}
                     />
-                    {signUpErrors.email && (
-                      <p className="mt-1 text-sm text-red-400">
-                        {signUpErrors.email.message}
-                      </p>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => setShowSignUpPassword(!showSignUpPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-400 transition-all duration-200 hover:scale-110 hover:text-gray-200">
+                      {showSignUpPassword ? (
+                        <EyeOff size={16} />
+                      ) : (
+                        <Eye size={16} />
+                      )}
+                    </button>
                   </div>
-                  <div>
-                    <div className="relative">
-                      <Input
-                        id="signup-password"
-                        type={showSignUpPassword ? 'text' : 'password'}
-                        placeholder="Create a password"
-                        className="border-neutral-600 bg-neutral-800 pr-10 text-white"
-                        {...registerSignUp('password', {
-                          required: 'Password is required',
-                          minLength: {
-                            value: 8,
-                            message: 'Password must be at least 8 characters',
-                          },
-                        })}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowSignUpPassword(!showSignUpPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-400 hover:text-gray-200">
-                        {showSignUpPassword ? (
-                          <EyeOff size={16} />
-                        ) : (
-                          <Eye size={16} />
-                        )}
-                      </button>
-                    </div>
-                    {signUpErrors.password && (
-                      <p className="mt-1 text-sm text-red-400">
-                        {signUpErrors.password.message}
-                      </p>
-                    )}
-                  </div>
+                  {signUpErrors.password && (
+                    <p className="mt-1 text-sm text-red-400 duration-200 animate-in fade-in-0 slide-in-from-top-1">
+                      {signUpErrors.password.message}
+                    </p>
+                  )}
                 </div>
 
-                <div>
-                  <Input
-                    id="signup-confirm-password"
-                    type="password"
-                    placeholder="Confirm your password"
-                    className="border-neutral-600 bg-neutral-800 text-white"
-                    {...registerSignUp('confirmPassword', {
-                      required: 'Please confirm your password',
-                      validate: (value) =>
-                        value === watchPassword || 'Passwords do not match',
-                    })}
-                  />
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Input
+                      id="signup-confirm-password"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      placeholder="Confirm your password"
+                      className="border-neutral-600 bg-neutral-800 pr-10 text-white transition-all duration-300 hover:border-neutral-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                      {...registerSignUp('confirmPassword', {
+                        required: 'Please confirm your password',
+                        validate: (value) =>
+                          value === watchPassword || 'Passwords do not match',
+                      })}
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-400 transition-all duration-200 hover:scale-110 hover:text-gray-200">
+                      {showConfirmPassword ? (
+                        <EyeOff size={16} />
+                      ) : (
+                        <Eye size={16} />
+                      )}
+                    </button>
+                  </div>
                   {signUpErrors.confirmPassword && (
-                    <p className="mt-1 text-sm text-red-400">
+                    <p className="mt-1 text-sm text-red-400 duration-200 animate-in fade-in-0 slide-in-from-top-1">
                       {signUpErrors.confirmPassword.message}
                     </p>
                   )}
                 </div>
 
                 {error && (
-                  <p className="text-center text-sm text-red-400">{error}</p>
+                  <div className="duration-300 animate-in fade-in-0 slide-in-from-top-2">
+                    <p className="rounded-md border border-red-400/20 bg-red-400/10 px-3 py-2 text-center text-sm text-red-400 transition-all duration-300">
+                      {error}
+                    </p>
+                  </div>
                 )}
 
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button
+                  type="submit"
+                  className="w-full transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:scale-100"
+                  disabled={isLoading}>
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

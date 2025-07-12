@@ -12,7 +12,7 @@ export default function AuthPage() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 bg-gradient-to-br from-neutral-700 via-neutral-800 to-neutral-900 min-h-screen">
-      <div className="p-4 md:p-0 col-span-1">
+      <div className="flex items-center justify-center p-4 md:p-0 col-span-1">
         <Signin />
       </div>
       <div 
