@@ -34,6 +34,7 @@ export const ChatMessage = forwardRef<HTMLDivElement, ChatMessageProps>(
       }
     }
 
+
     return (
       <div
         ref={ref}

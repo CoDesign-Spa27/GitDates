@@ -153,8 +153,8 @@ const GitDateProfile = () => {
   const profile = gitdateProfile.data
   const { trigger: updateAvatar } = useSWRMutation(
     email ? ['updateAvatar', email] : null,
-    (_key, { arg }: { arg: { email: string; avatar: string } }) =>
-      updateUserAvatar(arg.email, arg.avatar)
+    (_key, { arg }: { arg: { email: string; image: string } }) =>
+      updateUserAvatar(arg.email, arg.image)
   )
 
   const {
@@ -212,7 +212,7 @@ const GitDateProfile = () => {
       }
 
       // Update avatar in database
-      const result = await updateAvatar({ email, avatar: publicUrl })
+      const result = await updateAvatar({ email, image: publicUrl })
 
       if (result?.success) {
         toast({

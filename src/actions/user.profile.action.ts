@@ -102,6 +102,7 @@ export const updateUserAvatar = async (email: string, image: string) => {
       throw new Error('User not found')
     }
 
+    // Update both user and gitdate profile images
     const [updatedUser, updatedGitDateProfile] = await prisma.$transaction([
       prisma.user.update({
         where: {
@@ -134,7 +135,10 @@ export const updateUserAvatar = async (email: string, image: string) => {
     return {
       success: true,
       message: 'Avatar updated successfully',
-      data: updatedUser,
+      data: {
+        user: updatedUser,
+        gitDateProfile: updatedGitDateProfile
+      },
     }
   } catch (err) {
     console.error('Error updating avatar:', err)
@@ -220,7 +224,6 @@ export const getGitDateProfile = async () => {
     return new ErrorHandler('Error fetching Gitdate profile', 'DATABASE_ERROR')
   }
 }
-
 export const updateGitDateProfile = async (
   githubData: UserData & {
     name?: string
@@ -245,19 +248,31 @@ export const updateGitDateProfile = async (
       throw new Error('User not found')
     }
 
-    const updatedGithubProfile = await prisma.gitDateProfile.update({
-      where: {
-        userId: user.id,
-      },
-      data: {
-        name: githubData.name,
-        city: githubData.city,
-        state: githubData.state,
-        country: githubData.country,
-        bio: githubData.bio,
-        blog: githubData.blog,
-      },
-    })
+    // Update both user and gitdate profile
+    const [updatedUser, updatedGithubProfile] = await prisma.$transaction([
+      prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          name: githubData.name,
+        },
+      }),
+      prisma.gitDateProfile.update({
+        where: {
+          userId: user.id,
+        },
+        data: {
+          name: githubData.name,
+          city: githubData.city,
+          state: githubData.state,
+          country: githubData.country,
+          bio: githubData.bio,
+          blog: githubData.blog,
+        },
+      }),
+    ])
+
     const response = new SuccessResponse(
       'Successfully updated gitdate profile',
       200,
