@@ -71,14 +71,49 @@ export async function GET(req: NextRequest) {
         }>(contributionsQuery),
       ])
 
-    const repoLanguages = await Promise.all(
-      repos.data.slice(0, 5).map((repo) =>
-        octokit.rest.repos.listLanguages({
-          owner: userData.login,
+    // Filter and validate repositories before fetching languages
+    const validRepos = repos.data
+      .filter((repo) => {
+        // Filter out repos with problematic names or that are inaccessible
+        const hasValidName = repo.name && repo.name.length > 0 && !repo.name.endsWith('-')
+        const isAccessible = !repo.private || repo.permissions?.admin || repo.permissions?.push
+        return hasValidName && isAccessible && !repo.fork // Optionally exclude forks
+      })
+      .slice(0, 5)
+
+    // Fetch languages with individual error handling
+    const repoLanguagesPromises = validRepos.map(async (repo) => {
+      try {
+        const languages = await octokit.rest.repos.listLanguages({
+          owner: repo.owner.login, // Use repo.owner.login instead of userData.login
           repo: repo.name,
         })
-      )
-    )
+        return { repo: repo.name, languages: languages.data }
+      } catch (error) {
+        console.warn(`Failed to fetch languages for ${repo.name}:`, error)
+        return { repo: repo.name, languages: {} }
+      }
+    })
+
+    const repoLanguages = await Promise.all(repoLanguagesPromises)
+
+    // Process languages with weights based on bytes of code
+    const languageStats: Record<string, number> = {}
+    
+    repoLanguages.forEach(({ languages }) => {
+      Object.entries(languages).forEach(([lang, bytes]) => {
+        languageStats[lang] = (languageStats[lang] || 0) + bytes
+      })
+    })
+
+    // Sort languages by total bytes and get top languages
+    const topLanguages = Object.entries(languageStats)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10)
+      .reduce((acc, [lang, bytes]) => {
+        acc[lang] = bytes
+        return acc
+      }, {} as Record<string, number>)
 
     const userProfile = {
       basicInfo: {
@@ -114,13 +149,9 @@ export async function GET(req: NextRequest) {
         })),
       },
       codingProfile: {
-        topLanguages: repoLanguages
-          .map((lang) => Object.keys(lang.data))
-          .flat()
-          .reduce((acc: Record<string, number>, curr) => {
-            acc[curr] = (acc[curr] || 0) + 1
-            return acc
-          }, {}),
+
+        
+        topLanguages: topLanguages,
         starredReposCount: starredRepos.data.length,
       },
       activity: {
