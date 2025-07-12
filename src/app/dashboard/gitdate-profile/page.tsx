@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -62,7 +62,7 @@ export interface EditProfileForm {
   blog: string
 }
 
-const GitDateProfile = () => {
+const GitDateProfileContent = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
@@ -623,7 +623,6 @@ const GitDateProfile = () => {
               </div>
             </Card>
 
-            {/* Languages Card */}
             <Card className="p-6 shadow-sm">
               <h2 className="mb-6 flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
                 <Code2 className="h-5 w-5 text-gitdate" />
@@ -655,6 +654,14 @@ const GitDateProfile = () => {
         )}
       </div>
     </div>
+  )
+}
+
+const GitDateProfile = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <GitDateProfileContent />
+    </Suspense>
   )
 }
 

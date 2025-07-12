@@ -155,12 +155,12 @@ const Signin = () => {
             <TabsList className="grid w-full grid-cols-2 transition-all duration-300">
               <TabsTrigger
                 value="signin"
-                className="px-0 py-2 transition-all duration-300  ">
+                className="px-0 py-2 transition-all duration-300">
                 Sign In
               </TabsTrigger>
               <TabsTrigger
                 value="signup"
-                className="px-0 py-2 transition-all duration-300 ">
+                className="px-0 py-2 transition-all duration-300">
                 Sign Up
               </TabsTrigger>
             </TabsList>
@@ -191,7 +191,7 @@ const Signin = () => {
                     id="signin-email"
                     type="email"
                     placeholder="Enter your email"
-                    className="border-neutral-600 bg-neutral-800 text-white transition-all duration-300 hover:border-neutral-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    className="bg-neutral-800 text-white  border-neutral-600"
                     {...registerSignIn('email', {
                       required: 'Email is required',
                       pattern: {
@@ -213,7 +213,7 @@ const Signin = () => {
                       id="signin-password"
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Enter your password"
-                      className="border-neutral-600 bg-neutral-800 pr-10 text-white transition-all duration-300 hover:border-neutral-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                      className="bg-neutral-800 text-white  border-neutral-600"
                       {...registerSignIn('password', {
                         required: 'Password is required',
                       })}
@@ -282,7 +282,7 @@ const Signin = () => {
                     id="signup-name"
                     type="text"
                     placeholder="Enter your full name"
-                    className="border-neutral-600 bg-neutral-800 text-white transition-all duration-300 hover:border-neutral-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    className="bg-neutral-800 text-white   border-neutral-600"
                     {...registerSignUp('name', {
                       required: 'Name is required',
                     })}
@@ -299,7 +299,7 @@ const Signin = () => {
                     id="signup-email"
                     type="email"
                     placeholder="Enter your email"
-                    className="border-neutral-600 bg-neutral-800 text-white transition-all duration-300 hover:border-neutral-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    className="bg-neutral-800 text-white   border-neutral-600"
                     {...registerSignUp('email', {
                       required: 'Email is required',
                       pattern: {
@@ -321,7 +321,7 @@ const Signin = () => {
                       id="signup-password"
                       type={showSignUpPassword ? 'text' : 'password'}
                       placeholder="Create a password"
-                      className="border-neutral-600 bg-neutral-800 pr-10 text-white transition-all duration-300 hover:border-neutral-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                      className="bg-neutral-800 text-white   border-neutral-600"
                       {...registerSignUp('password', {
                         required: 'Password is required',
                         minLength: {
@@ -354,8 +354,8 @@ const Signin = () => {
                       id="signup-confirm-password"
                       type={showConfirmPassword ? 'text' : 'password'}
                       placeholder="Confirm your password"
-                      className="border-neutral-600 bg-neutral-800 pr-10 text-white transition-all duration-300 hover:border-neutral-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                      {...registerSignUp('confirmPassword', {
+                      className="bg-neutral-800 text-white   border-neutral-600 "
+                        {...registerSignUp('confirmPassword', {
                         required: 'Please confirm your password',
                         validate: (value) =>
                           value === watchPassword || 'Passwords do not match',
