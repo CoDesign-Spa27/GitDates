@@ -63,9 +63,8 @@ const Signin = () => {
     setIsLoading(true)
     setError('')
     try {
-      await signIn('github', { redirect: false, callbackUrl: '/dashboard' })
+      await signIn('github')
     } catch (error) {
-      console.error(error)
       setError('An error occurred during GitHub sign-in')
     } finally {
       setIsLoading(false)
@@ -89,7 +88,6 @@ const Signin = () => {
         router.push('/dashboard')
       }
     } catch (error) {
-      console.error('Sign in error:', error)
       setError('An error occurred during sign-in')
     } finally {
       setIsLoading(false)
@@ -132,7 +130,6 @@ const Signin = () => {
         setError(response.message || 'Failed to create account')
       }
     } catch (error) {
-      console.error('Sign up error:', error)
       setError('An error occurred during sign-up')
     } finally {
       setIsLoading(false)
@@ -191,7 +188,7 @@ const Signin = () => {
                     id="signin-email"
                     type="email"
                     placeholder="Enter your email"
-                    className="bg-neutral-800 text-white  border-neutral-600"
+                    className="border-neutral-600 bg-neutral-800 text-white"
                     {...registerSignIn('email', {
                       required: 'Email is required',
                       pattern: {
@@ -213,7 +210,7 @@ const Signin = () => {
                       id="signin-password"
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Enter your password"
-                      className="bg-neutral-800 text-white  border-neutral-600"
+                      className="border-neutral-600 bg-neutral-800 text-white"
                       {...registerSignIn('password', {
                         required: 'Password is required',
                       })}
@@ -282,7 +279,7 @@ const Signin = () => {
                     id="signup-name"
                     type="text"
                     placeholder="Enter your full name"
-                    className="bg-neutral-800 text-white   border-neutral-600"
+                    className="border-neutral-600 bg-neutral-800 text-white"
                     {...registerSignUp('name', {
                       required: 'Name is required',
                     })}
@@ -299,7 +296,7 @@ const Signin = () => {
                     id="signup-email"
                     type="email"
                     placeholder="Enter your email"
-                    className="bg-neutral-800 text-white   border-neutral-600"
+                    className="border-neutral-600 bg-neutral-800 text-white"
                     {...registerSignUp('email', {
                       required: 'Email is required',
                       pattern: {
@@ -321,7 +318,7 @@ const Signin = () => {
                       id="signup-password"
                       type={showSignUpPassword ? 'text' : 'password'}
                       placeholder="Create a password"
-                      className="bg-neutral-800 text-white   border-neutral-600"
+                      className="border-neutral-600 bg-neutral-800 text-white"
                       {...registerSignUp('password', {
                         required: 'Password is required',
                         minLength: {
@@ -354,8 +351,8 @@ const Signin = () => {
                       id="signup-confirm-password"
                       type={showConfirmPassword ? 'text' : 'password'}
                       placeholder="Confirm your password"
-                      className="bg-neutral-800 text-white   border-neutral-600 "
-                        {...registerSignUp('confirmPassword', {
+                      className="border-neutral-600 bg-neutral-800 text-white"
+                      {...registerSignUp('confirmPassword', {
                         required: 'Please confirm your password',
                         validate: (value) =>
                           value === watchPassword || 'Passwords do not match',

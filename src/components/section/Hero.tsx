@@ -27,7 +27,6 @@ import { useRouter } from 'next/navigation'
 import { AnimatedGradientText } from '../ui/animated-gradient-text'
 import { cn } from '@/lib/utils'
 import { CTAButton } from '../ui/cta-button'
- 
 
 const Hero = () => {
   const { scrollY } = useScroll()
@@ -56,13 +55,12 @@ const Hero = () => {
     'for(let i = 0; i < infinity; i++) { loveCoding(with: you); }',
     'class Relationship extends Perfect { constructor(you, me) {...} }',
   ]
- 
+
   return (
     <section
       id="home"
       ref={containerRef}
-      className="relative min-h-screen w-full overflow-hidden bg-[url('/rectangle.svg')] bg-cover bg-fixed bg-center bg-no-repeat md:bg-[url('/rectangle.svg')]">
-
+      className="relative min-h-screen w-full overflow-hidden bg-[url('https://gitdate-files.blr1.cdn.digitaloceanspaces.com/bg-images/hero-bg.png')] bg-cover bg-fixed bg-center bg-no-repeat md:bg-[url('https://gitdate-files.blr1.cdn.digitaloceanspaces.com/bg-images/hero-bg.png')]">
       <div className="pointer-events-none absolute inset-0">
         {codeSnippets.map((snippet, index) => (
           <motion.div

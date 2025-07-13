@@ -15,6 +15,7 @@ import { useMessage } from '@/components/hooks/useMessage'
 
 import { UserStatus } from '@/components/chat/user-status'
 import { VirtualizedChat } from '@/components/chat/virtualized-chat'
+import { ErrorHandler } from '@/lib/error'
 
 type Conversation = {
   id: string
@@ -64,7 +65,6 @@ export default function MessagesPage() {
           setConversation(data.additional)
         }
       },
-      onError: (err) => console.error('Error loading conversation:', err),
       onSettled: () => setLoading(false),
     })
   }, [conversationId])
@@ -150,7 +150,7 @@ export default function MessagesPage() {
     try {
       socketSendMessage(conversation.id, content)
     } catch (err) {
-      console.error('Failed to send message:', err)
+      return new ErrorHandler('Failed to send message', 'DATABASE_ERROR')
     } finally {
       setSendingMessage(false)
     }

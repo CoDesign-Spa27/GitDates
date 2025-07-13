@@ -23,7 +23,7 @@ export const createMatchPreferenceMutation = async (
     }
     if (response?.status) return response
   } catch (error) {
-    console.error('Error creating match preference:', error)
+ 
     throw error
   }
 }
@@ -36,7 +36,7 @@ export const updateAvatarMutation = async (email: string, avatar: string) => {
     }
     if (response?.success) return response
   } catch (error) {
-    console.error('Error updating avatar:', error)
+ 
     throw error
   }
 }

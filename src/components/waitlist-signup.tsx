@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { ErrorHandler } from '@/lib/error'
 
 interface WaitlistSignupProps {
   className?: string
@@ -53,7 +54,7 @@ export function WaitlistSignup({ className }: WaitlistSignupProps) {
       const data: WaitlistStats = await response.json()
       setTotalSignups(data.total)
     } catch (error) {
-      console.error('Failed to fetch total signups:', error)
+      return new ErrorHandler('Failed to fetch total signups', 'DATABASE_ERROR')
     }
   }
 

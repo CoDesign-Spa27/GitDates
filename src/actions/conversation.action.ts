@@ -112,7 +112,7 @@ export async function getOrCreateConversation(matchId: string) {
       },
     });
    
-    console.log(match, "Match found for user:", user.id);
+ 
     if (!match) throw new Error("Match not found or not accepted");
 
     // Get or create conversation for this match

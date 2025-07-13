@@ -4,6 +4,7 @@ import './globals.css'
 import localFont from 'next/font/local'
 import Provider from '@/providers/provider'
 import { GoogleAnalytics } from '@next/third-parties/google'
+import RemoveNextJsToast from '@/components/nextjspopupremove'
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -112,6 +113,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${riffic.variable} antialiased`}>
+      <RemoveNextJsToast />
         <Provider>{children}</Provider>
       </body>
       <GoogleAnalytics gaId="G-ETEF0ZPMZG" />

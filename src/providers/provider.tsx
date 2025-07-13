@@ -27,9 +27,10 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
     <AuthProvider>
       <ThemeProvider
         attribute="class"
-        defaultTheme="system"
+        defaultTheme="dark"
         enableSystem
         disableTransitionOnChange
+
         >
         {children}
         <Toaster />

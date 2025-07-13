@@ -41,7 +41,7 @@ export const signUpUser = async (data: SignUpData) => {
     const response = new SuccessResponse('User created successfully', 201, user)
     return response.serialize()
   } catch (error) {
-    console.error('Error creating user:', error)
+ 
     return new ErrorHandler('Failed to create user', 'DATABASE_ERROR')
   }
 }
@@ -79,7 +79,7 @@ export const checkUserGitHubConnection = async () => {
     )
     return response.serialize()
   } catch (error) {
-    console.error('Error checking GitHub connection:', error)
+ 
     return new ErrorHandler(
       'Failed to check GitHub connection',
       'DATABASE_ERROR'
@@ -159,7 +159,7 @@ export const linkGitHubAccount = async (githubAccountData: {
     )
     return response.serialize()
   } catch (error) {
-    console.error('Error linking GitHub account:', error)
+ 
     return new ErrorHandler('Failed to link GitHub account', 'DATABASE_ERROR')
   }
 }

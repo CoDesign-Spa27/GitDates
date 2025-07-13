@@ -40,7 +40,7 @@ export const ConnectGitHub = ({ onSuccess }: GitHubConnectionProps) => {
         })
       }
     } catch (error) {
-      console.error('Error connecting GitHub account:', error)
+ 
       toast({
         title: 'Error',
         description: 'Failed to connect GitHub account. Please try again.',

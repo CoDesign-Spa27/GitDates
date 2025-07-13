@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   typescript: {
@@ -11,10 +11,11 @@ const nextConfig: NextConfig = {
         fs: false,
       }
     }
-
     return config
+},
+  eslint: {
+    ignoreDuringBuilds: true,
   },
-
   /* config options here */
   images: {
     remotePatterns: [
@@ -30,6 +31,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'wrmaspjmyjwjapxdfwkl.supabase.co',
       },
+      {
+        protocol: 'https',
+        hostname: 'gitdate-files.blr1.cdn.digitaloceanspaces.com',
+      },
     ],
   },
   // async rewrites() {
@@ -42,4 +47,4 @@ const nextConfig: NextConfig = {
   // }
 }
 
-export default nextConfig;
+export default nextConfig

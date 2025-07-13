@@ -105,7 +105,7 @@ const GitDateProfileContent = () => {
           }
         }
       } catch (error) {
-        console.error('Error checking GitHub connection:', error)
+ 
       } finally {
         setCheckingConnection(false)
       }
@@ -134,7 +134,7 @@ const GitDateProfileContent = () => {
         const data = await response.json()
         setGitDetails(data)
       } catch (error) {
-        console.error('Error fetching data:', error)
+ 
         setError('Failed to load profile data. Please try again.')
       } finally {
         setLoading(false)
@@ -273,7 +273,7 @@ const GitDateProfileContent = () => {
         throw new Error(result?.error || 'Failed to update avatar')
       }
     } catch (err) {
-      console.error('Image upload error:', err)
+ 
       toast({
         title: 'Error uploading image',
         description: err instanceof Error ? err.message : 'Please try again',
@@ -304,7 +304,7 @@ const GitDateProfileContent = () => {
       setError(null)
       await createGitDateProfile.mutateAsync(gitDetails)
     } catch (error) {
-      console.error('Error creating profile:', error)
+ 
       setError('Failed to create profile. Please try again.')
     } finally {
       setLoading(false)
@@ -319,14 +319,14 @@ const GitDateProfileContent = () => {
   }
 
   const onSubmit = async (formData: EditProfileForm & UserData) => {
-    console.log(formData, 'form data')
+ 
     try {
       setLoading(true)
       setError(null)
       await updateGitDateProfile.mutateAsync(formData)
       setIsEditing(false)
     } catch (error) {
-      console.error('Error updating profile:', error)
+ 
       setError('Failed to update profile. Please try again.')
     } finally {
       setLoading(false)

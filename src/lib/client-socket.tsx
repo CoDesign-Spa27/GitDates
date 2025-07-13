@@ -50,14 +50,14 @@ export function useSocket() {
       const socket = socketRef.current;
 
       socket.on('connect', () => {
-        console.log('Socket connected');
+ 
         setIsConnected(true);
         setConnectionError(null);
         reconnectAttemptsRef.current = 0;
       });
 
       socket.on('disconnect', (reason) => {
-        console.log('Socket disconnected', reason);
+ 
         setIsConnected(false);
 
         if (reason === 'io server disconnect') {
@@ -90,7 +90,6 @@ export function useSocket() {
 
   const sendMessage = useCallback((conversationId: string, content: string) => {
     if (socketRef.current && isConnected) {
-      console.log('Emitting sendMessage event to socket', { conversationId, content });
       socketRef.current.emit('sendMessage', { conversationId, content });
       return true;
     }

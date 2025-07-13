@@ -2,7 +2,10 @@ import { getToken } from 'next-auth/jwt'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export default async function middleware(request: NextRequest) {
+export default async function middleware(
+  request: NextRequest,
+  response: NextResponse
+) {
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
@@ -24,7 +27,7 @@ export default async function middleware(request: NextRequest) {
     // Redirect to dashboard if authenticated and trying to access public page
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
-
+  response.headers.set('ngrok-skip-browser-warning', 'true')
   return NextResponse.next()
 }
 

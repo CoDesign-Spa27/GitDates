@@ -169,9 +169,9 @@ export function AppSidebar() {
                 isActive(item.url) && "bg-gitdate text-white rounded-full "
               )} />
               <span className="truncate">{item.title}</span>
-              {item.title === "Conversations" && unreadCounts && unreadCounts.total > 0 && (
+              {item.title === "Conversations" && unreadCounts && (unreadCounts as { total: number }).total > 0 && (
                 <SidebarMenuBadge className="bg-gitdate text-white">
-                  {unreadCounts.total}
+                  {(unreadCounts as { total: number }).total}
                 </SidebarMenuBadge>
               )}
             </SidebarMenuButton>

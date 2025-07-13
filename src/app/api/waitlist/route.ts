@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       id: waitlistEntry.id,
     })
   } catch (error) {
-    console.error('Waitlist signup error:', error)
+ 
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
       createdAt: user.createdAt
     })
   } catch (error) {
-    console.error('Waitlist get error:', error)
+ 
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -27,7 +27,6 @@ export const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
       })
 
     if (error) {
-      console.error('Supabase upload error:', error)
       throw new Error(error.message || 'Failed to upload image to storage.')
     }
 
@@ -45,7 +44,6 @@ export const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
     return publicUrl
   } catch (error) {
-    console.error('Image upload failed:', error)
     throw error
   }
 }

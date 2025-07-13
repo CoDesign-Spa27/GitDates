@@ -306,7 +306,7 @@ export const getAllAccounts = async () => {
     );
     return response.serialize();
   } catch (error) {
-    console.error("Error getting all accounts", error);
+ 
     throw new ErrorHandler("Error getting all accounts", "DATABASE_ERROR");
   }
 };
@@ -358,7 +358,7 @@ export const sendMatchRequest = async (receiverId: string) => {
 
     return match;
   } catch (error) {
-    console.error("Error sending match request", error);
+ 
     throw error;
   }
 };
@@ -390,7 +390,7 @@ export const getMatchRequests = async () => {
       },
     });
 
-    console.log(pendingRequests, "pendingReuqests")
+ 
     const response = new SuccessResponse(
      "All request fetched successfully",
       200,
@@ -398,7 +398,7 @@ export const getMatchRequests = async () => {
      )
      return response.serialize()
   } catch (error) {
-    console.error("Error getting match requests", error);
+ 
     throw new ErrorHandler("Error getting all accounts", "DATABASE_ERROR");
   }
 };
@@ -430,7 +430,7 @@ export const getMatchStatus = async (otherUserId: string) => {
       isSender: match.senderId === user.id,
     };
   } catch (error) {
-    console.error("Error getting match status", error);
+ 
     return null;
   }
 };
@@ -465,7 +465,7 @@ export const respondToMatchRequest = async ({
     })
     return updateMatch
   } catch (error) {
-    console.error('Error getting match requests:', error)
+ 
     throw error
   }
 }
@@ -519,7 +519,7 @@ export const getMyMatches = async () => {
         createdAt: match.createdAt,
       };
     })
-    console.log(formattedResponse, 'formatted response')
+ 
     const response = new SuccessResponse(
       "Matches fetched successfully",
       200,
@@ -528,7 +528,7 @@ export const getMyMatches = async () => {
 
     return response.serialize();
   } catch (error) {
-    console.error("Error getting matches:", error);
+ 
     throw error;
   }
 };

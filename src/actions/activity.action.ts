@@ -46,7 +46,7 @@ export const recordProfileView = async (viewedUserId: string) => {
 
     return { success: true };
   } catch (error) {
-    console.error("Error recording profile view:", error);
+ 
     throw new ErrorHandler("Error recording profile view", "DATABASE_ERROR");
   }
 }
@@ -107,7 +107,7 @@ export const getActivitySummary = async () => {
     );
     return response.serialize();
   } catch (error) {
-    console.error("Error getting activity summary:", error);
+ 
     throw new ErrorHandler("Error getting activity summary", "DATABASE_ERROR");
   }
 }

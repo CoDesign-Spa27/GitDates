@@ -34,7 +34,7 @@ export async function generateSocketToken(req: NextRequest) {
     )
     return token
   } catch (error) {
-    console.error('Error generating socket token', error)
+ 
     return null
   }
 }
@@ -52,7 +52,7 @@ export function verifySocketToken(token: string): {
     }
     return decoded
   } catch (error) {
-    console.error('Error verifying socket token', error)
+ 
     return null
   }
 }

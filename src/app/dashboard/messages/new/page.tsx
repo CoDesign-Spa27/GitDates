@@ -31,7 +31,7 @@ function ConversationCreator() {
           setLoading(false);
         }
       } catch (error) {
-        console.error("Error creating conversation:", error);
+ 
         setError("Failed to create conversation. Please try again.");
         setLoading(false);
       }

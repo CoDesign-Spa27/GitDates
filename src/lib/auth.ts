@@ -68,7 +68,7 @@ export const authOptions: NextAuthOptions = {
 
       // Handle GitHub login
       if (!profile || !user.email) {
-        console.error('Missing profile or user email')
+ 
         return false
       }
 
@@ -130,7 +130,7 @@ export const authOptions: NextAuthOptions = {
             })
           }
         } catch (error) {
-          console.error('Error managing user profile:', error)
+ 
           return false
         }
       }

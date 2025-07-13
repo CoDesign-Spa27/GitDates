@@ -1,24 +1,28 @@
 'use client'
-import { useEffect } from "react";
-import Signin from "@/components/auth/signin-page";
+import { useEffect } from 'react'
+import Signin from '@/components/auth/signin-page'
 
 export default function AuthPage() {
   useEffect(() => {
-    document.documentElement.classList.add("dark");
+    document.documentElement.classList.add('dark')
     return () => {
-      document.documentElement.classList.remove("dark");
-    };
-  }, []);
+      document.documentElement.classList.remove('dark')
+    }
+  }, [])
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 bg-gradient-to-br from-neutral-700 via-neutral-800 to-neutral-900 min-h-screen">
-      <div className="flex items-center justify-center p-4 md:p-0 col-span-1">
+    <div className="grid min-h-screen grid-cols-1 bg-gradient-to-br from-neutral-700 via-neutral-800 to-neutral-900 md:grid-cols-3">
+      <div className="col-span-1 flex items-center justify-center p-4 md:p-0">
         <Signin />
       </div>
-      <div 
-        style={{ backgroundImage: 'url("/sign-in-bg.png")', backgroundSize: 'cover', backgroundPosition: 'left' }}
-        className="hidden md:flex items-center justify-center col-span-2">     
-      </div>
+      <div
+        style={{
+          backgroundImage:
+            'url("https://gitdate-files.blr1.cdn.digitaloceanspaces.com/bg-images/sign-in-bg.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'left',
+        }}
+        className="col-span-2 hidden items-center justify-center md:flex"></div>
     </div>
-  );
+  )
 }

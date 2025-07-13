@@ -1,68 +1,70 @@
-import { getActivitySummary } from "@/actions/activity.action";
-import { getConversations, getUnreadMessageCounts } from "@/actions/conversation.action";
-import { profileSetupStatus } from "@/actions/dashboard.action";
-import { getSelectedUserById } from "@/actions/explore.action";
-import { findMatches, getAllAccounts, getMatchPreference, getMatchRequests, getMyMatches } from "@/actions/match.action";
-import { getGitDateProfile } from "@/actions/user.profile.action";
-import { toast } from "@/hooks/use-toast";
- 
+import { getActivitySummary } from '@/actions/activity.action'
+import {
+  getConversations,
+  getUnreadMessageCounts,
+} from '@/actions/conversation.action'
+import { profileSetupStatus } from '@/actions/dashboard.action'
+import { getSelectedUserById } from '@/actions/explore.action'
+import {
+  findMatches,
+  getAllAccounts,
+  getMatchPreference,
+  getMatchRequests,
+  getMyMatches,
+} from '@/actions/match.action'
+import { getGitDateProfile } from '@/actions/user.profile.action'
+import { toast } from '@/hooks/use-toast'
 
 export const getMatchPreferencesFetcher = async (email: string) => {
-  try{
-
-    const response = await getMatchPreference(email);
+  try {
+    const response = await getMatchPreference(email)
     if (!response?.status) {
       toast({
-        title: "Failed to load match preferences",
-        variant: "destructive",
+        title: 'Failed to load match preferences',
+        variant: 'destructive',
       })
     }
-    if(response?.status)
-      return response;
-  }catch (error) { 
+    if (response?.status) return response
+  } catch (error) {
     toast({
-      title: "Internal Server Error",
-      variant: "destructive",
+      title: 'Internal Server Error',
+      variant: 'destructive',
     })
   }
 }
 
 export const findMatchesFetcher = async (email: string) => {
-  try{
-
-    const response = await findMatches(email);
+  try {
+    const response = await findMatches(email)
     if (!response?.status) {
       toast({
-        title: "Failed to load matches",
-        variant: "destructive",
+        title: 'Failed to load matches',
+        variant: 'destructive',
       })
     }
-    if(response?.status)
-      return response;
-  }catch (error) {
+    if (response?.status) return response
+  } catch (error) {
     toast({
-      title: "Internal Server Error",
-      variant: "destructive",
+      title: 'Internal Server Error',
+      variant: 'destructive',
     })
   }
-};
+}
 
-export const getAllAccountsFetcher = async () => { 
-  try{
-
-    const response = await getAllAccounts();
+export const getAllAccountsFetcher = async () => {
+  try {
+    const response = await getAllAccounts()
     if (!response?.status) {
       toast({
-        title: "Failed to load accounts",
-        variant: "destructive",
+        title: 'Failed to load accounts',
+        variant: 'destructive',
       })
     }
-    if(response?.status)
-      return response;
-  }catch (error) {
+    if (response?.status) return response
+  } catch (error) {
     toast({
-      title: "Internal Server Error",
-      variant: "destructive",
+      title: 'Internal Server Error',
+      variant: 'destructive',
     })
   }
 }
@@ -71,175 +73,170 @@ export const getSelectedUserByIdFetcher = async (userId: string) => {
     if (!userId) {
       toast({
         title: 'User ID is required',
-        variant: 'destructive'
-      });
-      return;
+        variant: 'destructive',
+      })
+      return
     }
 
-    const response = await getSelectedUserById(userId);
+    const response = await getSelectedUserById(userId)
     if (!response?.status) {
       toast({
         title: 'Failed to load user profile',
-        variant: 'destructive'
-      });
-      return;
+        variant: 'destructive',
+      })
+      return
     }
-    return response;
+    return response
   } catch (err) {
-    console.error('Error fetching user profile:', err);
     toast({
-      title: "Failed to load user profile",
-      description: "Please try again later",
-      variant: "destructive",
-    });
-    return null;
+      title: 'Failed to load user profile',
+      description: 'Please try again later',
+      variant: 'destructive',
+    })
+    return null
   }
 }
 
-export const getAllMatchRequestsFetcher = async () =>{
+export const getAllMatchRequestsFetcher = async () => {
   try {
     const response = await getMatchRequests()
-    if(!response){
-      toast({
-        title:'Failed to load match requests',
-        variant:'destructive'
-      })
-    }
-    if(response)
-      return response.additional
-  }
-  catch(err){
-    toast({
-      title: "Failed to load match requests",
-      description: "Please try again later",
-      variant: "destructive",
-    });
-  }
-}
-
-export const getMyMatchesFetcher = async() =>{
-  try{
-    const response = await getMyMatches();
-    if(!response.status){
-     toast({
-      title:'Failed to load Matches',
-    variant:'destructive'
-     })
-    }
-
-    if(response){
-      return response.additional
-    }
-  }catch(err){
-    toast({
-      title: "Failed to load match requests",
-      description: "Please try again later",
-      variant: "destructive",
-    });
-  }
-}
-
-
-export const getProfileSetupStatus = async () =>{
-  try {
-    const response = await profileSetupStatus();
     if (!response) {
       toast({
-        title: "Failed to load profile setup status",
-        variant: "destructive",
+        title: 'Failed to load match requests',
+        variant: 'destructive',
       })
     }
-    if(response)
-      return response;
-  }catch(err){
+    if (response) return response.additional
+  } catch (err) {
     toast({
-      title: "Failed to load user profile",
-      description: "Please try again later",
-      variant: "destructive",
-    });
+      title: 'Failed to load match requests',
+      description: 'Please try again later',
+      variant: 'destructive',
+    })
   }
 }
 
-export const getActivitySummaryFetchers = async()=>{
+export const getMyMatchesFetcher = async () => {
   try {
-    const response = await getActivitySummary();
-    if(!response){
+    const response = await getMyMatches()
+    if (!response.status) {
       toast({
-        title:'Failed to load Activity',
-        variant:'destructive'
+        title: 'Failed to load Matches',
+        variant: 'destructive',
       })
     }
-    if(response){
-      return response.additional;
-    }
-  }catch(err){
-    toast({
-      title: "Failed to load user profile",
-      description: "Please try again later",
-      variant: "destructive",
-    });
-  }
-}
 
-export const getConversationsFetcher=async()=>{
-  try {
-    const response = await getConversations();
-    if(!response){
-      toast({
-        title:'Failed to load conversation',
-        variant:'destructive'
-      })
-    }
-    if(response){
-      return response.additional;
-    }
-  }catch(err){
-    toast({
-      title: "Failed to load conversation",
-      description: "Please try again later",
-      variant: "destructive",
-    });
-  }
-}
-
-export const getUnreadConversationsFetcher=async()=>{
-  try {
-    const response = await getUnreadMessageCounts();
-    if(!response){
-      toast({
-        title:'Failed to load message counts',
-        variant:'destructive'
-      })
-    }
-    if(response){
-      return response.additional;
-    }
-  }catch(err){
-    toast({
-      title: "Failed to load message counts",
-      description: "Please try again later",
-      variant: "destructive",
-    });
-  }
-}
-
-export const getGitDateProfileFetcher = async() =>{
-  try {
-    const response = await getGitDateProfile();
-    if(!response){
-      toast({
-        title:'Failed to load gitdate profile',
-        variant:'destructive'
-      })
-    }
-    if(response.status){
+    if (response) {
       return response.additional
     }
-  }catch(err){
+  } catch (err) {
     toast({
-      title: "Failed to load message counts",
-      description: "Please try again later",
-      variant: "destructive",
-    });
+      title: 'Failed to load match requests',
+      description: 'Please try again later',
+      variant: 'destructive',
+    })
+  }
+}
+
+export const getProfileSetupStatus = async () => {
+  try {
+    const response = await profileSetupStatus()
+    if (!response) {
+      toast({
+        title: 'Failed to load profile setup status',
+        variant: 'destructive',
+      })
+    }
+    if (response) return response
+  } catch (err) {
+    toast({
+      title: 'Failed to load user profile',
+      description: 'Please try again later',
+      variant: 'destructive',
+    })
+  }
+}
+
+export const getActivitySummaryFetchers = async () => {
+  try {
+    const response = await getActivitySummary()
+    if (!response) {
+      toast({
+        title: 'Failed to load Activity',
+        variant: 'destructive',
+      })
+    }
+    if (response) {
+      return response.additional
+    }
+  } catch (err) {
+    toast({
+      title: 'Failed to load user profile',
+      description: 'Please try again later',
+      variant: 'destructive',
+    })
+  }
+}
+
+export const getConversationsFetcher = async () => {
+  try {
+    const response = await getConversations()
+    if (!response) {
+      toast({
+        title: 'Failed to load conversation',
+        variant: 'destructive',
+      })
+    }
+    if (response) {
+      return response.additional
+    }
+  } catch (err) {
+    toast({
+      title: 'Failed to load conversation',
+      description: 'Please try again later',
+      variant: 'destructive',
+    })
+  }
+}
+
+export const getUnreadConversationsFetcher = async () => {
+  try {
+    const response = await getUnreadMessageCounts()
+    if (!response) {
+      toast({
+        title: 'Failed to load message counts',
+        variant: 'destructive',
+      })
+    }
+    if (response) {
+      return response.additional
+    }
+  } catch (err) {
+    toast({
+      title: 'Failed to load message counts',
+      description: 'Please try again later',
+      variant: 'destructive',
+    })
+  }
+}
+
+export const getGitDateProfileFetcher = async () => {
+  try {
+    const response = await getGitDateProfile()
+    if (!response) {
+      toast({
+        title: 'Failed to load gitdate profile',
+        variant: 'destructive',
+      })
+    }
+    if (response.status) {
+      return response.additional
+    }
+  } catch (err) {
+    toast({
+      title: 'Failed to load message counts',
+      description: 'Please try again later',
+      variant: 'destructive',
+    })
   }
 }

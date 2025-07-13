@@ -30,7 +30,7 @@ export const getUserProfile = async () => {
     })
     return user
   } catch (error) {
-    console.error('Error fetching user profile', error)
+ 
     return null
   }
 }
@@ -78,10 +78,7 @@ export const updateUserProfile = async (data: UpdateUserProfileData) => {
 
     return updatedUser
   } catch (error) {
-    console.error(
-      'Error updating user profile:',
-      error instanceof Error ? error.message : 'Unknown error'
-    )
+ 
     throw new Error('Failed to update user profile')
   }
 }
@@ -141,7 +138,7 @@ export const updateUserAvatar = async (email: string, image: string) => {
       },
     }
   } catch (err) {
-    console.error('Error updating avatar:', err)
+ 
     return {
       success: false,
       error: err instanceof Error ? err.message : 'Failed to update avatar',

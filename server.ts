@@ -28,7 +28,7 @@ async function startServer() {
   io = new SocketIOServer(httpServer, {
     path: "/api/socket",
     cors: {
-      origin: dev ? "*" : "https://your-production-domain.com",
+      origin: dev ? "*" : process.env.NEXT_PROD_APP_URL,
       methods: ["GET", "POST"],
     }
   });

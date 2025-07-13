@@ -90,7 +90,7 @@ export async function GET(req: NextRequest) {
         })
         return { repo: repo.name, languages: languages.data }
       } catch (error) {
-        console.warn(`Failed to fetch languages for ${repo.name}:`, error)
+ 
         return { repo: repo.name, languages: {} }
       }
     })
@@ -175,7 +175,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(userProfile)
   } catch (error) {
-    console.error('Error fetching GitHub data:', error)
+ 
     return NextResponse.json(
       { error: 'Failed to fetch GitHub data' },
       { status: 500 }

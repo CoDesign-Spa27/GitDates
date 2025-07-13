@@ -20,7 +20,7 @@ export const ShareGitDate = () => {
         })
       }
     } catch (error) {
-      console.error('Error sharing:', error)
+ 
       toast({
         title: 'Failed to share',
         description: 'Please try again',

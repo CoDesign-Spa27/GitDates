@@ -6,9 +6,8 @@
     "dev": "next dev",
     "dev:socket": "tsx --tsconfig tsconfig.server.json server.ts",
     "build": "next build",
-    "start": "next start",
     "lint": "next lint",
-    "start:socket": "tsx --tsconfig tsconfig.server.json server.ts"
+    "start": "tsx --tsconfig tsconfig.server.json server.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

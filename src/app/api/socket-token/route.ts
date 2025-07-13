@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     }
     return NextResponse.json({ token })
   } catch (err) {
-    console.error('Error in socket token endpoint:', err)
+  
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
