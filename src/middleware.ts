@@ -27,7 +27,7 @@ export default async function middleware(
     // Redirect to dashboard if authenticated and trying to access public page
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
-  response.headers.set('ngrok-skip-browser-warning', 'true')
+
   return NextResponse.next()
 }
 
