@@ -1,4 +1,4 @@
-"use client";
+'use client'
 import {
   Sidebar,
   SidebarContent,
@@ -13,90 +13,96 @@ import {
   useSidebar,
   SidebarFooter,
   SidebarHeader,
-} from "@/components/ui/sidebar";
-import { ModeToggle } from "./ui/mode-toggle";
-import { Logo } from "./designs/logo";
-import { useMemo, useState, useEffect } from "react";
+} from '@/components/ui/sidebar'
+import { ModeToggle } from './ui/mode-toggle'
+import { Logo } from './designs/logo'
+import { useMemo, useState, useEffect } from 'react'
 import {
   dashboardIcon,
   exploreIcon,
   gitIcon,
   preferenceIcon,
   profileIcon,
-} from "../../public/icons";
-import { usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
-import { 
-  HeartHandshake, 
-  Settings, 
+} from '../../public/icons'
+import { usePathname, useRouter } from 'next/navigation'
+import Link from 'next/link'
+import {
+  HeartHandshake,
+  Settings,
   LogOut,
   Bell,
-  MessageCircle 
-} from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
-import { toast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
-import { ProfileSet } from "./profileSet";
-import { getUnreadMessageCounts } from "@/actions/conversation.action";
-import { useSocket } from "@/lib/client-socket";
-import { useConversations } from "./hooks/useConversation";
-import { useQueryClient } from "@tanstack/react-query";
-import { gitDarkLogo, gitLightLogo } from "../../public/assets";
-import Image from "next/image";
-import { useTheme } from "next-themes";
-import { motion } from "motion/react";
+  MessageCircle,
+  MessageSquare,
+} from 'lucide-react'
+import { signOut, useSession } from 'next-auth/react'
+import { toast } from '@/hooks/use-toast'
+import { cn } from '@/lib/utils'
+import { ProfileSet } from './profileSet'
+import { getUnreadMessageCounts } from '@/actions/conversation.action'
+import { useSocket } from '@/lib/client-socket'
+import { useConversations } from './hooks/useConversation'
+import { useQueryClient } from '@tanstack/react-query'
+import { gitDarkLogo, gitLightLogo } from '../../public/assets'
+import Image from 'next/image'
+import { useTheme } from 'next-themes'
+import { motion } from 'motion/react'
 // Navigation items grouped by category
 const navigationItems = {
   main: [
     {
-      title: "Dashboard",
-      url: "/dashboard",
+      title: 'Dashboard',
+      url: '/dashboard',
       icon: dashboardIcon,
-      tooltip: "View your dashboard",
+      tooltip: 'View your dashboard',
     },
     {
-      title: "Explore",
-      url: "/dashboard/explore", 
+      title: 'Explore',
+      url: '/dashboard/explore',
       icon: exploreIcon,
-      tooltip: "Find new matches",
+      tooltip: 'Find new matches',
     },
-     {
-      title: "Conversations",
-      url: "/dashboard/conversations",
+    {
+      title: 'Conversations',
+      url: '/dashboard/conversations',
       icon: MessageCircle,
-      tooltip: "Conversations",
+      tooltip: 'Conversations',
     },
- 
   ],
   profile: [
     {
-      title: "GitDates Profile",
-      url: "/dashboard/gitdate-profile",
+      title: 'GitDates Profile',
+      url: '/dashboard/gitdate-profile',
       icon: gitIcon,
-      tooltip: "Manage GitDates profile",
+      tooltip: 'Manage GitDates profile',
     },
     {
-      title: "Match Preference",
-      url: "/dashboard/match-preference",
+      title: 'Match Preference',
+      url: '/dashboard/match-preference',
       icon: preferenceIcon,
-      tooltip: "Set match preferences",
+      tooltip: 'Set match preferences',
     },
     {
-      title: "Matches",
-      url: "/dashboard/matches",
+      title: 'Matches',
+      url: '/dashboard/matches',
       icon: HeartHandshake,
-      tooltip: "View your matches",
-    }
+      tooltip: 'View your matches',
+    },
   ],
   settings: [
+    {
+      title: 'Feedback',
+      url: '/dashboard/feedback',
+      icon: MessageSquare,
+      tooltip: 'Report bugs and provide feedback',
+    },
     // {
     //   title: "Settings",
     //   url: "/dashboard/settings",
     //   icon: Settings,
     //   tooltip: "App settings",
     // }
-  ]
-};
+  ],
+}
 
 export function AppSidebar() {
   const {
@@ -107,92 +113,93 @@ export function AppSidebar() {
     setOpenMobile,
     isMobile,
     toggleSidebar,
-  } = useSidebar();
-  const pathname = usePathname();
-  const router = useRouter();
-  const {unreadCounts} = useConversations();
-  const {subscribeToNewMessages} = useSocket();
-  const queryClient = useQueryClient();
-  const {theme} = useTheme();
+  } = useSidebar()
+  const pathname = usePathname()
+  const router = useRouter()
+  const { unreadCounts } = useConversations()
+  const { subscribeToNewMessages } = useSocket()
+  const queryClient = useQueryClient()
+  const { theme } = useTheme()
   useEffect(() => {
     const unsubscribe = subscribeToNewMessages((message) => {
-      queryClient.invalidateQueries({ queryKey: ['unread-counts'], });
-    });
+      queryClient.invalidateQueries({ queryKey: ['unread-counts'] })
+    })
 
     return () => {
-      unsubscribe?.();
-    };
-  }, [subscribeToNewMessages, queryClient]);
+      unsubscribe?.()
+    }
+  }, [subscribeToNewMessages, queryClient])
 
   const isActive = (url: string) => {
-    if (url === "/dashboard" && pathname === "/dashboard") {
-      return true;
+    if (url === '/dashboard' && pathname === '/dashboard') {
+      return true
     }
-    if(url !== "/dashboard" && pathname.startsWith(url)) {
-      return true;
+    if (url !== '/dashboard' && pathname.startsWith(url)) {
+      return true
     }
-    return false;
-  };
+    return false
+  }
 
   const handleSignOut = async () => {
     try {
-      await signOut({ callbackUrl: "/" });
+      await signOut({ callbackUrl: '/' })
     } catch (error) {
       toast({
-        title: "Failed to sign out",
-        description: "Please try again",
-        variant: "destructive",
-      });
+        title: 'Failed to sign out',
+        description: 'Please try again',
+        variant: 'destructive',
+      })
     }
-  };
+  }
 
-  const NavigationSection = ({ items, title }: { items: typeof navigationItems.main, title?: string }) => (
+  const NavigationSection = ({
+    items,
+    title,
+  }: {
+    items: typeof navigationItems.main
+    title?: string
+  }) => (
     <>
-      {title && (
-        <SidebarGroupLabel className="py-2">
-          {title}
-        </SidebarGroupLabel>
-      )}
+      {title && <SidebarGroupLabel className="py-2">{title}</SidebarGroupLabel>}
       {items.map((item) => (
         <SidebarMenuItem key={item.title} className="py-1">
-          <Link 
-            href={item.url} 
-            prefetch={false}
-          >
-            <SidebarMenuButton 
+          <Link href={item.url} prefetch={false}>
+            <SidebarMenuButton
               tooltip={item.tooltip}
               isActive={isActive(item.url)}
-              className='[&>svg]:size-8'
-            >
-              <item.icon className={cn(
-                "h-4 w-4 shrink-0 p-1 ",
-                isActive(item.url) && "bg-gitdate text-white rounded-full "
-              )} />
+              className="[&>svg]:size-8">
+              <item.icon
+                className={cn(
+                  'h-4 w-4 shrink-0 p-1',
+                  isActive(item.url) && 'rounded-full bg-gitdate text-white'
+                )}
+              />
               <span className="truncate">{item.title}</span>
-              {item.title === "Conversations" && unreadCounts && (unreadCounts as { total: number }).total > 0 && (
-                <SidebarMenuBadge className="bg-gitdate text-white">
-                  {(unreadCounts as { total: number }).total}
-                </SidebarMenuBadge>
-              )}
+              {item.title === 'Conversations' &&
+                unreadCounts &&
+                (unreadCounts as { total: number }).total > 0 && (
+                  <SidebarMenuBadge className="bg-gitdate text-white">
+                    {(unreadCounts as { total: number }).total}
+                  </SidebarMenuBadge>
+                )}
             </SidebarMenuButton>
           </Link>
         </SidebarMenuItem>
       ))}
     </>
-  );
+  )
 
   return (
     <Sidebar className="overflow-hidden" collapsible="icon">
       <SidebarHeader className="flex items-center justify-center pt-4 md:pt-6">
         <motion.div
           initial={false}
-          animate={{ 
+          animate={{
             scale: isCollapsed !== 'expanded' ? 1 : 0,
-            opacity: isCollapsed !== 'expanded' ? 1 : 0
+            opacity: isCollapsed !== 'expanded' ? 1 : 0,
           }}
           transition={{ duration: 0.2 }}
-          className={isCollapsed !== 'expanded' ? 'block' : 'hidden'}
-        >
+          className={isCollapsed !== 'expanded' ? 'block' : 'hidden'}>
           <Image
             src={theme === 'dark' ? gitDarkLogo : gitLightLogo}
             className="h-8 w-8"
@@ -203,14 +210,13 @@ export function AppSidebar() {
         </motion.div>
 
         <motion.div
-          initial={false} 
+          initial={false}
           animate={{
             scale: isCollapsed === 'expanded' ? 1 : 0,
-            opacity: isCollapsed === 'expanded' ? 1 : 0
+            opacity: isCollapsed === 'expanded' ? 1 : 0,
           }}
           transition={{ duration: 0.2 }}
-          className={isCollapsed === 'expanded' ? 'block' : 'hidden'}
-        >
+          className={isCollapsed === 'expanded' ? 'block' : 'hidden'}>
           <Logo />
         </motion.div>
       </SidebarHeader>

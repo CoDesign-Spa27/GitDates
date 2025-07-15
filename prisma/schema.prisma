@@ -38,6 +38,7 @@ model User {
   receivedMatches Match[]         @relation("Receiver")
   viewedProfiles  ProfileView[]   @relation("Viewer")
   profileViews    ProfileView[]   @relation("ViewedUser")
+  feedbacks     Feedback[]
   @@map("users")
 }
 
@@ -195,4 +196,40 @@ model Waitlist {
   createdAt DateTime @default(now())
 
   @@map("waitlist")
+}
+
+model Feedback {
+  id          String      @id @default(uuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String      @db.Text
+  type        FeedbackType
+  priority    FeedbackPriority @default(MEDIUM)
+  status      FeedbackStatus @default(OPEN)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("feedback")
+}
+
+enum FeedbackType {
+  BUG
+  FEATURE_REQUEST
+  IMPROVEMENT
+  OTHER
+}
+
+enum FeedbackPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum FeedbackStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
 }
