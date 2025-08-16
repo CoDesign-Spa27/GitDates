@@ -20,15 +20,57 @@ export const useMatchRequest = () => {
   const responsedToMatchRequest = useMutation({
     mutationFn: ({ matchId, action }: respondToMatchRequestArgumentsType) =>
       respondToMatchRequestMutation({ matchId, action }),
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ['match-request-recieved', email] })
- 
-      const previousMatchRequests = queryClient.getQueryData(['match-request-recieved', email])
-  
-      return { previousMatchRequests }
+    onMutate: async ({ matchId, action }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({
+        queryKey: ['match-request-recieved', email],
+      })
+      await queryClient.cancelQueries({ queryKey: ['my-matches'] })
+
+      // Snapshot the previous values
+      const previousMatchRequests = queryClient.getQueryData([
+        'match-request-recieved',
+        email,
+      ])
+      const previousMatches = queryClient.getQueryData(['my-matches'])
+
+      // Optimistically update the match requests list
+      if (previousMatchRequests && Array.isArray(previousMatchRequests)) {
+        const updatedRequests = previousMatchRequests.filter(
+          (request: any) => request.id !== matchId
+        )
+        queryClient.setQueryData(
+          ['match-request-recieved', email],
+          updatedRequests
+        )
+      }
+
+      // If accepting, optimistically add to matches (we'll let the server response handle the proper data)
+      if (action === 'ACCEPT') {
+        // The server will provide the correct match data, so we just trigger a refetch
+        // by invalidating the queries in onSettled
+      }
+
+      return { previousMatchRequests, previousMatches }
+    },
+    onError: (err, variables, context) => {
+      // Rollback on error
+      if (context?.previousMatchRequests) {
+        queryClient.setQueryData(
+          ['match-request-recieved', email],
+          context.previousMatchRequests
+        )
+      }
+      if (context?.previousMatches) {
+        queryClient.setQueryData(['my-matches'], context.previousMatches)
+      }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['match-request-recieved', email] })
+      // Invalidate both match requests and matches queries to get fresh data
+      queryClient.invalidateQueries({
+        queryKey: ['match-request-recieved', email],
+      })
+      queryClient.invalidateQueries({ queryKey: ['my-matches'] })
     },
   })
 

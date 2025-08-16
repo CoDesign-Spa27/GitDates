@@ -47,7 +47,9 @@ export default function MatchesPage() {
     try {
       await respondToMatchRequest({ matchId, action: 'ACCEPT' })
       toast({
-        title: 'Match request accepted',
+        title: 'Match request accepted!',
+        description: 'You can now message each other',
+        variant: 'success',
       })
     } catch (error) {
       toast({
@@ -61,11 +63,12 @@ export default function MatchesPage() {
     try {
       await respondToMatchRequest({ matchId, action: 'REJECT' })
       toast({
-        title: 'Match request rejected',
+        title: 'Match request declined',
+        description: 'The request has been removed',
       })
     } catch (error) {
       toast({
-        title: 'Failed to reject match request',
+        title: 'Failed to decline match request',
         variant: 'destructive',
       })
     }
@@ -98,19 +101,23 @@ export default function MatchesPage() {
         <TabsList className="mb-6">
           <TabsTrigger value="matches">
             Matches
-            {matches?.length > 0 && (
+            {matchesLoading ? (
+              <span className="ml-2 h-4 w-4 animate-spin rounded-full border-2 border-primary border-r-transparent"></span>
+            ) : matches?.length > 0 ? (
               <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
                 {matches.length}
               </span>
-            )}
+            ) : null}
           </TabsTrigger>
           <TabsTrigger value="requests">
             Requests
-            {requests?.length > 0 && (
+            {requestsLoading ? (
+              <span className="ml-2 h-4 w-4 animate-spin rounded-full border-2 border-amber-500 border-r-transparent"></span>
+            ) : requests?.length > 0 ? (
               <span className="ml-2 rounded-full bg-amber-500 px-2 py-0.5 text-xs text-white">
                 {requests.length}
               </span>
-            )}
+            ) : null}
           </TabsTrigger>
         </TabsList>
 
@@ -225,18 +232,26 @@ function RequestCard({
   onAccept: () => void
   onReject: () => void
 }) {
-  const [isLoading, setIsLoading] = useState(false)
+  const [actionLoading, setActionLoading] = useState<
+    'accept' | 'reject' | null
+  >(null)
 
   const handleAccept = async () => {
-    setIsLoading(true)
-    await onAccept()
-    setIsLoading(false)
+    setActionLoading('accept')
+    try {
+      await onAccept()
+    } finally {
+      setActionLoading(null)
+    }
   }
 
   const handleReject = async () => {
-    setIsLoading(true)
-    await onReject()
-    setIsLoading(false)
+    setActionLoading('reject')
+    try {
+      await onReject()
+    } finally {
+      setActionLoading(null)
+    }
   }
 
   return (
@@ -268,15 +283,17 @@ function RequestCard({
           variant="outline"
           className="flex-1"
           onClick={handleReject}
-          disabled={isLoading}>
-          <X className="mr-1 h-4 w-4" /> Reject
+          disabled={actionLoading !== null}>
+          <X className="mr-1 h-4 w-4" />
+          {actionLoading === 'reject' ? 'Declining...' : 'Decline'}
         </Button>
         <Button
           variant="default"
           className="flex-1"
           onClick={handleAccept}
-          disabled={isLoading}>
-          <Check className="mr-1 h-4 w-4" /> Accept
+          disabled={actionLoading !== null}>
+          <Check className="mr-1 h-4 w-4" />
+          {actionLoading === 'accept' ? 'Accepting...' : 'Accept'}
         </Button>
       </div>
     </div>
