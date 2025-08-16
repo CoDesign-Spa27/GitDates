@@ -63,6 +63,12 @@ const ExploreCard = ({
     try {
       setIsLoading(true)
       await sendMatchRequest(userId)
+ 
+      setMatchStatus({
+        status: 'PENDING',
+        isSender: true,
+      })
+
       toast({
         title: `Match request sent successfully!`,
         variant: 'success',
