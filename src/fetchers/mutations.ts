@@ -45,7 +45,7 @@ export const getOrCreateConversationMutation = async (matchId: string) => {
   try {
     const response = await getOrCreateConversation(matchId)
     if (!response) {
-      throw new Error('Failed to update avatar')
+      throw new Error('Failed to create convo')
     }
     if (response) return response
   } catch (err) {
