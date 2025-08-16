@@ -26,6 +26,16 @@ type Conversation = {
   messages: Array<any>
   currentUserId: string
   otherUserId: string
+  otherUserProfile: {
+    id: string
+    name: string
+    image: string
+  }
+  currentUserProfile: {
+    id: string
+    name: string
+    image: string
+  }
 }
 
 export default function MessagesPage() {
@@ -62,7 +72,7 @@ export default function MessagesPage() {
     getOrCreateMessage.mutate(undefined, {
       onSuccess: (data) => {
         if (data?.additional) {
-          setConversation(data.additional)
+          setConversation(data.additional as Conversation)
         }
       },
       onSettled: () => setLoading(false),
@@ -183,17 +193,7 @@ export default function MessagesPage() {
     }
   }, [conversation, sendTypingStatus, isConnected])
 
-  const getOtherUser = () => {
-    if (!conversation?.messages.length) return null
-    return (
-      conversation.messages.find(
-        (m) => m.senderId !== conversation.currentUserId
-      )?.sender || null
-    )
-  }
-
-  const otherUser = getOtherUser()
-
+  const otherUser = conversation?.otherUserProfile
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -252,7 +252,7 @@ export default function MessagesPage() {
           </Button>
           <Avatar className="h-10 w-10">
             <AvatarImage
-              src={otherUser?.image ?? undefined}
+              src={otherUser?.image}
               alt={`${otherUser?.name ?? 'User'}'s avatar`}
             />
             <AvatarFallback>
@@ -263,7 +263,7 @@ export default function MessagesPage() {
             <h1 className="text-xl font-semibold">
               {otherUser?.name || 'Chat'}
             </h1>
-            <UserStatus isOnline={isOnline} />
+            {/* <UserStatus isOnline={isOnline} /> */}
           </div>
         </div>
 

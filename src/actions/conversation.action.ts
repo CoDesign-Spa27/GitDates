@@ -100,14 +100,36 @@ export async function getOrCreateConversation(matchId: string) {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
+      select: {
+        id: true,
+        name: true,
+        image: true,
+      },
     })
     if (!user) throw new Error('User not found')
+
     // Check if match exists and user is part of it
     const match = await prisma.match.findFirst({
       where: {
         id: matchId,
         status: 'ACCEPTED',
         OR: [{ senderId: user.id }, { receiverId: user.id }],
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+        receiver: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
       },
     })
     if (!match) throw new Error('Match not found or not accepted')
@@ -163,11 +185,14 @@ export async function getOrCreateConversation(matchId: string) {
       })
     }
 
+    const otherUser = match.senderId === user.id ? match.receiver : match.sender
+
     const data = {
       ...conversation,
       currentUserId: user.id,
-      otherUserId:
-        match.senderId === user.id ? match.receiverId : match.senderId,
+      otherUserId: otherUser.id,
+      currentUserProfile: user,
+      otherUserProfile: otherUser,
     }
 
     const response = new SuccessResponse(
@@ -177,8 +202,10 @@ export async function getOrCreateConversation(matchId: string) {
     )
     return response.serialize()
   } catch (error) {
-    throw new ErrorHandler('Error while fetching conversations', 'DATABASE_ERROR')
-
+    throw new ErrorHandler(
+      'Error while fetching conversations',
+      'DATABASE_ERROR'
+    )
   }
 }
 
