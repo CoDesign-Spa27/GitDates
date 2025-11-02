@@ -5,6 +5,8 @@ import localFont from 'next/font/local'
 import Provider from '@/providers/provider'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import RemoveNextJsToast from '@/components/nextjspopupremove'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Analytics } from '@vercel/analytics/react'
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -114,7 +116,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${riffic.variable} antialiased`}>
       <RemoveNextJsToast />
-        <Provider>{children}</Provider>
+        <Provider>{children} 
+     <SpeedInsights />
+          <Analytics />
+
+        </Provider>
       </body>
       <GoogleAnalytics gaId="G-ETEF0ZPMZG" />
     </html>

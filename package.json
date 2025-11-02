@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-     "postinstall": "prisma generate",
+    "postinstall": "prisma generate",
     "dev": "next dev",
     "dev:socket": "tsx --tsconfig tsconfig.server.json server.ts",
     "build": "prisma generate && next build",
@@ -39,6 +39,8 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/socket.io": "^3.0.1",
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
     "bcryptjs": "^2.4.3",
     "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.1",
