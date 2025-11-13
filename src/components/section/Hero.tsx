@@ -27,7 +27,7 @@ import { useRouter } from 'next/navigation'
 import { AnimatedGradientText } from '../ui/animated-gradient-text'
 import { cn } from '@/lib/utils'
 import { CTAButton } from '../ui/cta-button'
-
+import { StaticRadialGradient  } from '@paper-design/shaders-react';
 const Hero = () => {
   const { scrollY } = useScroll()
   const containerRef = useRef(null)
@@ -45,152 +45,44 @@ const Hero = () => {
       transition: { duration: 0.8, ease: 'easeOut' },
     })
   }, [controls])
-
-  const codeSnippets = [
-    'if (youCode && iCode) { return match(); }',
-    "git commit -m 'Found my perfect match'",
-    'function findLove() { return you.merge(me); }',
-    'try { us(); } catch (feelings) { embrace(feelings); }',
-    'while(true) { commit(love); push(affection); }',
-    'for(let i = 0; i < infinity; i++) { loveCoding(with: you); }',
-    'class Relationship extends Perfect { constructor(you, me) {...} }',
-  ]
-
+ 
   return (
     <section
       id="home"
       ref={containerRef}
-      className="relative min-h-screen w-full overflow-hidden bg-[url('https://gitdate-files.blr1.cdn.digitaloceanspaces.com/bg-images/hero-bg.png')] bg-cover bg-fixed bg-center bg-no-repeat md:bg-[url('https://gitdate-files.blr1.cdn.digitaloceanspaces.com/bg-images/hero-bg.png')]">
+      className="relative">
       <div className="pointer-events-none absolute inset-0">
-        {codeSnippets.map((snippet, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0 }}
-            animate={{
-              opacity: 0.15,
-              x: [0, 10, -5, 0],
-              y: [0, 5, -10, 0],
-            }}
-            transition={{
-              x: {
-                duration: 7 + index * 0.5,
-                repeat: Infinity,
-                repeatType: 'reverse',
-              },
-              y: {
-                duration: 9 + index * 0.7,
-                repeat: Infinity,
-                repeatType: 'reverse',
-              },
-              opacity: { duration: 1 },
-            }}
-            className="absolute font-mono text-xs text-green-400 md:text-sm lg:text-base"
-            style={{
-              left: `${5 + index * 14}%`,
-              top: `${10 + ((index * 12) % 80)}%`,
-              transform: `rotate(${index * 3 - 5}deg)`,
-            }}>
-            {snippet}
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="pointer-events-none absolute inset-0">
-        {[...Array(20)].map((_, index) => (
-          <motion.div
-            key={`icon-${index}`}
-            initial={{ opacity: 0 }}
-            animate={{
-              opacity: [0.08, 0.2, 0.08],
-              x: [0, index % 2 === 0 ? 15 : -15, 0],
-              y: [0, index % 2 === 0 ? 15 : -15, 0],
-              rotate: [0, index % 2 === 0 ? 10 : -10, 0],
-            }}
-            transition={{
-              opacity: { duration: 5, repeat: Infinity, repeatType: 'reverse' },
-              x: {
-                duration: 7 + index * 0.3,
-                repeat: Infinity,
-                repeatType: 'reverse',
-              },
-              y: {
-                duration: 8 + index * 0.5,
-                repeat: Infinity,
-                repeatType: 'reverse',
-              },
-              rotate: {
-                duration: 10 + index * 0.2,
-                repeat: Infinity,
-                repeatType: 'reverse',
-              },
-            }}
-            className="absolute text-white/30"
-            style={{
-              left: `${Math.floor(Math.random() * 90)}%`,
-              top: `${Math.floor(Math.random() * 90)}%`,
-              fontSize: `${Math.floor(Math.random() * 24) + 14}px`,
-            }}>
-            {index % 6 === 0 ? (
-              <Github />
-            ) : index % 6 === 1 ? (
-              <Heart className="text-pink-500/40" />
-            ) : index % 6 === 2 ? (
-              <Code />
-            ) : index % 6 === 3 ? (
-              <Star className="text-yellow-400/40" />
-            ) : index % 6 === 4 ? (
-              <Command />
-            ) : (
-              <MessageSquare />
-            )}
-          </motion.div>
-        ))}
+    <StaticRadialGradient
+  style={{width:'100%', height:'100%'}}
+  colors={["#ff0073"]}
+  colorBack="#000000"
+  radius={1}
+  focalDistance={3}
+  focalAngle={60}
+  falloff={0.5}
+  mixing={0.40}
+  distortion={1}
+  distortionShift={1}
+  distortionFreq={18}
+  grainMixer={1}
+  grainOverlay={0.45}
+/>
       </div>
 
       <motion.div
         className="relative z-20 flex min-h-screen flex-col items-center justify-center px-4 text-center"
         style={{ y: y1, opacity }}>
         <div className="mb-8">
-          <div className="group relative mx-auto flex w-full max-w-[250px] items-center justify-center rounded-full px-2 py-1.5 shadow-[inset_0_-8px_10px_#8fdfff1f] transition-shadow duration-500 ease-out hover:shadow-[inset_0_-5px_10px_#8fdfff3f]">
-            <span
-              className={cn(
-                'animate-gradient absolute inset-0 block h-full w-full rounded-[inherit] bg-gradient-to-r from-gitdate/50 via-[#9c40ff]/50 to-gitdate/50 bg-[length:300%_100%] p-[1px]'
-              )}
-              style={{
-                WebkitMask:
-                  'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                WebkitMaskComposite: 'destination-out',
-                mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                maskComposite: 'subtract',
-                WebkitClipPath: 'padding-box',
-              }}
-            />
-            <motion.div
-              className="px-2"
-              animate={{
-                rotate: 360,
-              }}
-              transition={{
-                duration: 8,
-                repeat: Infinity,
-                ease: 'linear',
-              }}>
-              <Settings className="size-6 text-pink-400/80" />
-            </motion.div>
-
-            <AnimatedGradientText className="text-sm font-medium">
-              Introducing GitDates
-            </AnimatedGradientText>
-          </div>
+          
           <motion.h1
             className="relative mb-8 pt-5 font-riffic text-6xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}>
-            <span className="bg-gitdate bg-clip-text text-transparent">
-              git
+            <span className="bg-gradient-to-l from-teal-500 to-white bg-clip-text text-transparent">
+             Git
             </span>
-            <span className="bg-gradient-to-r from-purple-600 to-white bg-clip-text text-transparent">
+            <span className="bg-gradient-to-br from-amber-200 to-white bg-clip-text text-transparent">
               Connected
             </span>
             <div

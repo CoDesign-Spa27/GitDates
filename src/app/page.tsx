@@ -29,7 +29,7 @@ export default function Home() {
             }}>
             <Image
               src={
-                'https://gitdate-files.blr1.cdn.digitaloceanspaces.com/bg-images/hero-intro.svg'
+                '/hero-dash.png'
               }
               alt="hero-intro"
               width={1200}
